@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.settings;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
+import butterknife.BindView;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -36,28 +39,32 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 
 public class SettingsFragment extends Fragment implements FragmentLayerListener {
 
-//    @BindView(R.id.fl_container)
+    @BindView(R.id.fl_container)
     View flContainer;
 
-//    @BindView(R.id.tv_display)
+    @BindView(R.id.tv_display)
     TextView tvDisplay;
 
-//    @BindView(R.id.tv_player)
+    @BindView(R.id.tv_player)
     TextView tvPlayer;
 
-//    @BindView(R.id.tv_theme_name)
+    @BindView(R.id.tv_theme_name)
     TextView tvTheme;
 
-//    @BindView(R.id.tv_headset)
+    @BindView(R.id.tv_headset)
     TextView tvHeadset;
 
     private FragmentNavigation navigation;
+
+    long start;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        start = System.currentTimeMillis();
+
         Context context = requireContext();
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
@@ -115,16 +122,18 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         tvTheme = textView;
         linearLayout.addView(textView);
 
-//        textView.setSty
-
         return frameLayout;
-//        return inflater.inflate(R.layout.fragment_settings, container, false);
+
+//        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+//        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 //        ButterKnife.bind(this, view);
+
+        Log.d("KEK3", "view created for: " + (System.currentTimeMillis() - start) + "ms");
 
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
