@@ -271,4 +271,78 @@ public class FileStructMergerTest {
 
         assertTrue(outRemoteFileToDownload.contains("2"));
     }
+
+    @Test
+    public void testReplaceRemoteByLocalItem() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "12");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+
+        Set<Integer> localExistingFiles = new HashSet<>();
+        localExistingFiles.add(1);
+
+        Set<Integer> remoteExistingFiles = new HashSet<>();
+        remoteExistingFiles.add(1);
+
+        List<String> outRemoteFileToDownload = new ArrayList<>();
+
+        Map<Integer, String> mergedItemsMap = new HashMap<>();
+
+        FileStructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                emptySet(),
+                emptySet(),
+                localExistingFiles,
+                remoteExistingFiles,
+                (local, remote) -> false,
+                String::valueOf,
+                item -> {},
+                item -> {},
+                item -> {},
+                outRemoteFileToDownload::add,
+                mergedItemsMap::put,
+                mergedItemsMap::put);
+
+        assertEquals(1, mergedItemsMap.size());
+        assertEquals("12", mergedItemsMap.get(1));
+    }
+
+    @Test
+    public void testReplaceLocalByRemoteItem() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "12");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+
+        Set<Integer> localExistingFiles = new HashSet<>();
+        localExistingFiles.add(1);
+
+        Set<Integer> remoteExistingFiles = new HashSet<>();
+        remoteExistingFiles.add(1);
+
+        List<String> outRemoteFileToDownload = new ArrayList<>();
+
+        Map<Integer, String> mergedItemsMap = new HashMap<>();
+
+        FileStructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                emptySet(),
+                emptySet(),
+                localExistingFiles,
+                remoteExistingFiles,
+                (local, remote) -> true,
+                String::valueOf,
+                item -> {},
+                item -> {},
+                item -> {},
+                outRemoteFileToDownload::add,
+                mergedItemsMap::put,
+                mergedItemsMap::put);
+
+        assertEquals(1, mergedItemsMap.size());
+        assertEquals("1", mergedItemsMap.get(1));
+    }
 }

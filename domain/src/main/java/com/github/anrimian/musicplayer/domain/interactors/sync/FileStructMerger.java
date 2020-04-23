@@ -12,7 +12,8 @@ import java.util.Set;
 
 public class FileStructMerger {
 
-    //move(or modify?) change
+    //modify change(+ upload/download modified files)
+    //move change(+ move command list)
     public static <K, T> void mergeFilesMap(
             Map<K, T> localItems,
             Map<K, T> remoteItems,
@@ -32,6 +33,7 @@ public class FileStructMerger {
         for (Map.Entry<K, T> entry: localItems.entrySet()) {
             K key = entry.getKey();
             T localItem = entry.getValue();
+
             if (remoteRemovedItems.contains(key)) {
 
                 //delete priority?
@@ -78,7 +80,7 @@ public class FileStructMerger {
                     && !remoteRemovedItems.contains(remoteExistingFileKey)) {
                 T item = itemDataCreator.map(remoteExistingFileKey);
                 onLocalItemAdded.call(remoteExistingFileKey, item);
-                onLocalItemAdded.call(remoteExistingFileKey, item);
+                omRemoteItemAdded.call(remoteExistingFileKey, item);
                 outRemoteFileToDownload.call(item);
             }
         }
