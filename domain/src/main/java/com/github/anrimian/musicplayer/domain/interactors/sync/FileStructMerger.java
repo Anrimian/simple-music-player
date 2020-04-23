@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiFunction;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
+import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
 
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,6 @@ import java.util.Set;
 
 public class FileStructMerger {
 
-    //modify change(+ upload/download modified files)
     //move change(+ move command list)
     public static <K, T> void mergeFilesMap(
             Map<K, T> localItems,
@@ -21,54 +21,87 @@ public class FileStructMerger {
             Set<K> remoteRemovedItems,
             Set<K> localExistingFiles,
             Set<K> remoteExistingFiles,
+            BiFunction<T, T, Boolean> changeInspector,//we really need it?
             BiFunction<T, T, Boolean> itemPriorityFunction,
             Mapper<K, T> itemDataCreator,
-            Callback<T> outLocalFilesToDelete,
-            Callback<T> outRemoteFilesToDelete,
-            Callback<T> outLocalFilesToUpload,
+            Callback<T> outLocalFileToDelete,
+            Callback<T> outRemoteFileToDelete,
+            Callback<T> outLocalFileToUpload,
             Callback<T> outRemoteFileToDownload,
             BiCallback<K, T> onLocalItemAdded,
-            BiCallback<K, T> omRemoteItemAdded) {
+            BiCallback<K, T> onLocalItemRemoved,
+            TripleCallback<K, T, T> onLocalItemChanged,
+            BiCallback<K, T> onRemoteItemAdded,
+            BiCallback<K, T> omRemoteItemRemoved,
+            TripleCallback<K, T, T> onRemoteItemChanged) {
 
         for (Map.Entry<K, T> entry: localItems.entrySet()) {
-            K key = entry.getKey();
+            K localKey = entry.getKey();
             T localItem = entry.getValue();
+            T remoteItem = remoteItems.get(localKey);
 
-            if (remoteRemovedItems.contains(key)) {
+            //delete local
+            if (remoteRemovedItems.contains(localKey)) {
+                onLocalItemRemoved.call(localKey, localItem);
+                outLocalFileToDelete.call(localItem);
+                continue;
+            }
 
-                //delete priority?
-                outLocalFilesToDelete.call(localItem);
-            } else  {
-                onLocalItemAdded.call(key, localItem);
+            if (remoteItem == null) {
+                //remote not exists
 
-                if (!remoteItems.containsKey(key)) {
-                    outLocalFilesToUpload.call(localItem);
-                } else if (!localExistingFiles.contains(key)) {
+                //upload to remote
+                onRemoteItemAdded.call(localKey, localItem);
+                outLocalFileToUpload.call(localItem);
+            } else {
+                //remote exists
+
+                //process change
+                if (!itemPriorityFunction.call(localItem, remoteItem)
+                        && changeInspector.call(localItem, remoteItem)) {
+                    //change local file
+                    onLocalItemChanged.call(localKey, localItem, remoteItem);
+                    outRemoteFileToDownload.call(remoteItem);
+                }
+
+                //local file not exists, download
+                if (!localExistingFiles.contains(localKey)) {
                     outRemoteFileToDownload.call(localItem);
                 }
             }
         }
 
         for (Map.Entry<K, T> entry : remoteItems.entrySet()) {
-            K key = entry.getKey();
+            K remoteKey = entry.getKey();
             T remoteItem = entry.getValue();
+            T localItem = localItems.get(remoteKey);
 
-            T localItem = localItems.get(key);
-            if (localItem == null) {
-                if (localRemovedItems.contains(key)) {
-                    //delete priority?
-                    outRemoteFilesToDelete.call(remoteItem);
-                    continue;
-                } else {
-                    outRemoteFileToDownload.call(remoteItem);
-                }
-            } else if (!remoteExistingFiles.contains(key)) {
-                outLocalFilesToUpload.call(remoteItem);
+            //delete remote
+            if (localRemovedItems.contains(remoteKey)) {
+                omRemoteItemRemoved.call(remoteKey, remoteItem);
+                outRemoteFileToDelete.call(remoteItem);
+                continue;
             }
 
-            //item priority fun -> return true if we need to replace local item
-            if (localItem == null || itemPriorityFunction.call(localItem, remoteItem)) {
-                omRemoteItemAdded.call(key, remoteItem);
+            if (localItem == null) {
+                //process changes?
+                onLocalItemAdded.call(remoteKey, remoteItem);
+                outRemoteFileToDownload.call(remoteItem);
+            } else {
+                //local exists
+
+                //process change
+                if (itemPriorityFunction.call(localItem, remoteItem) &&
+                        changeInspector.call(localItem, remoteItem)) {
+                    //change remote file
+                    onRemoteItemChanged.call(remoteKey, remoteItem, localItem);
+                    outLocalFileToUpload.call(localItem);
+                }
+
+                //remote file not exists, upload
+                if (!remoteExistingFiles.contains(remoteKey)) {
+                    outLocalFileToUpload.call(remoteItem);
+                }
             }
         }
 
@@ -80,7 +113,7 @@ public class FileStructMerger {
                     && !remoteRemovedItems.contains(remoteExistingFileKey)) {
                 T item = itemDataCreator.map(remoteExistingFileKey);
                 onLocalItemAdded.call(remoteExistingFileKey, item);
-                omRemoteItemAdded.call(remoteExistingFileKey, item);
+                onRemoteItemAdded.call(remoteExistingFileKey, item);
                 outRemoteFileToDownload.call(item);
             }
         }

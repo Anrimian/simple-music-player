@@ -29,28 +29,33 @@ public class FileStructMergerTest {
         List<String> outLocalFilesToUpload = new ArrayList<>();
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
                 emptySet(),
                 emptySet(),
                 Collections.emptySet(),
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 item -> {},
                 outLocalFilesToUpload::add,
                 outRemoteFileToDownload::add,
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(4, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
-        assertEquals("3", mergedItemsMap.get(3));
-        assertEquals("4", mergedItemsMap.get(4));
+        assertEquals(4, localItems.size());
+        assertEquals("3", localItems.get(3));
+        assertEquals("4", localItems.get(4));
+
+        assertEquals(4, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
 
         assertTrue(outLocalFilesToUpload.contains("1"));
         assertTrue(outLocalFilesToUpload.contains("2"));
@@ -77,27 +82,30 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFilesToDelete = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 localRemovedItems,
                 emptySet(),
                 emptySet(),
                 Collections.emptySet(),
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 outRemoteFilesToDelete::add,
                 item -> {},
                 item -> {},
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> remoteItems.remove(key),
+                (key, oldItem, item) -> {});
 
-        assertEquals(3, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
-        assertEquals("3", mergedItemsMap.get(3));
+        assertEquals(3, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
+        assertEquals("3", remoteItems.get(3));
 
         assertTrue(outRemoteFilesToDelete.contains("4"));
     }
@@ -120,27 +128,30 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToDelete = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
                 remoteRemovedItems,
                 emptySet(),
                 Collections.emptySet(),
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 outLocalFilesToDelete::add,
                 item -> {},
                 item -> {},
                 item -> {},
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> localItems.remove(key),
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(3, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
-        assertEquals("3", mergedItemsMap.get(3));
+        assertEquals(3, localItems.size());
+        assertEquals("1", localItems.get(1));
+        assertEquals("2", localItems.get(2));
+        assertEquals("3", localItems.get(3));
 
         assertTrue(outLocalFilesToDelete.contains("4"));
     }
@@ -162,27 +173,30 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToUpload = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
                 emptySet(),
                 emptySet(),
                 remoteExistingFiles,
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 item -> {},
                 outLocalFilesToUpload::add,
                 item -> {},
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(3, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
-        assertEquals("3", mergedItemsMap.get(3));
+        assertEquals(3, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
+        assertEquals("3", remoteItems.get(3));
 
         assertTrue(outLocalFilesToUpload.contains("2"));
         assertTrue(outLocalFilesToUpload.contains("3"));
@@ -205,27 +219,35 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
                 emptySet(),
                 localExistingFiles,
                 emptySet(),
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 item -> {},
                 item -> {},
                 outRemoteFileToDownload::add,
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(3, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
-        assertEquals("3", mergedItemsMap.get(3));
+        assertEquals(3, localItems.size());
+        assertEquals("1", localItems.get(1));
+        assertEquals("2", localItems.get(2));
+        assertEquals("3", localItems.get(3));
+
+        assertEquals(3, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
+        assertEquals("3", remoteItems.get(3));
 
         assertTrue(outRemoteFileToDownload.contains("2"));
         assertTrue(outRemoteFileToDownload.contains("3"));
@@ -248,26 +270,33 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
                 emptySet(),
                 localExistingFiles,
                 remoteExistingFiles,
-                (local, remote) -> true,
+                (local, remote) -> false,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 item -> {},
                 item -> {},
                 outRemoteFileToDownload::add,
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(2, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
-        assertEquals("2", mergedItemsMap.get(2));
+        assertEquals(2, localItems.size());
+        assertEquals("1", localItems.get(1));
+        assertEquals("2", localItems.get(2));
+
+        assertEquals(2, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
 
         assertTrue(outRemoteFileToDownload.contains("2"));
     }
@@ -286,9 +315,7 @@ public class FileStructMergerTest {
         Set<Integer> remoteExistingFiles = new HashSet<>();
         remoteExistingFiles.add(1);
 
-        List<String> outRemoteFileToDownload = new ArrayList<>();
-
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
+        List<String> outLocalFilesToUpload = new ArrayList<>();
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
@@ -296,26 +323,36 @@ public class FileStructMergerTest {
                 emptySet(),
                 localExistingFiles,
                 remoteExistingFiles,
-                (local, remote) -> false,
+                (local, remote) -> true,
+                (local, remote) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
+                outLocalFilesToUpload::add,
                 item -> {},
-                outRemoteFileToDownload::add,
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> remoteItems.put(key, item));
 
-        assertEquals(1, mergedItemsMap.size());
-        assertEquals("12", mergedItemsMap.get(1));
+        assertEquals(1, remoteItems.size());
+        assertEquals("12", remoteItems.get(1));
+
+        assertEquals(1, localItems.size());
+        assertEquals("12", localItems.get(1));
+
+        assert outLocalFilesToUpload.contains("12");
     }
 
     @Test
     public void testReplaceLocalByRemoteItem() {
         Map<Integer, String> localItems = new HashMap<>();
-        localItems.put(1, "12");
+        localItems.put(1, "1");
 
         Map<Integer, String> remoteItems = new HashMap<>();
-        remoteItems.put(1, "1");
+        remoteItems.put(1, "12");
 
         Set<Integer> localExistingFiles = new HashSet<>();
         localExistingFiles.add(1);
@@ -325,8 +362,6 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        Map<Integer, String> mergedItemsMap = new HashMap<>();
-
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptySet(),
@@ -334,15 +369,25 @@ public class FileStructMergerTest {
                 localExistingFiles,
                 remoteExistingFiles,
                 (local, remote) -> true,
+                (local, remote) -> false,
                 String::valueOf,
                 item -> {},
                 item -> {},
                 item -> {},
                 outRemoteFileToDownload::add,
-                mergedItemsMap::put,
-                mergedItemsMap::put);
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> localItems.put(key, item),
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
 
-        assertEquals(1, mergedItemsMap.size());
-        assertEquals("1", mergedItemsMap.get(1));
+        assertEquals(1, remoteItems.size());
+        assertEquals("12", remoteItems.get(1));
+
+        assertEquals(1, localItems.size());
+        assertEquals("12", localItems.get(1));
+
+        assert outRemoteFileToDownload.contains("12");
     }
 }
