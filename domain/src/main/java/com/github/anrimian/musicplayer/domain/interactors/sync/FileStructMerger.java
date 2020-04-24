@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class FileStructMerger {
 
-    //move change(+ move command list)
+    //move change(+ move command list) - not here, it covers with change case
     public static <K, T> void mergeFilesMap(
             Map<K, T> localItems,
             Map<K, T> remoteItems,
