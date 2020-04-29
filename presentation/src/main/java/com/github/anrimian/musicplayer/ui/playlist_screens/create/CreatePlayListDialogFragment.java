@@ -119,7 +119,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         if (onCompleteListener != null) {
             onCompleteListener.onComplete(playList);
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     public void setOnCompleteListener(@Nullable OnCompleteListener<PlayList> onCompleteListener) {

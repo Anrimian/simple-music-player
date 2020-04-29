@@ -55,11 +55,9 @@ public class StoragePlayListProviderTest {
         for(int i = 0, size = map.size(); i < size; i++) {
             StoragePlayList playList = map.valueAt(i);
             if (playList.getName().equals("test playlist10")) {
-                storagePlayListsProvider.deletePlayList(playList.getId());
+                storagePlayListsProvider.deletePlayList(playList.getStorageId());
             }
         }
-
-        playListsObserver.assertValueCount(1);
     }
 
     @Test
@@ -72,19 +70,19 @@ public class StoragePlayListProviderTest {
         StoragePlayList playList = getPlayList("test playlist6");
         try {
             storagePlayListsProvider.addCompositionToPlayList(item.getAudioId(),
-                    playList.getId(),
+                    playList.getStorageId(),
                     0);
 
-            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
             assertEquals(1, items.size());
             assertEquals(item.getAudioId(), items.get(0).getAudioId());
 
-            storagePlayListsProvider.deleteItemFromPlayList(items.get(0).getItemId(), playList.getId());
+            storagePlayListsProvider.deleteItemFromPlayList(items.get(0).getItemId(), playList.getStorageId());
 
-            List<StoragePlayListItem> deletedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> deletedItems = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
             assertEquals(0, deletedItems.size());
         } finally {
-            storagePlayListsProvider.deletePlayList(playList.getId());
+            storagePlayListsProvider.deletePlayList(playList.getStorageId());
         }
     }
 
@@ -100,30 +98,30 @@ public class StoragePlayListProviderTest {
 
         try {
             storagePlayListsProvider.addCompositionToPlayList(compositionOne.getAudioId(),
-                    playList.getId(),
+                    playList.getStorageId(),
                     0);
 
             storagePlayListsProvider.addCompositionToPlayList(compositionTwo.getAudioId(),
-                    playList.getId(),
+                    playList.getStorageId(),
                     1);
 
             storagePlayListsProvider.addCompositionToPlayList(compositionThree.getAudioId(),
-                    playList.getId(),
+                    playList.getStorageId(),
                     2);
 
-            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
             assertEquals(compositionOne.getAudioId(), items.get(0).getAudioId());
             assertEquals(compositionTwo.getAudioId(), items.get(1).getAudioId());
             assertEquals(compositionThree.getAudioId(), items.get(2).getAudioId());
 
-            storagePlayListsProvider.moveItemInPlayList(playList.getId(), 2, 0);
+            storagePlayListsProvider.moveItemInPlayList(playList.getStorageId(), 2, 0);
 
-            List<StoragePlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> movedItems = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
             assertEquals(compositionThree.getAudioId(), movedItems.get(0).getAudioId());
             assertEquals(compositionOne.getAudioId(), movedItems.get(1).getAudioId());
             assertEquals(compositionTwo.getAudioId(), movedItems.get(2).getAudioId());
         } finally {
-            storagePlayListsProvider.deletePlayList(playList.getId());
+            storagePlayListsProvider.deletePlayList(playList.getStorageId());
         }
     }
 
@@ -135,10 +133,10 @@ public class StoragePlayListProviderTest {
 
         StoragePlayList playList = getPlayList(oldName);
         try {
-            storagePlayListsProvider.updatePlayListName(playList.getId(), newName);
+            storagePlayListsProvider.updatePlayListName(playList.getStorageId(), newName);
             assertEquals(newName, getPlayList(newName).getName());
         } finally {
-            storagePlayListsProvider.deletePlayList(playList.getId());
+            storagePlayListsProvider.deletePlayList(playList.getStorageId());
         }
     }
 
@@ -157,7 +155,7 @@ public class StoragePlayListProviderTest {
         LongSparseArray<StoragePlayList> map = storagePlayListsProvider.getPlayLists();
         for(int i = 0, size = map.size(); i < size; i++) {
             StoragePlayList playList = map.valueAt(i);
-            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getId());
+            List<StoragePlayListItem> items = storagePlayListsProvider.getPlayListItems(playList.getStorageId());
 
             if (index < items.size()) {
                 return items.get(index);

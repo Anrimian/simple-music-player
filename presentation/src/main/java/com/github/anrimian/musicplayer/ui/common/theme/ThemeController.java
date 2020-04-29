@@ -84,7 +84,7 @@ public class ThemeController {
     }
 
     public boolean isAutoDarkThemeEnabled() {
-        return preferences.getBoolean(AUTO_DARK_THEME, false);//set to true when all users'll updated
+        return preferences.getBoolean(AUTO_DARK_THEME, true);
     }
 
     private void processThemeChange(Activity activity, AppTheme appTheme) {

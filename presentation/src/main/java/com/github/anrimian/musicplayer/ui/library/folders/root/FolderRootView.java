@@ -14,7 +14,7 @@ public interface FolderRootView extends MvpView {
     String LOADING_STATE = "loading_state";
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showFolderScreens(List<String> paths);
+    void showFolderScreens(List<Long> ids);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LOADING_STATE)
     void showProgress();

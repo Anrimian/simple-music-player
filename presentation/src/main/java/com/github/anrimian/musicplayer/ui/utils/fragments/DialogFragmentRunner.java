@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.utils.fragments;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 public class DialogFragmentRunner<T extends DialogFragment> {
 

@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.wrappers;
 
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import java.util.LinkedList;
 

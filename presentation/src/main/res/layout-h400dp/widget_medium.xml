@@ -11,7 +11,7 @@
     <ImageView
         android:id="@+id/iv_cover"
         style="@style/ImageStyle"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:layout_marginStart="@dimen/widget_medium_content_margin_horizontal"
         android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
         android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"

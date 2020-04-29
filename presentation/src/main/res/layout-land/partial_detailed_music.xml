@@ -131,7 +131,7 @@
 
     <SeekBar
         android:id="@+id/sb_track_state"
-        style="?android:attr/progressBarStyleHorizontal"
+        style="@style/SeekBarStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="1.5dp"

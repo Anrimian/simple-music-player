@@ -21,6 +21,8 @@
         <item name="secondaryButtonColor">@color/secondary_button_color</item>
         <item name="brightButtonColor">@color/colorAccent</item>
         <item name="buttonColorInverse">@color/icon_color</item>
+        <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
+        <item name="colorControlThird">@color/color_control_third</item>
 
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
@@ -28,6 +30,7 @@
         <item name="toolbarTextColorPrimary">@color/text_color_primary_dark</item>
         <item name="toolbarTextColorSecondary">@color/text_color_secondary_dark</item>
         <item name="dialogTitleColor">@color/text_color_primary</item>
+        <item name="textColorDisabled">@color/text_color_disabled</item>
         <item name="colorError">@color/colorError</item>
         <item name="dialogButtonColor">?attr/colorAccent</item>
 
@@ -40,10 +43,10 @@
 
         <!--background-->
         <item name="listBackground">@color/light_light_gray</item>
-        <item name="listItemBackground">@android:color/white</item>
+        <item name="listItemBottomBackground">@color/list_item_bottom_background_light</item>
+        <item name="listItemBackground">@color/light_background_level_1</item>
         <item name="playerPanelBackground">?attr/listItemBackground</item>
-        <item name="android:itemBackground">@drawable/bg_menu_item</item>
-        <item name="menuItemBackground">@android:color/white</item>
+        <item name="popupMenuBackgroundColor">@color/popup_menu_background_color</item>
         <item name="dialogBackground">@android:color/white</item>
         <item name="subToolbarBackground">?attr/listItemBackground</item>
         <item name="snackbarBackground">@color/snackbar_color</item>
@@ -57,12 +60,17 @@
         <item name="android:listDivider">@drawable/divider</item>
     </style>
 
-    <style name="AppTheme.VersionSpecific" parent="AppTheme">
+    <style name="AppTheme.NightModeSpecific" parent="AppTheme">
+
+    </style>
+
+    <style name="AppTheme.VersionSpecific" parent="AppTheme.NightModeSpecific">
 
     </style>
 
     <style name="NavigationViewStyle">
         <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
+        <item name="android:windowBackground">?attr/listItemBackground</item>
     </style>
 
     <style name="SlidrActivityTheme">
@@ -72,8 +80,6 @@
 
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
-        <item name="android:activityOpenExitAnimation">@anim/anim_slide_out_right</item>
-        <item name="android:activityCloseEnterAnimation">@anim/anim_slide_in_right</item>
         <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>
     </style>
 

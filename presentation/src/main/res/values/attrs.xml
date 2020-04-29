@@ -12,8 +12,9 @@
     <!--background-->
     <attr name="listBackground" format="color"/>
     <attr name="listItemBackground" format="color"/>
+    <attr name="listItemBottomBackground" format="color"/>
     <attr name="playerPanelBackground" format="color"/>
-    <attr name="menuItemBackground" format="color"/>
+    <attr name="popupMenuBackgroundColor" format="color"/>
     <attr name="subToolbarBackground" format="color"/>
     <attr name="dialogBackground" format="color"/>
 
@@ -21,16 +22,19 @@
 
     <attr name="disabledColor" format="color"/>
 
-    <!--buttons-->
+    <!--controls-->
     <attr name="buttonColor" format="color"/>
     <attr name="secondaryButtonColor" format="color"/>
     <attr name="brightButtonColor" format="color"/>
     <attr name="buttonColorInverse" format="color"/>
+    <attr name="colorControlHighlightInverse" format="color"/>
+    <attr name="colorControlThird" format="color"/>
 
     <!--text-->
     <attr name="dialogTitleColor" format="color"/>
     <attr name="dialogButtonColor" format="color"/>
     <attr name="colorError" format="color"/>
+    <attr name="textColorDisabled" format="color"/>
     <attr name="toolbarTextColorPrimary" format="color"/>
     <attr name="toolbarTextColorSecondary" format="color"/>
 

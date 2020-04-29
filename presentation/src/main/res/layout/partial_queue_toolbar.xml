@@ -22,7 +22,6 @@
     <TextView
         android:id="@+id/tv_queue_subtitle"
         style="@style/ToolbarSubtitleStyle"
-        android:textColor="?android:attr/textColorSecondaryInverse"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tv_queue_title"

@@ -129,7 +129,7 @@ public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
 
     @Override
     public void closeScreen() {
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private void onCompleteButtonClicked() {

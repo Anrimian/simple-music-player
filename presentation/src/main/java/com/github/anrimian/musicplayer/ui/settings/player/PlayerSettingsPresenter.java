@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings.player;
 
-import com.github.anrimian.musicplayer.domain.business.settings.PlayerSettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
 
 import moxy.InjectViewState;
 import moxy.MvpPresenter;

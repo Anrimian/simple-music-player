@@ -1,11 +1,11 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.utils.model.Item;
@@ -208,13 +208,13 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void addCompositionsToPlayNext(List<Composition> compositions) {
         playerInteractor.addCompositionsToPlayNext(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
     }
 
     private void addCompositionsToEnd(List<Composition> compositions) {
         playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
     }
 
     private void onDefaultError(Throwable throwable) {
@@ -324,7 +324,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     }
 
     private void subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.getCurrentCompositionObservable()
+        currentItemDisposable = playerInteractor.getCurrentQueueItemObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError);
         presenterBatterySafeDisposable.add(currentItemDisposable);

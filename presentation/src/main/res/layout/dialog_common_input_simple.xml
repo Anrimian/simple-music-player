@@ -4,14 +4,18 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/edit_text"
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/content_margin"
+        android:layout_marginTop="@dimen/content_margin"
+        android:layout_marginBottom="@dimen/content_margin"
+        android:layout_marginEnd="@dimen/content_margin"
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
         android:inputType="textMultiLine"
         android:importantForAutofill="no"
+        android:textAlignment="viewStart"
         tools:text="dddddddddddddddddddddddddddddddddddddddddddddddddddddd"
         tools:targetApi="o"
         tools:ignore="LabelFor" />

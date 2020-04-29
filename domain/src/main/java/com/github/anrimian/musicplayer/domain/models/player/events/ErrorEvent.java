@@ -37,4 +37,12 @@ public class ErrorEvent implements PlayerEvent {
     public Composition getComposition() {
         return composition;
     }
+
+    @Override
+    public String toString() {
+        return "ErrorEvent{" +
+                "errorType=" + errorType +
+                ", composition=" + composition +
+                '}';
+    }
 }

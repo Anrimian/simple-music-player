@@ -1,35 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:id="@+id/fl_container"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="?android:attr/colorBackground">
 
-        <TextView
-            android:id="@+id/tv_about"
-            style="@style/TextStyle.Medium"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/content_horizontal_margin"
-            android:layout_marginEnd="@dimen/content_horizontal_margin"
-            android:layout_marginTop="@dimen/content_vertical_margin"
-            android:text="@string/about_app_text"/>
+            android:orientation="vertical">
 
-        <!--<View-->
+            <TextView
+                android:id="@+id/tv_log_info"
+                style="@style/TextStyle.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:text="@string/log_info_text"/>
+
+        <LinearLayout
+            android:id="@+id/log_actions_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="end"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btn_delete"
+                style="@style/ButtonBrightStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_file"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+
+            <Button
+                android:id="@+id/btn_view"
+                style="@style/ButtonBrightStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_file"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+
+            <Button
+                android:id="@+id/btn_send"
+                style="@style/ButtonBrightStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send_file"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/log_divider"
+            style="@style/Divider.Horizontal"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"/>
+
+            <TextView
+                android:id="@+id/tv_about"
+                style="@style/TextStyle.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                tools:text="@string/about_app_text"/>
+
+            <!--<View-->
             <!--style="@style/Divider.Horizontal"-->
             <!--android:layout_marginStart="@dimen/toolbar_content_start"/>-->
 
-        <!--<TextView-->
+            <!--<TextView-->
             <!--android:id="@+id/tv_player"-->
             <!--style="@style/Content.Text.Button"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:text="@string/playing"/>-->
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 </FrameLayout>

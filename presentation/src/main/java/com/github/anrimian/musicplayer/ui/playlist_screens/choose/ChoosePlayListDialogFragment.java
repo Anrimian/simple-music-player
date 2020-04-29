@@ -21,13 +21,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
@@ -51,6 +54,7 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 import static android.view.View.INVISIBLE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.STATUS_BAR_COLOR_ATTR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PLAY_LIST_MENU;
 import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
@@ -90,13 +94,26 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @Nullable
     private OnCompleteListener<PlayList> onCompleteListener;
 
+    @Nullable
+    private BiCallback<PlayList, Bundle> complexCompleteListener;
+
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
     private SlideDelegate slideDelegate;
 
     public static ChoosePlayListDialogFragment newInstance(@AttrRes int statusBarColorAttr) {
+        return newInstance(statusBarColorAttr, null);
+    }
+
+    public static ChoosePlayListDialogFragment newInstance(Bundle extra) {
+        return newInstance(0, extra);
+    }
+
+    public static ChoosePlayListDialogFragment newInstance(@AttrRes int statusBarColorAttr,
+                                                           Bundle extra) {
         Bundle args = new Bundle();
         args.putInt(STATUS_BAR_COLOR_ATTR_ARG, statusBarColorAttr);
+        args.putBundle(EXTRA_DATA_ARG, extra);
         ChoosePlayListDialogFragment fragment = new ChoosePlayListDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -122,9 +139,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
 
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) view.getParent());
-        bottomSheetBehavior.setPeekHeight(minHeight);
-
         ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
@@ -142,9 +156,11 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         attachDynamicShadow(recyclerView, titleShadow);
 
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
+        BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
+        bottomSheetBehavior.setPeekHeight(minHeight);
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(newState -> {
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                dismiss();
+                dismissAllowingStateLoss();
             }
         }, presenter::onBottomSheetSlided));
 
@@ -159,6 +175,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         if (fragment != null) {
             fragment.setOnCompleteListener(this::onPlayListMenuItemSelected);
         }
+
+        AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground);
     }
 
     @Override
@@ -265,11 +283,18 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         this.onCompleteListener = onCompleteListener;
     }
 
+    public void setComplexCompleteListener(@Nullable BiCallback<PlayList, Bundle> complexCompleteListener) {
+        this.complexCompleteListener = complexCompleteListener;
+    }
+
     private void onPlayListSelected(PlayList playList) {
         if (onCompleteListener != null) {
             onCompleteListener.onComplete(playList);
         }
-        dismiss();
+        if (complexCompleteListener != null) {
+            complexCompleteListener.call(playList, requireArguments().getBundle(EXTRA_DATA_ARG));
+        }
+        dismissAllowingStateLoss();
     }
 
     private void onCreatePlayListButtonClicked() {

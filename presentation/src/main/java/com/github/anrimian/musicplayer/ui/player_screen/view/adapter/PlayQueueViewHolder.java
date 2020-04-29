@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
@@ -73,8 +73,8 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showAsCurrentComposition(show);
     }
 
-    void showAsPlaying(boolean playing) {
-        compositionItemWrapper.showAsPlaying(playing);
+    void showAsPlaying(boolean playing, boolean animate) {
+        compositionItemWrapper.showAsPlaying(playing, animate);
     }
 
     PlayQueueItem getPlayQueueItem() {

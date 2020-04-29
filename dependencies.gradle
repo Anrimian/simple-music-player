@@ -4,45 +4,51 @@ allprojects {
         maven {
             url "https://maven.google.com"
         }
+        maven { url 'https://jitpack.io' }
     }
 }
 
 ext {
     //Android
     androidBuildToolsVersion = "29.0.2"
-    androidMinSdkVersion = 21//16
+    androidMinSdkVersion = 21
     androidTargetSdkVersion = 29
     androidCompileSdkVersion = 29
 
     //support libraries
-    androidXVersion = "1.1.0-alpha02"
-    googleMaterialVersion = "1.1.0-alpha01"
+    androidXVersion = "1.1.0"
+    googleMaterialVersion = "1.1.0"
     cardViewVersion = "1.0.0"
-    recyclerViewVersion = "1.0.0"
-    mediaCompatVersion = "1.0.0"
-    paletteVersion = "1.0.0"
+    recyclerViewVersion = "1.1.0"
+    recyclerViewFastScrollVersion = "1.1.1"
+    mediaCompatVersion = "1.1.0"
 
-    constraintLayoutVersion = "2.0.0-alpha2"
-    rxJavaVersion = "2.2.11"
-    rxAndroidVersion = "2.0.1"
-    rxPermissionsVersion = "0.9.4"
-    acraVersion = "4.9.0"
-    moxyVersion = "2.0.2"
-    butterKnifeVersion = "10.1.0"
-    daggerVersion = "2.24"
-    exoPlayerVersion = "2.9.6"
-    roomVersion = "2.1.0-rc01"
+    constraintLayoutVersion = "2.0.0-beta4"
+    rxJavaVersion = "2.2.19"
+    rxAndroidVersion = "2.1.1"
+    rxPermissionsVersion = "0.10.2"
+    rxJavaExtVersion = "0.20.10"
+    moxyVersion = "2.1.2"
+    butterKnifeVersion = "10.2.1"
+    daggerVersion = "2.27"
+    slidrVersion = "2.1.0"
+    exoPlayerVersion = "2.11.3"
+    roomVersion = "2.2.5"
     jTaggerVersion = '2.0.3'
-    circleImageViewVersion = "2.2.0"
+    circleImageViewVersion = "3.1.0"
+    chipsLayoutManagerVersion = "0.3.7"
+    glideVersion = "4.11.0"
 
     //Testing
-    jUnitVersion = '4.12'
+    jUnitVersion = '4.13'
     espressoVersion = '3.1.0'
     mockitoVersion = '1.9.5'
     dexmakerVersion = '1.2'
+    androidXTestVersion = "1.1.0"
 
     //developing
     javaxAnnotationVersion = "3.0.2"
+    acraReportDialogVersion = "0.0.5"
 }
 
 ext {
@@ -50,24 +56,19 @@ ext {
     material = "com.google.android.material:material:$googleMaterialVersion"
     cardView = "androidx.cardview:cardview:$cardViewVersion"
     recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    recyclerViewFastScroll = "me.zhanghai.android.fastscroll:library:$recyclerViewFastScrollVersion"
     supportMedia = "androidx.media:media:$mediaCompatVersion"
-    palette = "androidx.palette:palette:$paletteVersion"
     constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
-    //unused?
-    recyclerViewAnimation = 'jp.wasabeef:recyclerview-animators:2.3.0'
-
     rxJava = "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:0.20.10"
+    rxJava2Ext = "com.github.akarnokd:rxjava2-extensions:$rxJavaExtVersion"
     rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    rxPermissions = "com.tbruyelle.rxpermissions2:rxpermissions:$rxPermissionsVersion"
+    rxPermissions = "com.github.tbruyelle:rxpermissions:$rxPermissionsVersion"
 
     moxy = "com.github.moxy-community:moxy:$moxyVersion"
     moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
     moxyAppcompat = "com.github.moxy-community:moxy-androidx:$moxyVersion"
     moxyMaterial = "com.github.moxy-community:moxy-material:$moxyVersion"
-
-    acra = "ch.acra:acra:$acraVersion"
 
     room = "androidx.room:room-runtime:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
@@ -78,9 +79,10 @@ ext {
     dagger = "com.google.dagger:dagger:$daggerVersion"
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    slidr = "com.r0adkll:slidableactivity:2.0.6"
+    slidr = "com.r0adkll:slidableactivity:$slidrVersion"
 
     circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
+    chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
 
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
 
@@ -89,8 +91,12 @@ ext {
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
     roomTest = "android.arch.persistence.room:testing:$roomVersion"
 
+    glide = "com.github.bumptech.glide:glide:$glideVersion"
+    glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
+
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"
+    acraReportDialog = "com.github.Anrimian:AcraReportDialog:$acraReportDialogVersion"
 
     //tests
     dexmaker = "com.google.dexmaker:dexmaker:${dexmakerVersion}"
@@ -98,6 +104,6 @@ ext {
     junit = "junit:junit:${jUnitVersion}"
     espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     mockito = "org.mockito:mockito-core:${mockitoVersion}"
-    rules = "androidx.test:rules:1.1.0"
-    supportTest = "androidx.test:runner:1.1.0"
+    rules = "androidx.test:rules:$androidXTestVersion"
+    supportTest = "androidx.test:runner:$androidXTestVersion"
 }

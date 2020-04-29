@@ -19,13 +19,12 @@ import com.github.anrimian.musicplayer.ui.common.layout.LayoutBuilder;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsFragment;
 import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsFragment;
+import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsFragment;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsFragment;
 import com.github.anrimian.musicplayer.ui.settings.themes.ThemeSettingsFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 
@@ -53,6 +52,9 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
 
     @BindView(R.id.tv_headset)
     TextView tvHeadset;
+
+    @BindView(R.id.tv_library)
+    TextView tvLibrary;
 
     private FragmentNavigation navigation;
 
@@ -140,15 +142,12 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         navigation = FragmentNavigation.from(requireFragmentManager());
 
         tvDisplay.setOnClickListener(v -> navigation.addNewFragment(new DisplaySettingsFragment()));
+        tvLibrary.setOnClickListener(v -> navigation.addNewFragment(new LibrarySettingsFragment()));
         tvPlayer.setOnClickListener(v -> navigation.addNewFragment(new PlayerSettingsFragment()));
         tvTheme.setOnClickListener(v -> navigation.addNewFragment(new ThemeSettingsFragment()));
         tvHeadset.setOnClickListener(v -> navigation.addNewFragment(new HeadsetSettingsFragment()));
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(flContainer,
-                slidrConfig,
-                () -> navigation.goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(flContainer, this, toolbar::onStackFragmentSlided);
     }
 
     @Override
@@ -157,5 +156,6 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         toolbar.setTitle(R.string.settings);
         toolbar.setSubtitle(null);
         toolbar.setTitleClickListener(null);
+        toolbar.clearOptionsMenu();
     }
 }

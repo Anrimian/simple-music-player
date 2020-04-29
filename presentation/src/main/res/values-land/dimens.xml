@@ -6,4 +6,7 @@
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.7</item>
     <item name="composition_action_dialog_height" type="dimen" format="float">0.9</item>
 
+    <!--snackbar-->
+    <dimen name="snackbar_padding_vertical">8dp</dimen>
+
 </resources>

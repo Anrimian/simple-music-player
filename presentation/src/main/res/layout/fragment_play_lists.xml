@@ -17,7 +17,23 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="@dimen/list_bottom_padding_with_fab"
+        android:clipToPadding="false"
         tools:listitem="@layout/item_play_list" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:tint="@android:color/white"
+        android:contentDescription="@string/play_all"
+        app:fabSize="normal"
+        app:layout_anchor="@id/recycler_view"
+        app:layout_anchorGravity="bottom|right|end"
+        app:srcCompat="@drawable/ic_plus"
+        app:layout_behavior="@string/fab_behavior"/>
 
     <include layout="@layout/partial_progress_state"/>
 

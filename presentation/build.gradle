@@ -31,7 +31,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         QA {
             initWith release
@@ -62,17 +62,15 @@ dependencies {
     implementation deps.material
     implementation deps.cardView
     implementation deps.recyclerView
+    implementation deps.recyclerViewFastScroll
     implementation deps.constraintLayout
     implementation deps.supportMedia
-    implementation deps.palette
     implementation deps.circleImageView
-
-    implementation deps.recyclerViewAnimation
 
     implementation deps.rxAndroid
     implementation deps.rxPermissions
 
-    implementation deps.acra
+    debugImplementation deps.acraReportDialog
 
     implementation deps.moxy
     implementation deps.moxyAppcompat
@@ -88,7 +86,12 @@ dependencies {
     implementation deps.room
     annotationProcessor deps.roomCompiler
 
+    implementation deps.glide
+    annotationProcessor deps.glideCompiler
+
     implementation deps.slidr
+
+    implementation deps.chipsLayoutManager
 
     compileOnly deps.javaxAnnotation
 

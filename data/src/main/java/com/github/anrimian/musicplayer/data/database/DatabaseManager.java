@@ -20,8 +20,11 @@ public class DatabaseManager {
 
     public AppDatabase getAppDatabase() {
         return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
-                .addMigrations(Migrations.getMigration1_2(context))
-                .fallbackToDestructiveMigration()
+                .addMigrations(Migrations.getMigration1_2(context),
+                        Migrations.MIGRATION_2_3,
+                        Migrations.getMigration3_4(context),
+                        Migrations.MIGRATION_4_5,
+                        Migrations.MIGRATION_5_6)
                 .build();
     }
 }

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/windowBackground">
+    android:background="?attr/listItemBackground">
 
     <TextView
         android:id="@+id/tv_composition_name"
@@ -55,7 +55,6 @@
         android:scaleType="centerCrop"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        android:contentDescription="@string/folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_composition_name"
         tools:srcCompat="@drawable/ic_music_placeholder_simple" />
@@ -71,5 +70,13 @@
         app:layout_constraintTop_toTopOf="@id/iv_music_icon"
         app:layout_constraintBottom_toBottomOf="@id/iv_music_icon"
         tools:srcCompat="@drawable/ic_play"/>
+
+    <FrameLayout
+        android:id="@+id/icon_clickable_area"
+        style="@style/ImageStyle"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_composition_name"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

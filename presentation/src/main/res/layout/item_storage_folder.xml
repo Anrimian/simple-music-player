@@ -63,6 +63,7 @@
         android:id="@+id/btn_actions_menu"
         style="@style/ButtonStyle.Menu"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="@dimen/scrollbar_width"
         android:contentDescription="@string/content_description_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

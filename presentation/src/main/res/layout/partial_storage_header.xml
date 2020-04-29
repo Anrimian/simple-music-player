@@ -37,7 +37,7 @@
         tools:targetApi="lollipop" />
 
     <FrameLayout
-        android:id="@+id/clickable_item"
+        android:id="@+id/header_clickable_item"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:foreground="?selectableItemBackground"

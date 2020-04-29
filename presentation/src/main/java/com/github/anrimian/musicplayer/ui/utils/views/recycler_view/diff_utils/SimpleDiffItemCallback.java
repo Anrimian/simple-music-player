@@ -15,6 +15,10 @@ public class SimpleDiffItemCallback<T> extends DiffUtil.ItemCallback<T> {
     private final ContentCheckFunction<T> contentCheckFunction;
     private final PayloadFunction<T> payloadFunction;
 
+    public SimpleDiffItemCallback() {
+        this(new EqualContentCheckFunction<>());
+    }
+
     public SimpleDiffItemCallback(ContentCheckFunction<T> contentCheckFunction) {
         this(contentCheckFunction, new PayloadDefaultFunction<>());
     }

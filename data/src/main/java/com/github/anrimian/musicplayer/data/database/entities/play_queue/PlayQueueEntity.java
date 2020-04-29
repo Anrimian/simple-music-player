@@ -16,7 +16,9 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
                         onDelete = ForeignKey.CASCADE)
         },
         indices = {
-                @Index({"audioId"})
+                @Index({"audioId"}),
+                @Index(value = "position", unique = true),
+                @Index(value = "shuffledPosition", unique = true)
         }
 )
 public class PlayQueueEntity {

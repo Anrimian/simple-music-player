@@ -14,6 +14,7 @@
     <color name="text_color_primary">#212121</color>
     <color name="text_color_secondary">#757575</color>
     <color name="text_color_primary_inverse">#FFFFFF</color>
+    <color name="text_color_disabled">#61212121</color>
 
     <color name="colorError">#c62828</color>
     <color name="icon_color">#252728</color>
@@ -24,8 +25,19 @@
 
     <color name="light_light_gray">#e9e7e7</color>
 
+    <color name="list_item_bottom_background_light">#A0A0A0</color>
+
     <color name="colorPrimaryDarkSecondary">#f5f5f5</color>
     <color name="selectionStatusBarColor">#848282</color>
+
+    <color name="color_control_highlight_light">#80BDBDBD</color>
+
+    <color name="popup_menu_background_color">#fff</color>
+<!-- leave for future ideas  -->
+<!--    <color name="player_panel_background">#F6F6F6</color>-->
+
+    <color name="light_background_level_1">#fafafa</color>
+    <color name="color_control_third">#CCCCCC</color>
 
     <!--second theme-->
     <color name="secondColorPrimary">#3F51B5</color>
@@ -39,17 +51,20 @@
     <color name="colorAccentDark">#03A9F4</color>
     <color name="darkColorPrimaryVariant">#F57C00</color>
 
+    <color name="dark_background_level_2">#292929</color>
     <color name="dark_background_level_1">#1D1D1D</color>
     <color name="dark_background_level_0">#121212</color>
 
     <color name="text_color_primary_dark">#F3F3F3</color>
     <color name="text_color_secondary_dark">#B1B1B1</color>
+    <color name="text_color_disabled_dark">#61FFFFFF</color>
 
     <color name="primary_button_color_dark">#F1ECEC</color>
     <color name="secondary_button_color_dark">#B1B1B1</color>
     <color name="color_control_highlight_dark">#4DFFFFFF</color>
 
-    <color name="menu_item_background_color_dark">#3D3D3D</color>
+    <color name="dialog_background_color_dark">#3D3D3D</color>
+    <color name="popup_menu_background_color_dark">#474646</color>
 
     <color name="actionModeStatusBarColorDark">#5C5B5B</color>
     <color name="actionModeBackgroundColorDark">#3D3D3D</color>
@@ -58,10 +73,10 @@
 
     <color name="snackbar_color_dark">#ffff</color>
 
-
     <!--other-->
     <color name="startShadowColor">#00000000</color>
     <color name="endShadowColor">#33000000</color>
+    <color name="fakeShadowColor">#33000000</color>
 
     <!--light theme(indigo)-->
     <color name="colorBluePrimary">#3F51B5</color>

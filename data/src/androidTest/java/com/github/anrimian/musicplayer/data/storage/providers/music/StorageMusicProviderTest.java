@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.collection.LongSparseArray;
 import androidx.test.rule.GrantPermissionRule;
 
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,14 +29,15 @@ public class StorageMusicProviderTest {
     @Before
     public void before() {
         Context appContext = getInstrumentation().getTargetContext();
-        storageMusicProvider = new StorageMusicProvider(appContext);
+        StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(appContext);
+        storageMusicProvider = new StorageMusicProvider(appContext, storageAlbumsProvider);
     }
 
     @Test
     public void testRepositoryReturnValues() {
-        LongSparseArray<StorageComposition> map = storageMusicProvider.getCompositions();
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions();
         for(int i = 0, size = map.size(); i < size; i++) {
-            StorageComposition composition = map.valueAt(i);
+            StorageFullComposition composition = map.valueAt(i);
             System.out.println(composition);
             Assert.assertNotNull(composition.getFilePath());
         }

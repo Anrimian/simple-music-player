@@ -4,16 +4,18 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
+import com.github.anrimian.musicplayer.utils.filelog.FileLog;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -44,8 +46,9 @@ public class AppModule {
     @Nonnull
     @Singleton
     NotificationsDisplayer provideNotificationsController(Context context,
-                                                          AppNotificationBuilder notificationBuilder) {
-        return new NotificationsDisplayer(context, notificationBuilder);
+                                                          AppNotificationBuilder notificationBuilder,
+                                                          CoverImageLoader coverImageLoader) {
+        return new NotificationsDisplayer(context, notificationBuilder, coverImageLoader);
     }
 
     @Provides
@@ -65,8 +68,15 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    Analytics analytics() {
-        return new AnalyticsImpl();
+    Analytics analytics(FileLog fileLog) {
+        return new AnalyticsImpl(fileLog);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    FileLog fileLog(Context context) {
+        return new FileLog(context);
     }
 
     @Provides

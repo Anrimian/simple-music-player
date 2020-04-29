@@ -3,11 +3,13 @@
 
     <!--specific sizes-->
     <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
-    <item name="composition_action_dialog_height" type="dimen" format="float">0.5</item>
+    <item name="composition_action_dialog_height" type="dimen" format="float">0.6</item>
 
     <dimen name="music_control_button_padding_collapsed">12dp</dimen>
     <dimen name="music_control_button_padding_expanded">7dp</dimen>
 
+    <!--animation-->
+    <integer name="button_animation_duration">300</integer>
 
     <dimen name="text_size_xxsmall">12sp</dimen>
     <dimen name="text_size_xsmall">13sp</dimen>
@@ -38,6 +40,11 @@
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
+   <!--content_vertical_margin*2(32) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">88dp</dimen>
+
+    <!--dialog margins-->
+    <dimen name="dialog_content_margin_start">20dp</dimen>
 
     <dimen name="subtitle_height">48dp</dimen>
 
@@ -77,6 +84,8 @@
     <!--toolbar-->
     <dimen name="toolbar_content_start">72dp</dimen>
     <dimen name="toolbar_control_offset">0dp</dimen>
+    <!--toolbar has own offset on large screens, remove after toolbar removing-->
+    <dimen name="toolbar_control_offset_2">0dp</dimen>
 
     <!--widgets-->
     <dimen name="widget_content_margin_vertical">4dp</dimen>
@@ -94,4 +103,37 @@
     <dimen name="swipe_panel_text_top_padding">4dp</dimen>
     <dimen name="swipe_panel_icon_size">28dp</dimen>
     <dimen name="swipe_panel_text_size">11sp</dimen>
+
+    <!--chips-->
+    <dimen name="chip_corner_radius">22dp</dimen>
+    <dimen name="chip_horizontal_margin">8dp</dimen>
+    <dimen name="chip_height">32dp</dimen>
+    <dimen name="chip_button_width">34dp</dimen>
+    <dimen name="chip_spacing_margin">8dp</dimen>
+
+    <!--notification-->
+    <dimen name="notification_large_icon_size">300dp</dimen>
+
+    <!--snackbar-->
+    <integer name="snackbar_max_lines">3</integer>
+    <dimen name="snackbar_padding_start">16dp</dimen>
+    <dimen name="snackbar_padding_end">8dp</dimen>
+    <dimen name="snackbar_padding_vertical">16dp</dimen>
+    <dimen name="snackbar_padding_button_vertical">8dp</dimen>
+    <dimen name="snackbar_margin_content">16dp</dimen>
+    <dimen name="snackbar_margin">8dp</dimen>
+    <dimen name="snackbar_corners">4dp</dimen>
+
+    <!--scrollbars-->
+    <dimen name="scrollbar_thumb_vertical_padding">16dp</dimen>
+    <dimen name="scrollbar_width">4dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_screen_margin">16dp</dimen>
+    <dimen name="action_bar_popup_screen_margin">8dp</dimen>
+    <dimen name="popup_item_horizontal_margin">16dp</dimen>
+
+    <!--seekbar-->
+    <dimen name="seekbar_height">2dp</dimen>
+    <dimen name="seekbar_corner_radius">6dp</dimen>
 </resources>

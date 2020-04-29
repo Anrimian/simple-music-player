@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -13,7 +13,8 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.domain.models.composition.order.OrderType.ADD_TIME;
+import static com.github.anrimian.musicplayer.domain.models.order.OrderType.ADD_TIME;
+import static com.github.anrimian.musicplayer.domain.models.order.OrderType.COMPOSITION_COUNT;
 
 /**
  * Created on 16.04.2018.
@@ -26,6 +27,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String REPEAT_MODE = "repeat_mode";
     private static final String FOLDER_ORDER = "folder_order";
     private static final String COMPOSITIONS_ORDER = "compositions_order";
+    private static final String ARTISTS_ORDER = "artists_order";
+    private static final String ALBUMS_ORDER = "albums_order";
+    private static final String GENRES_ORDER = "genres_order";
 
     private static final String SHOW_COVERS = "show_covers";
     private static final String SHOW_COVERS_IN_NOTIFICATION = "show_covers_in_notification";
@@ -37,6 +41,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Order> artistsOrderSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Order> albumsOrderSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Order> genresOrderSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
@@ -160,6 +167,57 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setCompositionsOrder(Order order) {
         preferences.putInt(COMPOSITIONS_ORDER, orderToInt(order));
+    }
+
+    @Override
+    public Order getArtistsOrder() {
+        // + 1 means reversed order
+        return orderFromInt(preferences.getInt(ARTISTS_ORDER, COMPOSITION_COUNT.getId() + 1));
+    }
+
+    @Override
+    public void setArtistsOrder(Order order) {
+        preferences.putInt(ARTISTS_ORDER, orderToInt(order));
+        artistsOrderSubject.onNext(order);
+    }
+
+    @Override
+    public Observable<Order> getArtistsOrderObservable() {
+        return withDefaultValue(artistsOrderSubject, this::getArtistsOrder);
+    }
+
+    @Override
+    public Order getAlbumsOrder() {
+        // + 1 means reversed order
+        return orderFromInt(preferences.getInt(ALBUMS_ORDER, COMPOSITION_COUNT.getId() + 1));
+    }
+
+    @Override
+    public void setAlbumsOrder(Order order) {
+        preferences.putInt(ALBUMS_ORDER, orderToInt(order));
+        albumsOrderSubject.onNext(order);
+    }
+
+    @Override
+    public Observable<Order> getAlbumsOrderObservable() {
+        return withDefaultValue(albumsOrderSubject, this::getAlbumsOrder);
+    }
+
+    @Override
+    public Order getGenresOrder() {
+        // + 1 means reversed order
+        return orderFromInt(preferences.getInt(GENRES_ORDER, COMPOSITION_COUNT.getId() + 1));
+    }
+
+    @Override
+    public void setGenresOrder(Order order) {
+        preferences.putInt(GENRES_ORDER, orderToInt(order));
+        genresOrderSubject.onNext(order);
+    }
+
+    @Override
+    public Observable<Order> getGenresOrderObservable() {
+        return withDefaultValue(genresOrderSubject, this::getGenresOrder);
     }
 
     @Override

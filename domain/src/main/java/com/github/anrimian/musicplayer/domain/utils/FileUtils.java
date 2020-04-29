@@ -41,13 +41,23 @@ public class FileUtils {
         return fileName;
     }
 
-    public static String getChangedFilePath(String fullPath, String newFileName) {
+    public static String getNewPath(String fullPath, String newFileName) {
         String fileName = FileUtils.formatFileName(fullPath);
-        String newPath = fullPath.replace(fileName, newFileName);
+        return TextUtils.replaceLast(fullPath, fileName, newFileName);
+    }
+
+    public static String getChangedFilePath(String fullPath, String newFileName) {
+        String newPath = getNewPath(fullPath, newFileName);
         return getUniqueFilePath(newPath, newFileName);
     }
 
     public static String getChangedFilePath(String filePath, String oldPath, String newPath) {
+        String fileName = FileUtils.formatFileName(filePath);
+        String path = filePath.replaceFirst(oldPath, newPath);
+        return getUniqueFilePath(path, fileName);
+    }
+
+    public static String safeReplacePath(String filePath, String oldPath, String newPath) {
         String fileName = FileUtils.formatFileName(filePath);
         String path = filePath.replace(oldPath, newPath);
         return getUniqueFilePath(path, fileName);
@@ -67,6 +77,6 @@ public class FileUtils {
                 file = new File(newPath);
             }
         }
-        return file.getAbsolutePath();
+        return file.getPath();
     }
 }

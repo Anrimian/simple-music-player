@@ -19,11 +19,8 @@ import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.themes.view.ThemesAdapter;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.decorators.DividerItemDecoration;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,11 +62,7 @@ public class ThemeSettingsFragment extends Fragment {
         toolbar.setSubtitle(R.string.theme);
         toolbar.setTitleClickListener(null);
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(container,
-                slidrConfig,
-                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(container, this, toolbar::onStackFragmentSlided);
 
         rvThemes.setLayoutManager(new LinearLayoutManager(requireContext()));
         DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(),

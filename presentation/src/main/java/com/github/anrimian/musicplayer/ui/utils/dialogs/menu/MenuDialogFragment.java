@@ -15,11 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 
 public class MenuDialogFragment extends DialogFragment {
@@ -33,10 +35,20 @@ public class MenuDialogFragment extends DialogFragment {
     @Nullable
     private OnCompleteListener<MenuItem> onCompleteListener;
 
+    @Nullable
+    private BiCallback<MenuItem, Bundle> complexCompleteListener;
+
     public static MenuDialogFragment newInstance(@MenuRes int menuRes, String title) {
+        return newInstance(menuRes, title, null);
+    }
+
+    public static MenuDialogFragment newInstance(@MenuRes int menuRes,
+                                                 String title,
+                                                 Bundle extra) {
         Bundle args = new Bundle();
         args.putInt(MENU_ARG, menuRes);
         args.putString(TITLE_ARG, title);
+        args.putBundle(EXTRA_DATA_ARG, extra);
         MenuDialogFragment fragment = new MenuDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -50,7 +62,7 @@ public class MenuDialogFragment extends DialogFragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        MenuAdapter menuAdapter = new MenuAdapter(getMenu());
+        MenuAdapter menuAdapter = new MenuAdapter(getMenu(), R.layout.item_dialog_menu);
         menuAdapter.setOnItemClickListener(this::onMenuItemClicked);
         recyclerView.setAdapter(menuAdapter);
 
@@ -60,15 +72,22 @@ public class MenuDialogFragment extends DialogFragment {
                 .create();
     }
 
-    public void setOnCompleteListener(OnCompleteListener<MenuItem> onCompleteListener) {
+    public void setOnCompleteListener(@Nullable OnCompleteListener<MenuItem> onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
+    }
+
+    public void setComplexCompleteListener(@Nullable BiCallback<MenuItem, Bundle> complexCompleteListener) {
+        this.complexCompleteListener = complexCompleteListener;
     }
 
     private void onMenuItemClicked(MenuItem menuItem) {
         if (onCompleteListener != null) {
             onCompleteListener.onComplete(menuItem);
         }
-        dismiss();
+        if (complexCompleteListener != null) {
+            complexCompleteListener.call(menuItem, getArguments().getBundle(EXTRA_DATA_ARG));
+        }
+        dismissAllowingStateLoss();
     }
 
     private Menu getMenu() {

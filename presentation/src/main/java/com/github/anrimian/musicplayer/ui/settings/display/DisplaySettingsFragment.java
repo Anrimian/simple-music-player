@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings.display;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,7 @@ import androidx.core.widget.NestedScrollView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,11 +68,9 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
         toolbar.setSubtitle(R.string.display);
         toolbar.setTitleClickListener(null);
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(nsvContainer,
-                slidrConfig,
-                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(nsvContainer, this, toolbar::onStackFragmentSlided);
+
+        cbColoredNotification.setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O? View.VISIBLE: View.GONE);
 
         onCheckChanged(cbCovers, presenter::onCoversChecked);
         onCheckChanged(cbCoversInNotification, presenter::onCoversInNotificationChecked);

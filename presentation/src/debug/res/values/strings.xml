@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Music Player(debug)</string>
-    <string name="file_provider_authorities" translatable="false">share_file_provider(debug)</string>
+    <string name="file_provider_authorities" translatable="false">
+                com.github.anrimian.simplemusicplayer.share_file_provider(debug)
+    </string>
 
 </resources>

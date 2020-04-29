@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/listItemBackground">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_music_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:contentDescription="@string/folder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_album_name"
+        tools:srcCompat="@drawable/ic_music_placeholder_simple" />
+
+    <TextView
+        android:id="@+id/tv_album_name"
+        style="@style/TextStyleItemPrimary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_vertical_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_compositions_count"
+        style="@style/TextStyleContentSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/content_spacing_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintEnd_toEndOf="@+id/tv_album_name"
+        app:layout_constraintStart_toStartOf="@+id/tv_album_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_album_name"/>
+
+    <FrameLayout
+        android:id="@+id/clickable_item"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="?selectableItemBackground"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View style="@style/Divider.Horizontal.Constraint"
+        android:id="@+id/divider"
+        android:layout_marginTop="@dimen/list_vertical_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_album_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_compositions_count" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

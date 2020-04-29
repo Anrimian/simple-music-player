@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
@@ -28,12 +29,12 @@ import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentStackListener;
+import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil;
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher;
-import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +117,7 @@ public class AdvancedToolbar extends FrameLayout {
     public void initializeViews(Window window) {
         this.window = window;
         toolbar = findViewById(R.id.toolbar_internal);
+        actionMenuView = findViewById(R.id.acv_main);
         clTitleContainer = findViewById(R.id.title_container);
         tvTitle = findViewById(R.id.tv_title);
         tvSubtitle = findViewById(R.id.tv_subtitle);
@@ -142,14 +144,13 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setupWithActivity(AppCompatActivity activity) {
-        toolbar.setTitle("");//replace null to prevent auto title setting from action bar
+        //now its only using for back button
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
     }
 
@@ -171,6 +172,10 @@ public class AdvancedToolbar extends FrameLayout {
     public void setSearchModeEnabled(boolean enabled,
                                      boolean showKeyboard,
                                      boolean jumpToState) {
+        if (bottomSheetListener == null) {
+            return;//uninitialized state
+        }
+
         inSearchMode = enabled;
         searchModeSubject.onNext(enabled);
 
@@ -190,6 +195,14 @@ public class AdvancedToolbar extends FrameLayout {
             etSearch.setText(null);
             AndroidUtils.hideKeyboard(etSearch);
         }
+    }
+
+    public void setupOptionsMenu(@MenuRes int menuResId, Callback<MenuItem> listener) {
+        ActionMenuUtil.setupMenu(actionMenuView, menuResId, listener);
+    }
+
+    public void clearOptionsMenu() {
+        ActionMenuUtil.setupMenu(actionMenuView, R.menu.empty_stub_menu, null);
     }
 
     public void release() {
@@ -252,7 +265,6 @@ public class AdvancedToolbar extends FrameLayout {
         if (!isEmpty(subtitle)) {
             flTitleArea.setContentDescription(getTitle() + ", " + subtitle);
         }
-
     }
 
     public void setTitleClickListener(View.OnClickListener listener) {
@@ -276,22 +288,14 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public ActionMenuView getActionMenuView() {
-        if (actionMenuView == null) {
-            actionMenuView = findActionMenuView();
-            if (actionMenuView == null) {
-                toolbar.inflateMenu(R.menu.empty_stub_menu);
-            }
-            actionMenuView = findActionMenuView();
-        }
         return actionMenuView;
     }
 
-    public void setTextChangeListener(Callback<String> textChangeListener) {
+    public void setupSearch(Callback<String> textChangeListener, String text) {
         this.textChangeListener = textChangeListener;
-    }
-
-    public void setTextConfirmListener(Callback<String> textConfirmListener) {
-        this.textConfirmListener = textConfirmListener;
+        this.textConfirmListener = textChangeListener;
+        etSearch.setText(text);
+        setSearchModeEnabled(!isEmpty(text));
     }
 
     public Observable<Boolean> getSearchModeObservable() {
@@ -304,10 +308,10 @@ public class AdvancedToolbar extends FrameLayout {
 
     private void onFragmentStackChanged(int stackSize, boolean jumpToState) {
         boolean isRoot = stackSize <= 1;
-        if (isRoot && bottomSheetListener.isExpanded()) {
+        //hmm, not sure about search mode, check how it works
+        if (isRoot && (bottomSheetListener.isExpanded() || isInSearchMode())) {
             return;
         }
-
         setCommandButtonMode(isRoot, !jumpToState);
     }
 
@@ -330,17 +334,6 @@ public class AdvancedToolbar extends FrameLayout {
                 drawerArrowDrawable.setProgress((float) animation.getAnimatedValue())
         );
         return objectAnimator;
-    }
-
-    @Nullable
-    private ActionMenuView findActionMenuView() {
-        for (int i = 0; i < toolbar.getChildCount(); i++) {
-            View child = toolbar.getChildAt(i);
-            if (child instanceof ActionMenuView) {
-                return (ActionMenuView) child;
-            }
-        }
-        return null;
     }
 
     private boolean onSearchTextViewAction(TextView v, int actionId, KeyEvent event) {
@@ -367,12 +360,8 @@ public class AdvancedToolbar extends FrameLayout {
         drawerArrowDrawable.setColor(color);
     }
 
-    public void setupSelectionModeMenu(@MenuRes int menuResource,
-                                       NavigationView.OnNavigationItemSelectedListener listener) {
-        setupMenu(acvSelection,
-                menuResource,
-                listener,
-                1);
+    public void setupSelectionModeMenu(@MenuRes int menuResource, Callback<MenuItem> listener) {
+        setupMenu(acvSelection, menuResource, listener, 1);
     }
 
     public void editActionMenu(Callback<Menu> callback) {

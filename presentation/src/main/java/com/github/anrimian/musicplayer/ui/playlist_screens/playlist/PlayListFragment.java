@@ -2,8 +2,6 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment;
@@ -36,11 +34,10 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +52,6 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_A
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
@@ -98,7 +94,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_play_list, container, false);
+        return inflater.inflate(R.layout.fragment_base_fab_list, container, false);
     }
 
     @Override
@@ -114,7 +110,7 @@ public class PlayListFragment extends MvpAppCompatFragment
         progressViewWrapper.hideAll();
 
         DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
-                getColorFromAttr(requireContext(), R.attr.listBackground),
+                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
                 R.drawable.ic_playlist_remove,
@@ -128,6 +124,8 @@ public class PlayListFragment extends MvpAppCompatFragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        RecyclerViewUtils.attachFastScroller(recyclerView, true);
+
         adapter = new PlayListItemAdapter(recyclerView,
                 presenter.isCoversEnabled(),
                 presenter::onCompositionClicked,
@@ -136,10 +134,7 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(clListContainer, slidrConfig, () ->
-                        FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
@@ -155,29 +150,10 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void onFragmentMovedOnTop() {
+        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+        toolbar.setupOptionsMenu(R.menu.play_list_menu, this::onOptionsItemClicked);
+
         presenter.onFragmentMovedToTop();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.play_list_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_change_play_list_name: {
-                presenter.onChangePlayListNameButtonClicked();
-                return true;
-            }
-            case R.id.menu_delete_play_list: {
-                presenter.onDeletePlayListButtonClicked();
-                return true;
-            }
-            default: return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -215,7 +191,6 @@ public class PlayListFragment extends MvpAppCompatFragment
                 R.plurals.compositions_count,
                 playList.getCompositionsCount(),
                 playList.getCompositionsCount()));
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -272,7 +247,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
         MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, v -> presenter.onRestoreRemovedItemClicked())
+                .setAction(R.string.cancel, presenter::onRestoreRemovedItemClicked)
                 .show();
     }
 
@@ -334,6 +309,18 @@ public class PlayListFragment extends MvpAppCompatFragment
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onCompositionsAddedToPlayNext(List<Composition> compositions) {
+        String message = MessagesUtils.getPlayNextMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCompositionsAddedToQueue(List<Composition> compositions) {
+        String message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions);
+        MessagesUtils.makeSnackbar(clListContainer, message, Snackbar.LENGTH_SHORT).show();
+    }
+
     private void onCompositionActionSelected(Composition composition,
                                              @MenuRes int menuItemId,
                                              Bundle extra) {
@@ -362,13 +349,12 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_share: {
-                shareFile(requireContext(), composition.getFilePath());
+                DialogUtils.shareComposition(requireContext(), composition);
                 break;
             }
             case R.id.menu_delete_from_play_list: {
-                presenter.onDeleteFromPlayListButtonClicked(new PlayListItem(playListId,//TODO replace!!!
-                                playListId,
-                                composition),
+                presenter.onDeleteFromPlayListButtonClicked(
+                        new PlayListItem(playListId, composition),
                         position);
                 break;
             }
@@ -381,5 +367,19 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     private long getPlayListId() {
         return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
+    }
+
+    private void onOptionsItemClicked(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_change_play_list_name: {
+                presenter.onChangePlayListNameButtonClicked();
+                break;
+            }
+            case R.id.menu_delete_play_list: {
+                presenter.onDeletePlayListButtonClicked();
+                break;
+            }
+        }
     }
 }

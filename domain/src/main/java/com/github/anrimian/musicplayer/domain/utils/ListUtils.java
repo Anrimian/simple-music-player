@@ -3,9 +3,12 @@ package com.github.anrimian.musicplayer.domain.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+@SuppressWarnings("WeakerAccess")
 public class ListUtils {
 
     public static <T> List<T> asList(T object) {
@@ -20,6 +23,17 @@ public class ListUtils {
     }
 
     public static <T, E> List<E> mapList(List<T> from, List<E> to, MapperFunction<T, E> mapper) {
+        for (T t: from) {
+            to.add(mapper.map(t));
+        }
+        return to;
+    }
+
+    public static <T, E> Set<E> mapToSet(List<T> from, MapperFunction<T, E> mapper) {
+        return mapToSet(from, new HashSet<>(from.size()), mapper);
+    }
+
+    public static <T, E> Set<E> mapToSet(List<T> from, Set<E> to, MapperFunction<T, E> mapper) {
         for (T t: from) {
             to.add(mapper.map(t));
         }

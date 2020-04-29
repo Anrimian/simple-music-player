@@ -1,8 +1,0 @@
-<!-- drawachangePlayStateause.xml -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="30dp"
-    android:width="30dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#000" android:pathData="M14,19H18V5H14M6,19H10V5H6V19Z" />
-</vector>

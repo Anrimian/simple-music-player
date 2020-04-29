@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.models.utils;
 
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 
 import java.util.List;
 

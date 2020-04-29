@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar">
+        <item name="android:progressDrawable">@drawable/bg_seekbar_progress</item>
+    </style>
+</resources>

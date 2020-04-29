@@ -12,6 +12,8 @@
         android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="@dimen/list_bottom_padding_with_fab"
+        android:clipToPadding="false"
         tools:listitem="@layout/item_storage_music" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

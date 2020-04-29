@@ -15,6 +15,12 @@ public enum PlayerState {
         public PlayerState toBaseState() {
             return PAUSE;
         }
+    },
+    PAUSED_PREPARE_ERROR {
+        @Override
+        public PlayerState toBaseState() {
+            return PAUSE;
+        }
     };
 
     public PlayerState toBaseState() {

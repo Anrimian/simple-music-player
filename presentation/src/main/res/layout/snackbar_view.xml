@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_snackbar">
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:progressDrawable="@drawable/bg_progress_circle"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="@dimen/snackbar_padding_start"
+        android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
+        tools:visibility="visible"
+        tools:progress="60"/>
+
+    <TextView
+        style="@style/TextStyle.Snackbar"
+        android:id="@+id/tv_message"
+        android:gravity="center_vertical|start"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginTop="@dimen/snackbar_padding_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_vertical"
+        android:layout_marginStart="@dimen/snackbar_padding_start"
+        android:layout_marginEnd="@dimen/snackbar_margin_content"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        android:maxLines="@integer/snackbar_max_lines"
+        android:ellipsize="end"
+        tools:text="messaggemessagemessage"/>
+
+    <Button
+        style="@style/ButtonBorderlessStyle"
+        android:id="@+id/tv_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="@dimen/snackbar_padding_end"
+        android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
+        android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
+        android:textColor="?attr/colorAccent"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:visibility="visible"
+        tools:text="retry"/>
+
+</LinearLayout>

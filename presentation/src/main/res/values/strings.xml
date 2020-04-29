@@ -1,6 +1,10 @@
 <resources>
-    <string name="file_provider_authorities" translatable="false">share_file_provider</string>
-    <string name="feedback_email" translatable="false">anrimian.developer@gmail.com</string>
+
+    <string name="file_provider_authorities" translatable="false">
+        com.github.anrimian.simplemusicplayer.share_file_provider
+    </string>
+    <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
+    <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
@@ -48,37 +52,35 @@
     <string name="select_play_list">Select playlist</string>
     <string name="add_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_composition_error_template">Can not delete song: %1$s</string>
-    <string name="add_to_playlist_success_template">Song %1$s added to playlist %2$s</string>
-    <string name="add_to_playlist_count_success_template">%1$d songs added to playlist %2$s</string>
+    <string name="add_to_playlist_success_template">Song \"%1$s\" added to playlist \"%2$s\"</string>
     <string name="play_list_is_empty">Playlist is empty</string>
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
-    <string name="delete_composition_template">Delete song %1$s? This action cannot be undone.</string>
-    <string name="delete_folder_template">Delete %2$s from folder %1$s?
+    <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
+    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"?
         If there are no more files in the folder, it will also be deleted.
         This action cannot be undone.
     </string>
-    <string name="delete_template">Delete %1$s? This action cannot be undone.</string>
-    <string name="delete_composition_success">Song %1$s deleted</string>
-    <string name="delete_compositions_success">%1$d songs deleted</string>
+    <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>
     <string name="play_queue">Play queue</string>
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="play_all">Play all</string>
-    <string name="repeat_playlist">Repeat playlist</string>
+    <string name="repeat_playlist">Repeat play queue</string>
     <string name="repeat_composition">Repeat song</string>
     <string name="do_not_repeat">Do not repeat</string>
     <string name="delete_from_queue">Delete from play queue</string>
     <string name="delete_from_play_list">Delete from playlist</string>
     <string name="add_item_to_playlist_error_template">Can not add song to playlist: %1$s</string>
-    <string name="delete_from_playlist_success_template">Song %1$s deleted from playlist %2$s</string>
-    <string name="delete_from_playlist_count_success_template">%1$d songs deleted from playlist %2$s</string>
-    <string name="delete_playlist_template">Delete playlist %1$s?</string>
+    <string name="delete_from_playlist_success_template">Song \"%1$s\" deleted from playlist \"%2$s\"</string>
+    <string name="delete_playlist_template">Delete playlist \"%1$s\"?</string>
     <string name="play_list_delete_error">Can not delete playlist: %1$s </string>
     <string name="play_not_exists">Playlist don\'t exists</string>
-    <string name="play_list_deleted">Playlist %1$s was deleted</string>
+    <string name="play_list_deleted">Playlist \"%1$s\" was deleted</string>
     <string name="can_not_receive_file_for_send">Can\'t receive files for send: %1$s</string>
     <string name="position_template">Current play time: %1$s</string>
     <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
@@ -91,7 +93,7 @@
     </string>
     <string name="select_all">Select all</string>
     <string name="file_uri_extract_error">
-        Can\'t get system path for file \"%s\" to send.
+        Can\'t get system path for composition \"%s\" to send.
         Possible he is in private system folder or so.
     </string>
     <string name="loading_progress">Loading…</string>
@@ -114,8 +116,23 @@
     <string name="playing_error">Play error</string>
     <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
-    <string name="version_template">Version %s</string>
-    <string name="about_app_text">Found a issue? Is the screen displayed incorrectly or slowly? Lacking any features? Write me about it, I will be appreciated for feedback.</string>
+    <string name="version_template">Version %1$s(Build %2$d)</string>
+    <string name="about_app_text"><![CDATA[<big><b>What is this app?</b></big>
+        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.
+        <br/>If you find an error, %1$s about it.
+        <br/>If you feel that some features are missing, %1$s about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
+        <br/>
+        <br/><big><b>Is this app completely free?</b></big>
+        <br/>Yes, no ads, no in-app purchases. Perhaps if this app becomes highly popular I could implement some paid non-essential features, but I definitely won\'t add ads or lock existing functionality.
+        <br/>
+        <br/><big><b>Has this app any analytics or data collection?</b></big>
+        <br/>No analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
+        <br/>
+        <br/><big><b>Translations</b></big>
+        <br/>If you find an error in app texts or want to offer translation to your language, %2$s about it.]]>
+    </string>
+    <string name="about_app_text_write">email me</string>
+    <string name="about_app_text_here">email me</string>
     <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
     <string name="white_purple_theme">White(Purple)</string>
@@ -145,6 +162,56 @@
     <string name="scan_storage">Rescan media storage</string>
     <string name="auto_night_mode">Auto night mode</string>
     <string name="unsupported_format_hint">Unsupported format</string>
+    <string name="artists">Artists</string>
+    <string name="no_artists_in_library">No artists in library</string>
+    <string name="albums">Albums</string>
+    <string name="no_albums_in_library">No albums in library</string>
+    <string name="genres">Genres</string>
+    <string name="no_genres_in_library">No genres in library</string>
+    <string name="no_items_in_genre">No compositions in selected genre</string>
+    <string name="no_compositions">No compositions</string>
+    <string name="change_album_name">Change album</string>
+    <string name="album">Album</string>
+    <string name="genre">Genre</string>
+    <string name="change_composition_genre">Change composition genre</string>
+    <string name="change_name">Change name</string>
+    <string name="rename_progress">Renaming…</string>
+    <string name="album_artist">Album artist</string>
+    <string name="change_album_artist">Change album artist</string>
+    <string name="edit_album_tags">Edit album tags</string>
+    <string name="by_composition_count">By composition count</string>
+    <string name="by_duration">By duration</string>
+    <string name="longest_first">Longest first</string>
+    <string name="more_first">More first</string>
+    <string name="artist_already_exists">Artist with this name already exists</string>
+    <string name="album_already_exists">Album with this name already exists</string>
+    <string name="genre_already_exists">Genre with this name already exists</string>
+    <string name="remove_genre">Remove genre</string>
+    <string name="add_composition_genre">Add genre</string>
+    <string name="add">Add</string>
+    <string name="edit_genre">Edit genre</string>
+    <string name="genre_removed_message">Genre \"%s\" was removed</string>
+    <string name="exclude_from_scanning">Hide</string>
+    <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
+    <string name="excluded_folders">Excluded folders</string>
+    <string name="remove_excluded_folder">Remove excluded folder</string>
+    <string name="no_excluded_folders">No excluded folders</string>
+    <string name="ignored_folder_removed">Excluded folder removed</string>
+    <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
+    <string name="move_progress">Moving…</string>
+    <string name="delete_progress">Deleting…</string>
+    <string name="play_next_message_single">Composition \"%s\" will be played next</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
+    <string name="queue_item_removed">Queue item removed</string>
+    <string name="by_size">By size</string>
+    <string name="largest_first">Largest first</string>
+    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help to improve app quality. Current log file size: %d KB</string>
+    <string name="view_file">View file</string>
+    <string name="send_file">Send file</string>
+    <string name="delete_file">Delete file</string>
+    <string name="log_file_deleted">Log file deleted</string>
+    <string name="pick_email_app_to_send">Pick a email app to send</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -166,4 +233,47 @@
         <item quantity="many">%1$s files</item>
         <item quantity="other">%1$s files</item>
     </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s album</item>
+        <item quantity="few">%1$s albums</item>
+        <item quantity="many">%1$s albums</item>
+        <item quantity="other">%1$s albums</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s song will be played next</item>
+        <item quantity="few">%s songs will be played next</item>
+        <item quantity="many">%s songs will be played next</item>
+        <item quantity="other">%s songs will be played next</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s song added to end of play queue</item>
+        <item quantity="few">%s songs added to end of play queue</item>
+        <item quantity="many">%s songs added to end of play queue</item>
+        <item quantity="other">%s songs added to end of play queue</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d song added to playlist \"%2$s\"</item>
+        <item quantity="few">%1$d songs added to playlist \"%2$s\"</item>
+        <item quantity="many">%1$d songs added to playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs added to playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d song deleted from playlist \"%2$s\"</item>
+        <item quantity="few">%1$d songs deleted from playlist \"%2$s\"</item>
+        <item quantity="many">%1$d songs deleted from playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs deleted from playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d song deleted</item>
+        <item quantity="few">%1$d songs deleted</item>
+        <item quantity="many">%1$d songs deleted</item>
+        <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
 </resources>

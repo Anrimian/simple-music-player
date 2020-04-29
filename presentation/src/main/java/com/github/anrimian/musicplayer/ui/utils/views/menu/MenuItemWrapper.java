@@ -3,15 +3,13 @@ package com.github.anrimian.musicplayer.ui.utils.views.menu;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import androidx.annotation.IdRes;
+
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import java.util.LinkedList;
 
 import javax.annotation.Nullable;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.MenuRes;
 
 public class MenuItemWrapper {
 

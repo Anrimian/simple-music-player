@@ -33,8 +33,6 @@
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:allowBackup">
 
-        <activity android:name=".utils.acra.AcraReportDialog"/>
-
         <activity android:name=".ui.main.MainActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing"
@@ -45,7 +43,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.editor.CompositionEditorActivity"
+        <activity android:name=".ui.editor.composition.CompositionEditorActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/SlidrActivityTheme"/>
+
+        <activity android:name=".ui.editor.album.AlbumEditorActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SlidrActivityTheme"/>
 

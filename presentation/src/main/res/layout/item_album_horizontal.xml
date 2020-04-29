@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="130dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_selectable_round_shape">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_music_icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginTop="@dimen/list_vertical_margin"
+        android:contentDescription="@string/folder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/ic_music_placeholder_simple" />
+
+    <TextView
+        android:id="@+id/tv_album_name"
+        style="@style/TextStyleItemPrimary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/content_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_music_icon"
+        tools:text="album"/>
+
+    <TextView
+        android:id="@+id/tv_compositions_count"
+        style="@style/TextStyleContentSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
+        app:layout_constraintEnd_toEndOf="@+id/tv_album_name"
+        app:layout_constraintStart_toStartOf="@+id/tv_album_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_album_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="albalbumalbumalbumalbumum"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

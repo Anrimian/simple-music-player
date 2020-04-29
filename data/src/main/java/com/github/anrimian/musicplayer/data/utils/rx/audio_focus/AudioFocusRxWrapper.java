@@ -37,7 +37,7 @@ public class AudioFocusRxWrapper {
         return null;
     }
 
-    private class AudioFocusObservable implements AudioManager.OnAudioFocusChangeListener {
+    private static class AudioFocusObservable implements AudioManager.OnAudioFocusChangeListener {
 
         private final PublishSubject<AudioFocusEvent> subject = PublishSubject.create();
 

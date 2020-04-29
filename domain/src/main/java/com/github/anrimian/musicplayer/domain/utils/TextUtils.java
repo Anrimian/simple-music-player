@@ -76,4 +76,24 @@ public class TextUtils {
     public static int indexOfEnd(String text, String source) {
         return text.indexOf(source) + source.length();
     }
+
+    public static String nullIfEmpty(String text) {
+        if (TextUtils.isEmpty(text)) {
+            return null;
+        }
+        return text;
+    }
+
+    public static String toNullableString(StringBuilder sb) {
+        return sb.length() == 0 ? null : sb.toString();
+    }
+
+    public static String replaceLast(String string, String from, String to) {
+        int lastIndex = string.lastIndexOf(from);
+        if (lastIndex < 0) {
+            return string;
+        }
+        String tail = string.substring(lastIndex).replace(from, to);
+        return string.substring(0, lastIndex) + tail;
+    }
 }

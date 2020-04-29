@@ -19,7 +19,7 @@
         app:iconTint="?android:attr/textColorPrimary"/>
     <item android:id="@+id/menu_edit"
         android:icon="@drawable/ic_circle_edit_outline"
-        android:title="@string/edit"
+        android:title="@string/edit_tags"
         app:iconTint="?android:attr/textColorPrimary"/>
     <item android:id="@+id/menu_share"
         android:icon="@drawable/ic_share_variant"

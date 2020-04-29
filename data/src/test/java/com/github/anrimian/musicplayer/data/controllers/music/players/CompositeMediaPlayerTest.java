@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
-import com.github.anrimian.musicplayer.data.utils.TestDataProvider;
+import utils.TestDataProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
@@ -20,8 +20,8 @@ import static org.mockito.Mockito.when;
 
 public class CompositeMediaPlayerTest {
 
-    private final MediaPlayer player1 = mock(MediaPlayer.class);
-    private final MediaPlayer player2 = mock(MediaPlayer.class);
+    private final AppMediaPlayer player1 = mock(AppMediaPlayer.class);
+    private final AppMediaPlayer player2 = mock(AppMediaPlayer.class);
 
     private CompositeMediaPlayer compositeMediaPlayer;
 
@@ -52,7 +52,7 @@ public class CompositeMediaPlayerTest {
         compositeMediaPlayer.prepareToPlay(composition, 0L);
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
 
-        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN, composition));
+        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
     }
@@ -66,13 +66,13 @@ public class CompositeMediaPlayerTest {
         compositeMediaPlayer.prepareToPlay(composition, 0L);
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
 
-        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN, composition));
+        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(0L));
 
-        player2EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN, composition));
+        player2EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
 
-        eventsObserver.assertValue(new ErrorEvent(ErrorType.UNKNOWN, composition));
+        eventsObserver.assertValue(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
 
         Composition composition2 = TestDataProvider.fakeComposition(2);
 
@@ -90,7 +90,7 @@ public class CompositeMediaPlayerTest {
 
         player1PositionSubject.onNext(100L);
 
-        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNKNOWN, composition));
+        player1EventSubject.onNext(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
         inOrder.verify(player1).release();
         inOrder.verify(player2).prepareToPlay(eq(composition), eq(100L));
     }

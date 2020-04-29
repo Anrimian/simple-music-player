@@ -1,39 +1,27 @@
 package com.github.anrimian.musicplayer.data.database.entities.playlist;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 public class PlayListEntryDto {
 
     private final long itemId;
 
-    @Nullable
-    private final Long storageItemId;
-
     @Embedded
-    private final CompositionEntity composition;
+    private final Composition composition;
 
-    public PlayListEntryDto(long itemId,
-                            @Nullable Long storageItemId,
-                            CompositionEntity composition) {
+    public PlayListEntryDto(long itemId, Composition composition) {
         this.itemId = itemId;
-        this.storageItemId = storageItemId;
         this.composition = composition;
-    }
-
-    @Nullable
-    public Long getStorageItemId() {
-        return storageItemId;
     }
 
     public long getItemId() {
         return itemId;
     }
 
-    public CompositionEntity getComposition() {
+    public Composition getComposition() {
         return composition;
     }
 

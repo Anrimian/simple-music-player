@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain;
 public interface Payloads {
     Object CREATE_DATE = new Object();
     Object FILES_COUNT = new Object();
-    Object PATH = new Object();
+    Object FILE_NAME = new Object();
     Object ALBUM = new Object();
     Object ARTIST = new Object();
     Object DATE_ADDED = new Object();
@@ -14,4 +14,6 @@ public interface Payloads {
     Object CORRUPTED = new Object();
     Object ITEM_SELECTED = new Object();
     Object ITEM_UNSELECTED = new Object();
+    Object NAME = new Object();
+    Object COMPOSITIONS_COUNT = new Object();
 }

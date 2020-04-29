@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -27,13 +28,16 @@ import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
 import static android.view.View.VISIBLE;
 import static androidx.core.view.ViewCompat.isLaidOut;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
+@SuppressWarnings("WeakerAccess")
 public class ViewUtils {
 
     public static void onLongClick(View view, Runnable onClick) {
@@ -49,6 +53,11 @@ public class ViewUtils {
         } else {
             view.post(runnable);
         }
+    }
+
+    public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
+        BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
+        return bottomSheetDialog.getBehavior();
     }
 
     public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {
@@ -135,8 +144,8 @@ public class ViewUtils {
     }
 
     public static Animator getBackgroundAnimatorAttr(View view,
-                                                 @AttrRes int from,
-                                                 @AttrRes int to) {
+                                                     @AttrRes int from,
+                                                     @AttrRes int to) {
         ValueAnimator animator = getAttrColorAnimator(view.getContext(), from, to);
         animator.addUpdateListener(animation ->
                 view.setBackgroundColor((Integer) animation.getAnimatedValue())

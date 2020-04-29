@@ -81,6 +81,11 @@ public class LibraryFoldersRootFragment extends LibraryFragment
         super.onFragmentMovedOnTop();
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setSubtitle(R.string.folders);
+
+        FragmentNavigation folderNavigation = FragmentNavigation.from(getChildFragmentManager());
+        if (folderNavigation.isInitialized()) {
+            folderNavigation.dispatchMovedToTop();
+        }
     }
 
     @Override
@@ -99,12 +104,12 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-        navigationWrapper.call(navigation -> navigation.setVisible(menuVisible));
+        navigationWrapper.call(navigation -> navigation.setMenuVisible(menuVisible));
     }
 
     @Override
-    public void showFolderScreens(List<String> paths) {
-        navigation.addNewFragmentStack(mapList(paths, LibraryFoldersFragment::newInstance),
+    public void showFolderScreens(List<Long> ids) {
+        navigation.addNewFragmentStack(mapList(ids, LibraryFoldersFragment::newInstance),
                 R.anim.anim_alpha_appear);
     }
 

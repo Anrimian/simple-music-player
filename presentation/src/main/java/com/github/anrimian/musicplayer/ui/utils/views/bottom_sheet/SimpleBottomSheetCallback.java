@@ -2,10 +2,10 @@ package com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet;
 
 import android.view.View;
 
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
 import androidx.annotation.NonNull;
+
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SimpleBottomSheetCallback extends BottomSheetBehavior.BottomSheetCallback {
 

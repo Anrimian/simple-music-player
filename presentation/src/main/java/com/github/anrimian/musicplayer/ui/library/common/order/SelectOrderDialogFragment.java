@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.ui.library.common.order.adapter.OrderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 
@@ -25,6 +25,7 @@ import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.ORDERS_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.ORDER_ARG;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getReversedOrderText;
 
@@ -49,9 +50,11 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @Nullable
     private OnCompleteListener<Order> onCompleteListener;
 
-    public static SelectOrderDialogFragment newInstance(Order order) {
+    public static SelectOrderDialogFragment newInstance(Order selectedOrder,
+                                                        OrderType... orders) {
         Bundle args = new Bundle();
-        args.putSerializable(ORDER_ARG, order);
+        args.putSerializable(ORDER_ARG, selectedOrder);
+        args.putSerializable(ORDERS_ARG, orders);
         SelectOrderDialogFragment fragment = new SelectOrderDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -67,8 +70,10 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rvOrder.setLayoutManager(layoutManager);
 
-        orderAdapter = new OrderAdapter();
-        orderAdapter.setOnItemClickListener(presenter::onOrderTypeSelected);
+        //noinspection ConstantConditions
+        OrderType[] orders = (OrderType[]) getArguments().getSerializable(ORDERS_ARG);
+
+        orderAdapter = new OrderAdapter(orders, presenter::onOrderTypeSelected);
         rvOrder.setAdapter(orderAdapter);
 
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
@@ -110,7 +115,7 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
         if (!getOrder().equals(order) && onCompleteListener != null) {
             onCompleteListener.onComplete(order);
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     public void setOnCompleteListener(@Nullable OnCompleteListener<Order> onCompleteListener) {

@@ -14,9 +14,11 @@ import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionHelper {
 
@@ -26,14 +28,10 @@ public class CompositionHelper {
                 && Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
                 && first.getDuration() == second.getDuration()
-                && Objects.equals(first.getFilePath(), second.getFilePath())
+                && Objects.equals(first.getFileName(), second.getFileName())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
                 && first.getCorruptionType() == second.getCorruptionType();
-    }
-
-    public static boolean hasChanges(@Nonnull Composition first, @Nonnull Composition second) {
-        return !areSourcesTheSame(first, second);
     }
 
     public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
@@ -57,8 +55,8 @@ public class CompositionHelper {
         if (first.getDuration() != second.getDuration()) {
             payloads.add(DURATION);
         }
-        if (!Objects.equals(first.getFilePath(), second.getFilePath())) {
-            payloads.add(PATH);
+        if (!Objects.equals(first.getFileName(), second.getFileName())) {
+            payloads.add(FILE_NAME);
         }
         if (first.getSize() != second.getSize()) {
             payloads.add(SIZE);
@@ -72,11 +70,11 @@ public class CompositionHelper {
         return payloads;
     }
 
-    public static int getTotalDuration(List<Composition> compositions) {
-        int totalDuration = 0;
-        for (Composition composition: compositions) {
-            totalDuration += composition.getDuration();
+    public static String formatCompositionName(Composition composition) {
+        String title = composition.getTitle();
+        if (isEmpty(title)) {
+            return formatFileName(composition.getFileName());
         }
-        return totalDuration;
+        return title;
     }
 }

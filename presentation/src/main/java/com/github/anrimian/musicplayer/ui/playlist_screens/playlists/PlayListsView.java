@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlists;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -24,14 +24,14 @@ public interface PlayListsView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updateList(List<PlayList> lists);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showPlayListMenu(PlayList playList);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showConfirmDeletePlayListDialog(PlayList playListToDelete);
+    void showConfirmDeletePlayListDialog(PlayList playList);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showPlayListDeleteSuccess(PlayList playListToDelete);

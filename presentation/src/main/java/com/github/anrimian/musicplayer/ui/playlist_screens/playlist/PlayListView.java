@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public interface PlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updateItemsList(List<PlayListItem> list);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
@@ -84,4 +84,10 @@ public interface PlayListView extends MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showEditPlayListNameDialog(PlayList playListInMenu);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToQueue(List<Composition> compositions);
 }

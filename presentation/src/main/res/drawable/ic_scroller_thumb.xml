@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape
+            android:shape="rectangle">
+
+            <size android:width="@dimen/scrollbar_width"
+                android:height="48dp"/>
+
+            <corners
+                android:topLeftRadius="64dp"
+                android:bottomLeftRadius="64dp" />
+
+            <solid android:color="?attr/colorControlThird" />
+
+        </shape>
+    </item>
+</layer-list>

@@ -3,12 +3,12 @@ package com.github.anrimian.musicplayer.ui.widgets;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import java.util.List;
 
@@ -16,13 +16,12 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_FILE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class WidgetUpdater {
@@ -50,7 +49,7 @@ public class WidgetUpdater {
             return;
         }
         updateDisposable.add(musicPlayerInteractor
-                .getCurrentCompositionObservable()
+                .getCurrentQueueItemObservable()
                 .subscribe(this::onCurrentCompositionReceived));
 
         updateDisposable.add(musicPlayerInteractor
@@ -87,32 +86,27 @@ public class WidgetUpdater {
     private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
         String compositionName = null;
         String compositionAuthor = null;
-        String compositionFile = null;
         long compositionId = 0;
         PlayQueueItem item = playQueueEvent.getPlayQueueItem();
         if (item != null) {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
-            compositionFile = item.getComposition().getFilePath();
             compositionId = item.getComposition().getId();
         }
-        updateComposition(compositionName, compositionAuthor, compositionFile, compositionId);
+        updateComposition(compositionName, compositionAuthor, compositionId);
     }
 
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
-                                   String compositionFile,
                                    long compositionId) {
         WidgetDataHolder.setCompositionName(context, compositionName);
         WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionFile(context, compositionFile);
         WidgetDataHolder.setCompositionId(context, compositionId);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
             intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
             intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
-            intent.putExtra(COMPOSITION_FILE_ARG, compositionFile);
             intent.putExtra(COMPOSITION_ID_ARG, compositionId);
         });
     }

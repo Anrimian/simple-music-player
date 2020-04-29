@@ -3,14 +3,19 @@ package com.github.anrimian.musicplayer.ui.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
@@ -19,25 +24,35 @@ import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
 
 /**
  * Created on 16.02.2017.
@@ -196,6 +211,14 @@ public class AndroidUtils {
         return menu;
     }
 
+    public static List<MenuItem> getMenuItems(Menu menu) {
+        List<MenuItem> items = new ArrayList<>(menu.size());
+        for (int i = 0; i < menu.size(); i++) {
+            items.add(menu.getItem(i));
+        }
+        return items;
+    }
+
     public static void playShortVibration(Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (v == null) {
@@ -208,6 +231,85 @@ public class AndroidUtils {
             v.vibrate(VibrationEffect.createOneShot(vibrationTime, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             v.vibrate(vibrationTime);
+        }
+    }
+
+    public static void setNavigationBarColorAttr(Activity activity, @AttrRes int attrRes) {
+        setNavigationBarColor(activity, getColorFromAttr(activity, attrRes));
+    }
+
+    public static void setNavigationBarColor(Activity activity, @ColorInt int color) {
+        Configuration configuration = activity.getResources().getConfiguration();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+            Window window = activity.getWindow();
+
+            window.setNavigationBarColor(color);
+
+            View decorView = window.getDecorView();
+            int flags = decorView.getSystemUiVisibility();
+            if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
+                flags |= SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            } else if ((flags & SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) == SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) {
+                flags = flags ^ SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+            decorView.setSystemUiVisibility(flags);
+        }
+    }
+
+    public static void setDialogNavigationBarColorAttr(@NonNull Dialog dialog, @AttrRes int attrRes) {
+        Configuration configuration = dialog.getContext().getResources().getConfiguration();
+        boolean isSmartphone = configuration.smallestScreenWidthDp < 600;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                !(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && !isSmartphone)) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                int color = AndroidUtils.getColorFromAttr(dialog.getContext(), attrRes);
+                DisplayMetrics metrics = new DisplayMetrics();
+                window.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+                GradientDrawable dimDrawable = new GradientDrawable();
+
+                GradientDrawable navigationBarDrawable = new GradientDrawable();
+                navigationBarDrawable.setShape(GradientDrawable.RECTANGLE);
+                navigationBarDrawable.setColor(color);
+
+                Drawable[] layers = {dimDrawable, navigationBarDrawable};
+
+                LayerDrawable windowBackground = new LayerDrawable(layers);
+                windowBackground.setLayerInsetTop(1, metrics.heightPixels);
+
+                window.setBackgroundDrawable(windowBackground);
+
+                if (ColorUtils.calculateLuminance(color) >= 0.5f) {//white
+                    View decorView = window.getDecorView();
+                    decorView.setSystemUiVisibility(SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                }
+            }
+        }
+    }
+
+    public static void clearVectorAnimationInfo(ImageView imageView) {
+        imageView.setTag(null);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
+        setAnimatedVectorDrawable(imageView, drawableRes, true);
+    }
+
+    public static void setAnimatedVectorDrawable(ImageView imageView,
+                                                 @DrawableRes int drawableRes,
+                                                 boolean animate) {
+        Drawable drawable = AppCompatResources.getDrawable(imageView.getContext(), drawableRes);
+        Integer tag = (Integer) imageView.getTag();
+        if (tag != null && tag == drawableRes) {
+            return;
+        }
+        imageView.setTag(drawableRes);
+        imageView.setImageDrawable(drawable);
+        if (animate && tag != null && drawable instanceof Animatable) {
+            ((Animatable) drawable).start();
         }
     }
 }

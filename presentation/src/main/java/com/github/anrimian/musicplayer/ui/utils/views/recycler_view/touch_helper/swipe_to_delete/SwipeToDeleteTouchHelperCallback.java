@@ -4,12 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
 
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 public class SwipeToDeleteTouchHelperCallback extends ItemTouchHelper.SimpleCallback {
 

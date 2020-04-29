@@ -1,12 +1,10 @@
 package com.github.anrimian.musicplayer.di.app.library.files;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.root.FolderRootPresenter;
 
@@ -24,7 +22,7 @@ public class LibraryFilesModule {
 
     @Provides
     @Nonnull
-    FolderRootPresenter folderRootPresenter(LibraryFilesInteractor interactor,
+    FolderRootPresenter folderRootPresenter(LibraryFoldersScreenInteractor interactor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new FolderRootPresenter(interactor,
@@ -35,17 +33,14 @@ public class LibraryFilesModule {
     @Provides
     @Nonnull
     @LibraryFilesScope
-    LibraryFilesInteractor libraryFilesInteractor(MusicProviderRepository musicProviderRepository,
-                                                  EditorRepository editorRepository,
-                                                  MusicPlayerInteractor musicPlayerInteractor,
-                                                  PlayListsRepository playListsRepository,
-                                                  SettingsRepository settingsRepository,
-                                                  UiStateRepository uiStateRepository) {
-        return new LibraryFilesInteractor(musicProviderRepository,
+    LibraryFoldersScreenInteractor libraryFilesInteractor(LibraryFoldersInteractor foldersInteractor,
+                                                          LibraryRepository libraryRepository,
+                                                          EditorRepository editorRepository,
+                                                          MediaScannerRepository mediaScannerRepository) {
+        return new LibraryFoldersScreenInteractor(foldersInteractor,
+                libraryRepository,
                 editorRepository,
-                musicPlayerInteractor,
-                playListsRepository,
-                settingsRepository,
-                uiStateRepository);
+                mediaScannerRepository);
     }
+
 }

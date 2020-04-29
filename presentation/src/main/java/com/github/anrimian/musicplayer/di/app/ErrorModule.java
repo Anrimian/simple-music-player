@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.di.app;
 import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParserImpl;
-import com.github.anrimian.musicplayer.domain.business.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.ui.common.error.parser.DefaultErrorParser;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 

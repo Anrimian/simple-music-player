@@ -1,14 +1,15 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 
@@ -22,8 +23,7 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
@@ -44,7 +44,7 @@ class FolderViewHolder extends FileViewHolder {
     TextView tvCompositionsCount;
 
     @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
+    ImageView btnActionsMenu;
 
     private FolderFileSource folder;
     private String path;
@@ -72,6 +72,7 @@ class FolderViewHolder extends FileViewHolder {
             });
         }
         btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
+        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
     }
 
     @Override
@@ -100,14 +101,14 @@ class FolderViewHolder extends FileViewHolder {
 
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getPath();
+        this.path = folderFileSource.getName();
         showFolderName();
         showFilesCount();
     }
 
     public void update(FolderFileSource folderFileSource, List<Object> payloads) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getPath();
+        this.path = folderFileSource.getName();
         bind(folderFileSource);
         for (Object payload: payloads) {
             if (payload instanceof List) {
@@ -122,7 +123,7 @@ class FolderViewHolder extends FileViewHolder {
                 setSelected(false);
                 return;
             }
-            if (payload == PATH) {
+            if (payload == NAME) {
                 showFolderName();
             }
             if (payload == FILES_COUNT) {
@@ -140,8 +141,8 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     private void showFolderName() {
-        String displayPath = getFileName(path);
-        tvFolderName.setText(displayPath);
+//        String displayPath = getFileName(path);
+        tvFolderName.setText(path);
     }
 
     private void selectImmediate() {

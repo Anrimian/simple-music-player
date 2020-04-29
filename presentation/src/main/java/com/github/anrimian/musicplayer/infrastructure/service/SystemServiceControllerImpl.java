@@ -18,6 +18,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     @Override
     public void startMusicService() {
         Intent intent = new Intent(context, MusicService.class);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {

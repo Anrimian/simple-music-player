@@ -12,10 +12,13 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import java.util.List;
 
@@ -25,9 +28,9 @@ import butterknife.ButterKnife;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.PATH;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -60,7 +63,11 @@ public class CompositionItemWrapper {
 
     @Nullable
     @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
+    ImageView btnActionsMenu;
+
+    @Nullable
+    @BindView(R.id.icon_clickable_area)
+    View iconClickableArea;
 
     private Composition composition;
 
@@ -71,10 +78,14 @@ public class CompositionItemWrapper {
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
         ButterKnife.bind(this, itemView);
-        if (ivMusicIcon != null) {
-            ivMusicIcon.setOnClickListener(v -> onIconClickListener.call(composition));
+        if (iconClickableArea != null) {
+            iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
+
+        if (btnActionsMenu != null) {
+            CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        }
     }
 
     public void bind(Composition composition, boolean showCovers) {
@@ -84,7 +95,7 @@ public class CompositionItemWrapper {
         showCorrupted();
         showCompositionImage(showCovers);
 
-        showAsPlaying(false);
+        showAsPlaying(false, false);
     }
 
     public void update(Composition composition, List<Object> payloads) {
@@ -94,7 +105,7 @@ public class CompositionItemWrapper {
                 //noinspection SingleStatementInBlock,unchecked
                 update(composition, (List) payload);
             }
-            if (payload == PATH || payload == TITLE) {
+            if (payload == FILE_NAME || payload == TITLE) {
                 showCompositionName();
             }
             if (payload == ARTIST || payload == DURATION) {
@@ -110,16 +121,12 @@ public class CompositionItemWrapper {
     public void showCompositionImage(boolean showCovers) {
         if (ivMusicIcon != null) {
             if (showCovers) {
-                CoverImageLoader.getInstance().displayImage(ivMusicIcon, composition);
+                Components.getAppComponent().imageLoader().displayImage(ivMusicIcon, composition);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
             }
         }
     }
-
-//    public void showNumber(int number) {//good idea
-//        tvAdditionalInfo.setText(String.valueOf(number) +" ● " + tvAdditionalInfo.getText());
-//    }
 
     public void showAsDraggingItem(boolean dragging) {
         if (this.isDragging != dragging) {
@@ -141,9 +148,11 @@ public class CompositionItemWrapper {
         }
     }
 
-    public void showAsPlaying(boolean isPlaying) {
+    public void showAsPlaying(boolean isPlaying, boolean animate) {
         if (ivPlay != null) {
-            ivPlay.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
+            AndroidUtils.setAnimatedVectorDrawable(ivPlay,
+                    isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
+                    animate);
         }
     }
 
@@ -161,6 +170,9 @@ public class CompositionItemWrapper {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
         clickableItem.setContentDescription(compositionName);
+        if (iconClickableArea != null) {
+            iconClickableArea.setContentDescription(compositionName);
+        }
     }
 
     private void showCorrupted() {
@@ -184,17 +196,14 @@ public class CompositionItemWrapper {
     }
 
     private void showAdditionalInfo() {
-        SpannableStringBuilder sb = new SpannableStringBuilder();
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(getContext());
         sb.append(formatCompositionAuthor(composition, getContext()));
-        sb.append(" ● ");//TODO split problem • ●
         sb.append(formatMilliseconds(composition.getDuration()));
         String corruptionHint = getCorruptionTypeHint();
         if (corruptionHint != null) {
-            sb.append(" ● ");
-            int start = sb.length();
-            int end = start + corruptionHint.length();
-
             sb.append(corruptionHint);
+            int start = sb.length() - corruptionHint.length();
+            int end = sb.length();
 
             ForegroundColorSpan fcs = new ForegroundColorSpan(getColorFromAttr(getContext(), R.attr.colorError));
             sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -209,6 +218,7 @@ public class CompositionItemWrapper {
         }
         switch (composition.getCorruptionType()) {
             case UNSUPPORTED: return getContext().getString(R.string.unsupported_format_hint);
+            case NOT_FOUND: return getContext().getString(R.string.file_not_found);
             default: return null;
         }
     }

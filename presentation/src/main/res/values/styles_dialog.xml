@@ -2,17 +2,11 @@
 <resources>
 
     <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:windowBackground">?attr/dialogBackground</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
         <item name="android:textColorPrimary">?attr/dialogTitleColor</item>
         <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
     </style>
-
-<!--    <style name="DarkDialogStyle" parent="Theme.AppCompat.Dialog.Alert">-->
-<!--        <item name="android:windowBackground">?attr/dialogBackground</item>-->
-<!--        <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>-->
-<!--        <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>-->
-<!--    </style>-->
 
     <style name="DialogTitleStyle" parent="@style/RtlOverlay.DialogWindowTitle.AppCompat">
         <item name="android:textAppearance">@style/DialogTitleTextAppearance</item>
@@ -23,7 +17,12 @@
     </style>
 
     <style name="DialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">?attr/dialogButtonColor</item>
+        <item name="android:textColor">@color/color_text_accent</item>
+    </style>
+
+    <style name="PopupAnimationStyle">
+        <item name="android:windowEnterAnimation">@anim/anim_popup_appear</item>
+        <item name="android:windowExitAnimation">@anim/anim_popup_disappear</item>
     </style>
 
 </resources>

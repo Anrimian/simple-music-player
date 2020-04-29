@@ -7,8 +7,9 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,8 +17,8 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.BiCallback;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +28,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_A
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.HINTS_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.NEGATIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITIVE_BUTTON_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.TITLE_ARG;
@@ -37,7 +39,7 @@ import static com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTex
 public class InputTextDialogFragment extends DialogFragment {
 
     @BindView(R.id.edit_text)
-    EditText editText;
+    AutoCompleteTextView editText;
 
     @Nullable
     private Callback<String> onCompleteListener;
@@ -80,17 +82,10 @@ public class InputTextDialogFragment extends DialogFragment {
                                                       String editTextValue,
                                                       boolean canBeEmpty,
                                                       Bundle extra) {
-        Bundle args = new Bundle();
-        args.putInt(TITLE_ARG, title);
-        args.putInt(POSITIVE_BUTTON_ARG, positiveButtonText);
-        args.putInt(NEGATIVE_BUTTON_ARG, negativeButtonText);
-        args.putInt(EDIT_TEXT_HINT, editTextHint);
-        args.putString(EDIT_TEXT_VALUE, editTextValue);
-        args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
-        args.putBundle(EXTRA_DATA_ARG, extra);
-        InputTextDialogFragment fragment = new InputTextDialogFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new InputTextDialogFragment.Builder(title, positiveButtonText, negativeButtonText, editTextHint, editTextValue)
+                .canBeEmpty(canBeEmpty)
+                .extra(extra)
+                .build();
     }
 
     @NonNull
@@ -126,6 +121,15 @@ public class InputTextDialogFragment extends DialogFragment {
         String startText = args.getString(EDIT_TEXT_VALUE);
         setEditableText(editText, startText);
 
+        String[] hints = args.getStringArray(HINTS_ARG);
+        if (hints != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                    R.layout.item_autocomplete,
+                    R.id.text_view,
+                    hints);
+            editText.setAdapter(adapter);
+        }
+
         editText.requestFocus();
 
         Button btnCreate = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -157,10 +161,63 @@ public class InputTextDialogFragment extends DialogFragment {
                 complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     private boolean isEnterButtonEnabled(String text) {
         return !isEmpty(text);
     }
+    public static class Builder {
+        @StringRes private final int title;
+        @StringRes private final int positiveButtonText;
+        @StringRes private final int negativeButtonText;
+        @StringRes private final int editTextHint;
+        private final String editTextValue;
+        private boolean canBeEmpty = true;
+        private Bundle extra = null;
+        private String[] hints;
+
+        public Builder(int title,
+                       int positiveButtonText,
+                       int negativeButtonText,
+                       int editTextHint,
+                       String editTextValue) {
+            this.title = title;
+            this.positiveButtonText = positiveButtonText;
+            this.negativeButtonText = negativeButtonText;
+            this.editTextHint = editTextHint;
+            this.editTextValue = editTextValue;
+        }
+
+        public Builder canBeEmpty(boolean canBeEmpty) {
+            this.canBeEmpty = canBeEmpty;
+            return this;
+        }
+
+        public Builder extra(Bundle extra) {
+            this.extra = extra;
+            return this;
+        }
+
+        public Builder hints(String[] hints) {
+            this.hints = hints;
+            return this;
+        }
+
+        public InputTextDialogFragment build() {
+            Bundle args = new Bundle();
+            args.putInt(TITLE_ARG, title);
+            args.putInt(POSITIVE_BUTTON_ARG, positiveButtonText);
+            args.putInt(NEGATIVE_BUTTON_ARG, negativeButtonText);
+            args.putInt(EDIT_TEXT_HINT, editTextHint);
+            args.putString(EDIT_TEXT_VALUE, editTextValue);
+            args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
+            args.putBundle(EXTRA_DATA_ARG, extra);
+            args.putStringArray(HINTS_ARG, hints);
+            InputTextDialogFragment fragment = new InputTextDialogFragment();
+            fragment.setArguments(args);
+            return fragment;
+        }
+    }
+
 }

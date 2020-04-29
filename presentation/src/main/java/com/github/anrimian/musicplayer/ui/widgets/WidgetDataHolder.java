@@ -12,7 +12,6 @@ public class WidgetDataHolder {
     private static final String CURRENT_COMPOSITION = "current_composition";
     private static final String CURRENT_COMPOSITION_AUTHOR = "current_composition_author";
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
-    private static final String CURRENT_COMPOSITION_FILE = "current_composition_file";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
 
 
@@ -31,11 +30,6 @@ public class WidgetDataHolder {
         preferences.putLong(CURRENT_COMPOSITION_ID, compositionId);
     }
 
-    static void setCompositionFile(Context context, String filePath) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        preferences.putString(CURRENT_COMPOSITION_FILE, filePath);
-    }
-
     static void setCurrentQueueSize(Context context, int size) {
         SharedPreferencesHelper preferences = getPreferences(context);
         preferences.putInt(CURRENT_QUEUE_SIZE, size);
@@ -49,11 +43,6 @@ public class WidgetDataHolder {
     public static String getCompositionAuthor(Context context) {
         SharedPreferencesHelper preferences = getPreferences(context);
         return preferences.getString(CURRENT_COMPOSITION_AUTHOR);
-    }
-
-    public static String getCompositionFile(Context context) {
-        SharedPreferencesHelper preferences = getPreferences(context);
-        return preferences.getString(CURRENT_COMPOSITION_FILE);
     }
 
     public static int getCurrentQueueSize(Context context) {

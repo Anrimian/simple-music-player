@@ -45,24 +45,23 @@
     <string name="select_play_list">Выберите плейлист</string>
     <string name="add_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
     <string name="delete_composition_error_template">Не удалось удалить композицию: %1$s</string>
-    <string name="add_to_playlist_success_template">Композиция %1$s добавлена в плейлист %2$s</string>
-    <string name="add_to_playlist_count_success_template">%1$d композиций добавлены в плейлист %2$s</string>
+    <string name="add_to_playlist_success_template">Композиция \"%1$s\" добавлена в плейлист \"%2$s\"</string>
     <string name="play_list_is_empty">Плейлист пуст</string>
     <string name="save_as_play_list">Сохранить как плейлист</string>
     <string name="cancel">Отмена</string>
     <string name="deleting">Удаление</string>
     <string name="delete_composition_template">
-        Удалить композицию %1$s?
+        Удалить композицию \"%1$s\"?
         Это действие нельзя будет отменить.
     </string>
     <string name="delete_folder_template">
-        Удалить %2$s из папки %1$s?
+        Удалить %2$s из папки \"%1$s\"?
         Если в папке больше нет файлов, то она тоже будет удалена.
         Это действие нельзя будет отменить.
     </string>
+    <string name="delete_empty_folder">Удалить папку \"%s\"? Это действие нельзя будет отменить.</string>
     <string name="delete_template">Удалить %1$s? Это действие нельзя будет отменить.</string>
-    <string name="delete_composition_success">Композиция %1$s удалена</string>
-    <string name="delete_compositions_success">%1$d композиций удалено</string>
+    <string name="delete_composition_success">Композиция \"%1$s\" удалена</string>
     <string name="search">Поиск</string>
     <string name="play_queue">Очередь воспроизведения</string>
     <string name="pause">Пауза</string>
@@ -74,12 +73,11 @@
     <string name="delete_from_queue">Удалить из очереди</string>
     <string name="delete_from_play_list">Удалить из плейлиста</string>
     <string name="add_item_to_playlist_error_template">Не удалось добавить композицию в плейлист: %1$s</string>
-    <string name="delete_from_playlist_success_template">Композиция %1$s удалена из плейлиста %2$s</string>
-    <string name="delete_from_playlist_count_success_template">%1$d композиций удалено из плейлиста %2$s</string>
-    <string name="delete_playlist_template">Удалить плейлист %1$s?</string>
+    <string name="delete_from_playlist_success_template">Композиция \"%1$s\" удалена из плейлиста \"%2$s\"</string>
+    <string name="delete_playlist_template">Удалить плейлист \"%1$s\"?</string>
     <string name="play_list_delete_error">Не удалось удалить плейлист: %1$s </string>
     <string name="play_not_exists">плейлист не существует</string>
-    <string name="play_list_deleted">Плейлист %1$s удалён</string>
+    <string name="play_list_deleted">Плейлист \"%1$s\" удалён</string>
     <string name="can_not_receive_file_for_send">Не удалось получить файлы для отправки: %1$s</string>
     <string name="position_template">Текущее время воспроизведения: %1$s</string>
     <string name="now_playing_template">Сейчас проигрывает: %1$s. Открыть очередь воспроизведения.</string>
@@ -87,7 +85,7 @@
     <string name="delete_playlist">Удалить плейлист</string>
     <string name="storage_timeout_error_message">Медиа хранилище устройства не отвечает. Это очень странная и редкая ошибка. Попробуйте перезагрузить устройство, возможно, это решит эту проблему.</string>
     <string name="select_all">Выделить всё</string>
-    <string name="file_uri_extract_error">Не удалось получить системный путь к файлу \"%s\" для отправки. Возможно, он в закрытой системной папке.</string>
+    <string name="file_uri_extract_error">Не удалось получить системный путь к композиции \"%s\" для отправки. Возможно, она в закрытой системной папке.</string>
     <string name="loading_progress">Загрузка…</string>
     <string name="alphabetical_order_desc_title">Я - А</string>
     <string name="add_date_order_desc_title">Сначала поздние</string>
@@ -108,8 +106,23 @@
     <string name="playing_error">Ошибка воспроизведения</string>
     <string name="no_file_permission">Нет разрешения на доступ к файлам</string>
     <string name="about_app">О приложении</string>
-    <string name="version_template">Версия %s</string>
-    <string name="about_app_text">Нашли ошибку? Экран отображается некорректо или медленно? Недостаёт какой-либо функциональности? Напишите мне об этом, буду благодарен обратной связи.</string>
+    <string name="version_template">Версия %1$s(Сборка %2$d)</string>
+    <string name="about_app_text"><![CDATA[<big><b>Что это за приложение?</b></big>
+        <br/>Это музыкальный проигрыватель который я написал для себя, в соответствии с моим видением того, как музыкальный плеер должен выглядеть.
+        <br/>Если вы нашли ошибку, %1$s мне об этом.
+        <br/>Если вам не хватает какой-либо функциональности, %1$s мне об этом, но я не могу обещать что я обязательно это реализую. Обычно я делаю это через какое-то время.
+        <br/>
+        <br/><big><b>Это приложение полностью бесплатно?</b></big>
+        <br/>Да, никаких покупок или рекламы. Возможно если это приложение станет очень популярным, я могу реализовать некоторый платный неключевой функционал, но я точно не стану добавлять рекламу либо блокировать существующий функционал.
+        <br/>
+        <br/><big><b>Если ли в приложение аналитика либо сбор пользовательских данных?</b></big>
+        <br/>Никакой аналитики или чего-либо ещё. Это приложение даже не имеет разрешения на доступ к интернету. (По крайней мере до реализации функциональности которая бы требовала подключение к интернету.)
+        <br/>
+        <br/><big><b>Переводы</b></big>
+        <br/>Если вы нашли ошибку к текстах приложения или хотите предложить перевод приложения на ваш язык, %2$s мне об этом.]]>
+    </string>
+    <string name="about_app_text_write">напишите</string>
+    <string name="about_app_text_here">напишите</string>
     <string name="send_email">Отправить email</string>
     <string name="theme">Тема оформления</string>
     <string name="white_purple_theme">Светлая(Фиолетовая)</string>
@@ -139,6 +152,56 @@
     <string name="scan_storage">Пересканировать системную библиотеку</string>
     <string name="auto_night_mode">Автоматическая тёмная тема</string>
     <string name="unsupported_format_hint">Неподдерживаемый формат</string>
+    <string name="artists">Иполнители</string>
+    <string name="no_artists_in_library">Нет исполнителей в библиотеке</string>
+    <string name="albums">Альбомы</string>
+    <string name="no_albums_in_library">Нет альбомов в библиотеке</string>
+    <string name="genres">Жанры</string>
+    <string name="no_genres_in_library">Нет жанров в библиотеке</string>
+    <string name="no_items_in_genre">Нет композиций в выбранном жанре</string>
+    <string name="no_compositions">Нет композиций</string>
+    <string name="change_album_name">Изменить альбом</string>
+    <string name="album">Альбом</string>
+    <string name="genre">Жарн</string>
+    <string name="change_composition_genre">Изменить жанр композиции</string>
+    <string name="change_name">Изменить имя</string>
+    <string name="rename_progress">Переименование…</string>
+    <string name="album_artist">Автор альбома</string>
+    <string name="change_album_artist">Изменить автора альбома</string>
+    <string name="edit_album_tags">Редактировать теги альбома</string>
+    <string name="by_composition_count">По количеству композиций</string>
+    <string name="by_duration">По длительности</string>
+    <string name="longest_first">Сперва долгие</string>
+    <string name="more_first">Сперва больше</string>
+    <string name="artist_already_exists">Исполнитель с таким именем уже существует</string>
+    <string name="album_already_exists">Альбом с таким именем уже существует</string>
+    <string name="genre_already_exists">Жанр с таким именем уже существует</string>
+    <string name="remove_genre">Удалить жанр</string>
+    <string name="add_composition_genre">Добавить жанр</string>
+    <string name="add">Добавить</string>
+    <string name="edit_genre">Изменить жанр</string>
+    <string name="genre_removed_message">Жанр \"%s\" убран</string>
+    <string name="exclude_from_scanning">Скрыть</string>
+    <string name="ignored_folder_added">Папка \'%s\' добавлена в список игнорируемых папок</string>
+    <string name="excluded_folders">Игнорируемые папки</string>
+    <string name="remove_excluded_folder">Убрать игнорируемую папку</string>
+    <string name="no_excluded_folders">Нет игнорируемых папок</string>
+    <string name="ignored_folder_removed">Игнорируемая папка убрана</string>
+    <string name="moving_and_destination_folders_matches">Перемещаемая и целевая папка совпадает</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Папка с таким именем уже существует в целевой папке</string>
+    <string name="move_progress">Перемещение…</string>
+    <string name="delete_progress">Удаление…</string>
+    <string name="play_next_message_single">Композиция \"%s\" будет проиграна следующей</string>
+    <string name="added_to_queue_message_single">Композиция \"%s\" добавлена в конец очереди воспроизведения</string>
+    <string name="queue_item_removed">Элемент очереди удалён</string>
+    <string name="by_size">По размеру</string>
+    <string name="largest_first">Сперва большие</string>
+    <string name="log_info_text">Произошли некоторые нефатальные ошибки и информация о них была записана в файл логов. Приложение не отсылает логи автоматически, но вы можете отослать их сами. Это поможет улучшить качество приложения. Текущий размер файла логов: %d KB</string>
+    <string name="view_file">Просмотреть файл</string>
+    <string name="send_file">Отправить файл</string>
+    <string name="delete_file">Удалить файл</string>
+    <string name="log_file_deleted">Файл удалён</string>
+    <string name="pick_email_app_to_send">Выберите приложение email для отправки</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -160,4 +223,40 @@
         <item quantity="many">%1$s файлов</item>
         <item quantity="other">%1$s файлов</item>
     </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s композиция будет проиграна следующей</item>
+        <item quantity="few">%s композиции будут проиграны следующими</item>
+        <item quantity="many">%s композиций будут проиграны следующими</item>
+        <item quantity="other">%s композиций будут проиграны следующими</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s композиция добавлена в конец очереди воспроизведения</item>
+        <item quantity="few">%s композиции добавлены в конец очереди воспроизведения</item>
+        <item quantity="many">%s композиций добавлены в конец очереди воспроизведения</item>
+        <item quantity="other">%s композиций добавлены в конец очереди воспроизведения</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d композиция добавлены в плейлист \"%2$s\"</item>
+        <item quantity="few">%1$d композиции добавлены в плейлист \"%2$s\"</item>
+        <item quantity="many">%1$d композиций добавлены в плейлист \"%2$s\"</item>
+        <item quantity="other">%1$d композиций добавлены в плейлист \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d композиция удалено из плейлиста \"%2$s\"</item>
+        <item quantity="few">%1$d композиции удалено из плейлиста \"%2$s\"</item>
+        <item quantity="many">%1$d композиций удалено из плейлиста \"%2$s\"</item>
+        <item quantity="other">%1$d композиций удалено из плейлиста \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d композиция удалена</item>
+        <item quantity="few">%1$d композиции удалено</item>
+        <item quantity="many">%1$d композиций удалено</item>
+        <item quantity="other">%1$d композиций удалено</item>
+    </plurals>
+
 </resources>

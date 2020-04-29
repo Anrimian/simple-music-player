@@ -11,5 +11,10 @@
 
     <!--list margins-->
     <dimen name="list_vertical_margin">8dp</dimen>
+    <!--content_vertical_margin*2(16) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">72dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_screen_margin">8dp</dimen>
 
 </resources>

@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
@@ -33,8 +34,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
     private final OnPositionItemClickListener<Composition> iconClickListener;
 
     @Nullable
-    private Composition currentComposition;
-    private boolean play;
+    private CurrentComposition currentComposition;
     private boolean isCoversEnabled;
 
     public CompositionsAdapter(RecyclerView recyclerView,
@@ -70,9 +70,7 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         boolean selected = selectedCompositions.contains(composition);
         holder.setSelected(selected);
 
-        boolean isCurrentComposition = composition.equals(currentComposition);
-        holder.showAsCurrentComposition(isCurrentComposition);
-        holder.showAsPlaying(isCurrentComposition && play);
+        holder.showCurrentComposition(currentComposition, false);
     }
 
     @Override
@@ -92,8 +90,8 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
                 holder.setSelected(false);
                 return;
             }
-            holder.update(getItem(position), payloads);
         }
+        holder.update(getItem(position), payloads);
     }
 
     @Override
@@ -116,13 +114,10 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         }
     }
 
-    public void showCurrentComposition(Composition currentComposition) {
+    public void showCurrentComposition(CurrentComposition currentComposition) {
         this.currentComposition = currentComposition;
         for (MusicViewHolder holder: viewHolders) {
-            Composition composition = holder.getComposition();
-            boolean isCurrentComposition = composition.equals(currentComposition);
-            holder.showAsCurrentComposition(isCurrentComposition);
-            holder.showAsPlaying(isCurrentComposition && play);
+            holder.showCurrentComposition(currentComposition, true);
         }
     }
 
@@ -130,16 +125,6 @@ public class CompositionsAdapter extends DiffListAdapter<Composition, MusicViewH
         this.isCoversEnabled = isCoversEnabled;
         for (MusicViewHolder holder: viewHolders) {
             holder.setCoversVisible(isCoversEnabled);
-        }
-    }
-
-    public void showPlaying(boolean play) {
-        this.play = play;
-        for (MusicViewHolder holder: viewHolders) {
-            Composition composition = holder.getComposition();
-            boolean isCurrentComposition = composition.equals(currentComposition);
-            holder.showAsCurrentComposition(isCurrentComposition);
-            holder.showAsPlaying(isCurrentComposition && play);
         }
     }
 }

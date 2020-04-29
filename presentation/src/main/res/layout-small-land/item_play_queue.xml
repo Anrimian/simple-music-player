@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/windowBackground">
+    android:background="?attr/listItemBackground">
 
     <TextView
         android:id="@+id/tv_composition_name"

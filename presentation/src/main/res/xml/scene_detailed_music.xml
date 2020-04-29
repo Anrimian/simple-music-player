@@ -41,12 +41,12 @@
 
         <Constraint
             android:id="@+id/music_icon_wrapper"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginStart="@dimen/content_spacing_margin"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_current_composition"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_skip_to_previous" />
+            app:layout_constraintBottom_toBottomOf="@id/tv_current_composition" />
 
         <Constraint
             android:id="@id/btn_actions_menu"

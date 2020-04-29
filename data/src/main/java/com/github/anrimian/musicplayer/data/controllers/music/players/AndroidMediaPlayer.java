@@ -1,10 +1,16 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 
-import com.github.anrimian.musicplayer.domain.business.player.PlayerErrorParser;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
+import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 
@@ -15,35 +21,57 @@ import javax.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-public class AndroidMediaPlayer implements MediaPlayer {
+import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
+
+public class AndroidMediaPlayer implements AppMediaPlayer {
 
     private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
 
     private final Scheduler scheduler;
+    private final CompositionSourceProvider sourceRepository;
     private final PlayerErrorParser playerErrorParser;
+    private final Analytics analytics;
 
-    private android.media.MediaPlayer mediaPlayer;
+    private final MediaPlayer mediaPlayer;
 
     @Nullable
     private Disposable trackPositionDisposable;
 
+    @Nullable
+    private Disposable preparationDisposable;
+
+    @Nullable
     private Composition currentComposition;
 
-    public AndroidMediaPlayer(Scheduler scheduler, PlayerErrorParser playerErrorParser) {
-        this.scheduler = scheduler;
-        this.playerErrorParser = playerErrorParser;
-        mediaPlayer = new android.media.MediaPlayer();
-        mediaPlayer.setOnErrorListener((mediaPlayer, i, i1) -> {
-            sendErrorEvent(new Exception());
-            mediaPlayer.reset();
-            return true;
-        });
+    private boolean isSourcePrepared = false;
+    private boolean playWhenReady = false;
+    private boolean isPlaying = false;
 
+    //problem with error case(file not found), multiple error events
+    public AndroidMediaPlayer(Scheduler scheduler,
+                              CompositionSourceProvider sourceRepository,
+                              PlayerErrorParser playerErrorParser,
+                              Analytics analytics) {
+        this.scheduler = scheduler;
+        this.sourceRepository = sourceRepository;
+        this.playerErrorParser = playerErrorParser;
+        this.analytics = analytics;
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(mediaPlayer -> {
+            if (currentComposition != null) {
+                playerEventSubject.onNext(new FinishedEvent(currentComposition));
+            }
+        });
+        mediaPlayer.setOnErrorListener((mediaPlayer, what, extra) -> {
+            sendErrorEvent(what, extra);
+            return false;
+        });
     }
 
     @Override
@@ -54,8 +82,9 @@ public class AndroidMediaPlayer implements MediaPlayer {
     @Override
     public void prepareToPlay(Composition composition, long startPosition) {
         this.currentComposition = composition;
-        //check if file exists
-        prepareMediaSource(composition)
+        RxUtils.dispose(preparationDisposable);
+        preparationDisposable = Single.fromCallable(() -> composition)
+                .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
                 .subscribeOn(scheduler)
@@ -64,27 +93,47 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public void stop() {
-        seekTo(0);
+        if (!isPlaying) {
+            return;
+        }
+        if (isSourcePrepared) {
+            seekTo(0);
+        }
         stopTracingTrackPosition();
-        mediaPlayer.stop();
-//        mediaPlayer.reset();
+        if (isSourcePrepared) {
+            mediaPlayer.pause();
+        }
+        isPlaying = false;
+        playWhenReady = false;
     }
 
     @Override
     public void resume() {
-        mediaPlayer.start();
-        startTracingTrackPosition();
+        if (isPlaying) {
+            return;
+        }
+        if (isSourcePrepared) {
+            start();
+        }
+        playWhenReady = true;
     }
 
     @Override
     public void pause() {
-        mediaPlayer.pause();
+        if (!isPlaying) {
+            return;
+        }
         stopTracingTrackPosition();
+        mediaPlayer.pause();
+        isPlaying = false;
+        playWhenReady = false;
     }
 
     @Override
     public void seekTo(long position) {
-        mediaPlayer.seekTo((int) position);
+        try {
+            mediaPlayer.seekTo((int) position);
+        } catch (IllegalStateException ignored) {}
         trackPositionSubject.onNext(position);
     }
 
@@ -100,11 +149,19 @@ public class AndroidMediaPlayer implements MediaPlayer {
 
     @Override
     public long getTrackPosition() {
-        return mediaPlayer.getCurrentPosition();
+        if (currentComposition == null) {
+            return 0;
+        }
+        try {
+            return mediaPlayer.getCurrentPosition();
+        } catch (IllegalStateException e) {
+            return 0;
+        }
     }
 
     @Override
     public void release() {
+        stopTracingTrackPosition();
         mediaPlayer.release();
     }
 
@@ -112,7 +169,7 @@ public class AndroidMediaPlayer implements MediaPlayer {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
                 .observeOn(scheduler)
-                .map(o -> (long) mediaPlayer.getCurrentPosition())
+                .map(o -> getTrackPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
 
@@ -134,6 +191,27 @@ public class AndroidMediaPlayer implements MediaPlayer {
         }
     }
 
+    private void sendErrorEvent(int what, int playerError) {
+        if (currentComposition != null) {
+            playerEventSubject.onNext(new ErrorEvent(
+                    getErrorTypeFromPlayerError(what, playerError),
+                    currentComposition)
+            );
+        }
+    }
+
+    private ErrorType getErrorTypeFromPlayerError(int what, int playerError) {
+        switch (playerError) {
+            case MEDIA_ERROR_UNSUPPORTED: {
+                return ErrorType.UNSUPPORTED;
+            }
+            default: {
+                analytics.logMessage("unknown player error, what: " + what + ", extra: " + playerError);
+                return ErrorType.IGNORED;
+            }
+        }
+    }
+
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
             playerEventSubject.onNext(new ErrorEvent(
@@ -144,10 +222,28 @@ public class AndroidMediaPlayer implements MediaPlayer {
     }
 
     private Completable prepareMediaSource(Composition composition) {
-        return Completable.fromAction(() -> {
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setDataSource(composition.getFilePath());
-            mediaPlayer.prepare();
-        });
+        return sourceRepository.getCompositionFileDescriptorSingle(composition.getId())
+                .doOnSuccess(fileDescriptor -> {
+                    mediaPlayer.reset();
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.setDataSource(fileDescriptor);
+                    mediaPlayer.prepare();
+                })
+                .ignoreElement()
+                .doOnSubscribe(d -> isSourcePrepared = false)
+                .doOnComplete(this::onSourcePrepared);
+    }
+
+    private void onSourcePrepared() {
+        if (playWhenReady) {
+            start();
+        }
+        isSourcePrepared = true;
+    }
+
+    private void start() {
+        mediaPlayer.start();
+        startTracingTrackPosition();
+        isPlaying = true;
     }
 }

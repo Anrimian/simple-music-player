@@ -13,10 +13,7 @@ import androidx.core.widget.NestedScrollView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,11 +58,7 @@ public class PlayerSettingsFragment extends MvpAppCompatFragment implements Play
         toolbar.setSubtitle(R.string.playing);
         toolbar.setTitleClickListener(null);
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(nsvContainer,
-                slidrConfig,
-                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(nsvContainer, this, toolbar::onStackFragmentSlided);
 
         onCheckChanged(cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked);
     }

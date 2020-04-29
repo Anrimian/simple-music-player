@@ -12,6 +12,8 @@
 
     <!--list margins-->
     <dimen name="list_vertical_margin">16dp</dimen>
+    <!--content_vertical_margin*2(48) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">102dp</dimen>
 
     <!--toolbar-->
     <dimen name="toolbar_content_start">80dp</dimen>

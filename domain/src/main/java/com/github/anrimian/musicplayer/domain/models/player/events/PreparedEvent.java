@@ -16,4 +16,11 @@ public class PreparedEvent implements PlayerEvent {
     public Composition getComposition() {
         return composition;
     }
+
+    @Override
+    public String toString() {
+        return "PreparedEvent{" +
+                "composition=" + composition +
+                '}';
+    }
 }

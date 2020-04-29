@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 
 import io.reactivex.Observable;
 
@@ -47,6 +47,24 @@ public interface SettingsRepository {
     Order getFolderOrder();
 
     Order getCompositionsOrder();
+
+    Order getArtistsOrder();
+
+    void setArtistsOrder(Order order);
+
+    Observable<Order> getArtistsOrderObservable();
+
+    Order getAlbumsOrder();
+
+    void setAlbumsOrder(Order order);
+
+    Observable<Order> getAlbumsOrderObservable();
+
+    Order getGenresOrder();
+
+    void setGenresOrder(Order order);
+
+    Observable<Order> getGenresOrderObservable();
 
     int getSkipConstraintMillis();
 

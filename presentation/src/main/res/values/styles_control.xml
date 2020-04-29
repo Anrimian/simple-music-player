@@ -15,4 +15,6 @@
         <item name="android:textSize">@dimen/text_size_small_2</item>
         <item name="android:textColor">@color/color_text_primary</item>
     </style>
+
+    <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar"/>
 </resources>

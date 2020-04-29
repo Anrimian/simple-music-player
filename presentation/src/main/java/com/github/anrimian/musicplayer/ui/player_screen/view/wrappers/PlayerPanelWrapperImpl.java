@@ -13,7 +13,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.utils.java.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
@@ -141,7 +141,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         bottomSheetDelegate = createBottomSheetDelegate();
         bottomSheetBehavior = BottomSheetBehavior.from(mlBottomSheet);
         mlBottomSheet.setClickable(true);
-        bottomSheetBehavior.setBottomSheetCallback(new SimpleBottomSheetCallback(
+        bottomSheetBehavior.addBottomSheetCallback(new SimpleBottomSheetCallback(
                 this::onBottomSheetStateChanged,
                 bottomSheetDelegate::onSlide
 

@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.widgets.providers;
 
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -9,8 +10,8 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 
@@ -26,11 +27,12 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
 
     @Override
     protected void applyViewLogic(RemoteViews widgetView,
+                                  AppWidgetManager appWidgetManager,
+                                  int widgetId,
                                   Context context,
                                   boolean play,
                                   String compositionName,
                                   String compositionAuthor,
-                                  String compositionFile,
                                   long compositionId,
                                   int queueSize,
                                   boolean enabled,
@@ -38,11 +40,10 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                                   boolean randomPlayModeEnabled,
                                   int repeatMode) {
         super.applyViewLogic(widgetView,
-                context,
+                appWidgetManager, widgetId, context,
                 play,
                 compositionName,
                 compositionAuthor,
-                compositionFile,
                 compositionId,
                 queueSize,
                 enabled,
@@ -62,14 +63,12 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
         widgetView.setImageViewResource(R.id.iv_repeat_mode, iconRes);
 
         if (showCovers) {
-//            ImageFormatUtils.displayImage(widgetView, R.id.iv_cover, compositionFile, compositionId);
-
-
-            CoverImageLoader.getInstance().displayImage(widgetView,
-                    R.id.iv_cover,
-                    compositionForLoading(compositionId, compositionFile),
-                    ImageUtils::toCircleBitmap,
-                    R.drawable.ic_music_placeholder);
+            Components.getAppComponent().imageLoader()
+                    .displayImage(widgetView,
+                            R.id.iv_cover,
+                            widgetId,
+                            compositionId,
+                            R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
         }
@@ -94,20 +93,5 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
     @Override
     protected int getRemoteViewId() {
         return R.layout.widget_medium;
-    }
-
-    //not so clear, but leave it here
-    private Composition compositionForLoading(long id, String filePath) {
-        return new Composition(null,
-                null,
-                null,
-                filePath,
-                0,
-                0,
-                id,
-                null,
-                new Date(),
-                new Date(),
-                null);
     }
 }

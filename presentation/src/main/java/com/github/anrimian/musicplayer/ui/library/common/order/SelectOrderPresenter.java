@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.common.order;
 
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
-import com.github.anrimian.musicplayer.domain.models.composition.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
 import moxy.InjectViewState;
 import moxy.MvpPresenter;

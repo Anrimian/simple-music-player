@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/popupMenuBackgroundColor"
+    android:foreground="?selectableItemBackground">
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_vertical_margin"
+        android:layout_marginBottom="@dimen/list_vertical_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        tools:text="text"/>
+
+</FrameLayout>

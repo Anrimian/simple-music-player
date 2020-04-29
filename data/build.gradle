@@ -24,6 +24,9 @@ android {
         }
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            androidTest.java.srcDirs += "$projectDir/src/testCommon"
+
+            test.java.srcDirs += "$projectDir/src/testCommon"
         }
     }
 
@@ -63,4 +66,6 @@ dependencies {
     androidTestImplementation deps.rules
     androidTestImplementation deps.rxJava2Ext
     androidTestImplementation deps.roomTest
+    androidTestImplementation deps.mockito
+
 }

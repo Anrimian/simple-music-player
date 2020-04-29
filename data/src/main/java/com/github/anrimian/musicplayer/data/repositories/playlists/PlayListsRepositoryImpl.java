@@ -50,13 +50,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             Date currentDate = new Date();
             long id = playListsDao.insertPlayList(name, currentDate, currentDate);
 
-            //don't modify storage playlists now
-//            Long storageId = storagePlayListsProvider.createPlayList(name,
-//                    currentDate,
-//                    currentDate);
-//            playListsDao.updateStorageId(id, storageId);
+            Long storageId = storagePlayListsProvider.createPlayList(name,
+                    currentDate,
+                    currentDate);
+            playListsDao.updateStorageId(id, storageId);
             return new PlayList(id,
-                    null,
                     name,
                     currentDate,
                     currentDate,
@@ -70,18 +68,14 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                                                  PlayList playList,
                                                  int position) {
         return Completable.fromAction(() -> {
-                    //don't modify storage playlists now
-
-
-//                    Long playListId = playList.getStorageId();
-//                    if (playListId != null) {
-//                        storagePlayListsProvider.addCompositionsToPlayList(compositions,
-//                                playListId,
-//                                position);
-//                    }
-                    playListsDao.addCompositions(compositions, playList.getId(), position);
-                }
-        ).subscribeOn(scheduler);
+            Long storageId = playListsDao.selectStorageId(playList.getId());
+            if (storageId != null) {
+                storagePlayListsProvider.addCompositionsToPlayList(compositions,
+                        storageId,
+                        position);
+            }
+            playListsDao.addCompositions(compositions, playList.getId(), position);
+        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -93,18 +87,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     @Override
     public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
         return Completable.fromAction(() -> {
-            //don't modify storage playlists now
-
-//            Long storageItemId = playListItem.getStorageItemId();
-//            if (storageItemId != null) {
-//                Long storagePlayListId = playListsDao.selectStorageId(playListId);
-//                if (storagePlayListId != null) {
-//                    storagePlayListsProvider.deleteItemFromPlayList(
-//                            playListItem.getStorageItemId(),
-//                            storagePlayListId
-//                    );
-//                }
-//            }
+            Long storagePlayListId = playListsDao.selectStorageId(playListId);
+            Long storageItemId = playListsDao.selectStorageItemId(playListItem.getItemId());
+            if (storageItemId != null && storagePlayListId != null) {
+                storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
+            }
             playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
         }).subscribeOn(scheduler);
     }
@@ -123,16 +110,10 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     @Override
     public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return Completable.fromAction(() -> {
-
-                    //don't modify storage playlists now
-
-//            storagePlayListsProvider.moveItemInPlayList(
-//                            playListId,
-//                            from,
-//                            to);
-                    playListsDao.moveItems(playList.getId(), from, to);
-                }
-        ).subscribeOn(scheduler);
+            Long storageId = playListsDao.selectStorageId(playList.getId());
+            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);
+            playListsDao.moveItems(playList.getId(), from, to);
+        }).subscribeOn(scheduler);
     }
 
     @Override

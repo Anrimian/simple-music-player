@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 
 public class StoragePlayList {
 
-    private long id;
+    private long storageId;
 
     @Nonnull
     private String name;
@@ -19,18 +19,18 @@ public class StoragePlayList {
     @Nonnull
     private Date dateModified;
 
-    public StoragePlayList(long id,
+    public StoragePlayList(long storageId,
                            @Nonnull String name,
                            @Nonnull Date dateAdded,
                            @Nonnull Date dateModified) {
-        this.id = id;
+        this.storageId = storageId;
         this.name = name;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
     }
 
-    public long getId() {
-        return id;
+    public long getStorageId() {
+        return storageId;
     }
 
     @Nonnull
@@ -55,19 +55,19 @@ public class StoragePlayList {
 
         StoragePlayList playList = (StoragePlayList) o;
 
-        return id == playList.id;
+        return storageId == playList.storageId;
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        return (int) (storageId ^ (storageId >>> 32));
     }
 
     @NonNull
     @Override
     public String toString() {
         return "PlayList{" +
-                "id=" + id +
+                "id=" + storageId +
                 ", name='" + name + '\'' +
                 ", dateAdded=" + dateAdded +
                 ", dateModified=" + dateModified +

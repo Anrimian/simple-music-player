@@ -1,8 +1,9 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
-import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
@@ -32,20 +32,24 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
+import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
+import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper;
@@ -57,6 +61,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFrag
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -73,6 +78,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -82,16 +88,15 @@ import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareFile;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.insertMenuItemIcons;
 import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 
 /**
@@ -181,10 +186,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private int selectedDrawerItemId = NO_ITEM;
     private int itemIdToStart = NO_ITEM;
 
+    private final Handler secondScrollHandler = new Handler(Looper.getMainLooper());
+    private int currentPosition = -2;//for immediate first scroll
+
     private LinearLayoutManager playQueueLayoutManager;
     private SeekBarViewWrapper seekBarViewWrapper;
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
+    private CompositeDisposable viewDisposable = new CompositeDisposable();
 
     private FragmentNavigation navigation;
 
@@ -226,15 +235,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        //FIXME: possible here: start playing, hide app, revoke permission, open
-        RxPermissions rxPermissions = new RxPermissions(requireActivity());
-        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requireFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_activity_container, new StartFragment())
-                    .commit();
-            return;
-        }
+        AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
         toolbar.initializeViews(requireActivity().getWindow());
         toolbar.setupWithActivity((AppCompatActivity) requireActivity());
@@ -248,8 +249,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
         drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
-        toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged);
-        toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged);
+        viewDisposable.add(toolbar.getSearchModeObservable()
+                .subscribe(drawerLockStateProcessor::onSearchModeChanged)
+        );
+        viewDisposable.add(toolbar.getSelectionModeObservable()
+                .subscribe(drawerLockStateProcessor::onSelectionModeChanged)
+        );
 
         if (mlBottomSheet == null) {
             playerPanelWrapper = new TabletPlayerPanelWrapper(view,
@@ -293,10 +298,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         rvPlayList.setAdapter(playQueueAdapter);
 
         DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(rvPlayList,
-                getColorFromAttr(requireContext(), R.attr.listBackground),
+                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
                 presenter::onItemSwipedToDelete,
                 ItemTouchHelper.START,
-                R.drawable.ic_delete_outline,
+                R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
@@ -316,6 +321,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
 
+        CompatUtils.setMainButtonStyle(ivPlayPause);
+        CompatUtils.setMainButtonStyle(ivSkipToNext);
+        CompatUtils.setMainButtonStyle(ivSkipToPrevious);
+        CompatUtils.setMainButtonStyle(btnRandomPlay);
+        CompatUtils.setMainButtonStyle(btnRepeatMode);
+        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (fragment != null) {
@@ -332,6 +344,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
+        }
+
+        RxPermissions rxPermissions = new RxPermissions(this);
+        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            requireFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_activity_container, new StartFragment())
+                    .commit();
         }
     }
 
@@ -359,6 +379,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onDestroyView();
         toolbar.release();
         drawerLockStateProcessor.release();
+        viewDisposable.clear();
     }
 
     @Override
@@ -392,6 +413,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         super.onStop();
         //battery saving
         presenter.onStop();
+
+        clearVectorAnimationInfo(ivPlayPause);
     }
 
     @Override
@@ -439,6 +462,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 fragment = new LibraryFoldersRootFragment();
                 break;
             }
+            case Screens.LIBRARY_ARTISTS: {
+                fragment = new ArtistsListFragment();
+                break;
+            }
+            case Screens.LIBRARY_ALBUMS: {
+                fragment = new AlbumsListFragment();
+                break;
+            }
+            case Screens.LIBRARY_GENRES: {
+                fragment = new GenresListFragment();
+                break;
+            }
             default: {
                 fragment = new LibraryCompositionsFragment();
             }
@@ -448,7 +483,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showStopState() {
-        ivPlayPause.setImageResource(R.drawable.ic_play);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
         ivPlayPause.setContentDescription(getString(R.string.play));
         ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
         playQueueAdapter.showPlaying(false);
@@ -456,7 +491,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayState() {
-        ivPlayPause.setImageResource(R.drawable.ic_pause);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
         ivPlayPause.setContentDescription(getString(R.string.pause));
         ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
         playQueueAdapter.showPlaying(true);
@@ -476,7 +511,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover) {
         animateVisibility(bottomSheetTopShadow, VISIBLE);
-        animateVisibility(rvPlayList, VISIBLE);//TODO blink on jump to item on start
+        animateVisibility(rvPlayList, VISIBLE);
 
         btnActionsMenu.setEnabled(item != null);
         if (item == null) {
@@ -488,7 +523,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             tvCurrentCompositionAuthor.setText(R.string.unknown_author);
             ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             String noCompositionMessage = getString(R.string.no_current_composition);
-            topBottomSheetPanel.setContentDescription(noCompositionMessage);
+            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
             rvPlayList.setContentDescription(noCompositionMessage);
             sbTrackState.setContentDescription(noCompositionMessage);
         } else {
@@ -502,7 +537,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             sbTrackState.setContentDescription(null);
 
             if (showCover) {
-                CoverImageLoader.getInstance()
+                Components.getAppComponent()
+                        .imageLoader()
                         .displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
@@ -512,28 +548,37 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
     }
 
+    //check by:
+    //switch order mode(working)
+    //new queue(so-so, but pass)
+    //remove queue item(working)
     @Override
-    public void scrollQueueToPosition(int position, boolean smoothScroll) {
-        if (position > playQueueLayoutManager.findFirstVisibleItemPosition() &&
-                position < playQueueLayoutManager.findLastCompletelyVisibleItemPosition()) {
+    public void scrollQueueToPosition(int position) {
+        secondScrollHandler.removeCallbacksAndMessages(null);
+        int positionDiff = Math.abs(position - currentPosition);
+        currentPosition = position;
+        if (RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
             return;
         }
 
-        boolean smooth = smoothScroll
+        boolean smooth = positionDiff == 1
                 || position == playQueueLayoutManager.findFirstVisibleItemPosition()
                 || position == playQueueLayoutManager.findLastVisibleItemPosition();
 
-        Context context = requireContext();
-        rvPlayList.post(() -> {
-            if (smooth) {
-                RecyclerViewUtils.smoothScrollToTop(position,
+        RecyclerViewUtils.scrollToPosition(rvPlayList,
+                playQueueLayoutManager,
+                position,
+                smooth);
+
+        //sometimes can not scroll, check twice
+        secondScrollHandler.postDelayed(() -> {
+            if (!RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
+                RecyclerViewUtils.scrollToPosition(rvPlayList,
                         playQueueLayoutManager,
-                        context,
-                        170);
-            } else {
-                playQueueLayoutManager.scrollToPositionWithOffset(position, 0);
+                        position,
+                        false);
             }
-        });
+        }, 300);
     }
 
     @Override
@@ -566,8 +611,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showShareMusicDialog(String filePath) {
-        shareFile(requireContext(), filePath);
+    public void showShareMusicDialog(Composition composition) {
+        DialogUtils.shareComposition(requireContext(), composition);
     }
 
     @Override
@@ -593,6 +638,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @Override
     public void startEditCompositionScreen(long id) {
         startActivity(CompositionEditorActivity.newIntent(requireContext(), id));
+    }
+
+    @Override
+    public void showErrorMessage(ErrorCommand errorCommand) {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, errorCommand.getMessage()).show();
+    }
+
+    @Override
+    public void showDeletedItemMessage() {
+        MessagesUtils.makeSnackbar(clPlayQueueContainer, R.string.queue_item_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
+                .show();
     }
 
     @Override
@@ -667,34 +724,32 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     private void clearFragment() {
-        navigation.clearRootFragment(R.anim.anim_alpha_disappear);
+        navigation.clearFragmentStack(R.anim.anim_alpha_disappear);
     }
 
     private void onCompositionMenuClicked(View view) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.composition_short_actions_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddCurrentCompositionToPlayListButtonClicked();
-                    return true;
-                }
-                case R.id.menu_share: {
-                    presenter.onShareCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCurrentCompositionButtonClicked();
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    presenter.onEditCompositionButtonClicked();
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.composition_short_actions_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddCurrentCompositionToPlayListButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_share: {
+                            presenter.onShareCompositionButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCurrentCompositionButtonClicked();
+                            break;
+                        }
+                        case R.id.menu_edit: {
+                            presenter.onEditCompositionButtonClicked();
+                            break;
+                        }
+                    }
+                });
     }
 
     private DrawerArrowDrawable createDrawerArrowDrawable() {
@@ -731,63 +786,58 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
         Composition composition = playQueueItem.getComposition();
 
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.play_queue_item_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_add_to_playlist: {
-                    presenter.onAddQueueItemToPlayListButtonClicked(composition);
-                    return true;
-                }
-                case R.id.menu_edit: {
-                    startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
-                    return true;
-                }
-                case R.id.menu_share: {
-                    onShareCompositionClicked(composition);
-                    return true;
-                }
-                case R.id.menu_delete_from_queue: {
-                    presenter.onDeleteQueueItemClicked(playQueueItem);
-                    return true;
-                }
-                case R.id.menu_delete: {
-                    presenter.onDeleteCompositionButtonClicked(composition);
-                    return true;
-                }
-            }
-            return false;
-        });
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.play_queue_item_menu,
+                item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_add_to_playlist: {
+                            presenter.onAddQueueItemToPlayListButtonClicked(composition);
+                            break;
+                        }
+                        case R.id.menu_edit: {
+                            startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                            break;
+                        }
+                        case R.id.menu_share: {
+                            onShareCompositionClicked(composition);
+                            break;
+                        }
+                        case R.id.menu_delete_from_queue: {
+                            presenter.onDeleteQueueItemClicked(playQueueItem);
+                            break;
+                        }
+                        case R.id.menu_delete: {
+                            presenter.onDeleteCompositionButtonClicked(composition);
+                            break;
+                        }
+                    }
+                });
     }
 
     private void onRepeatModeButtonClicked(View view) {
-        PopupMenu popup = new PopupMenu(requireContext(), view);
-        popup.inflate(R.menu.repeat_mode_menu);
-        popup.setOnMenuItemClickListener(item -> {
-            int repeatMode = RepeatMode.NONE;
-            switch (item.getItemId()) {
-                case R.id.menu_repeat_playlist: {
-                    repeatMode = RepeatMode.REPEAT_PLAY_LIST;
-                    break;
-                }
-                case R.id.menu_repeat_composition: {
-                    repeatMode = RepeatMode.REPEAT_COMPOSITION;
-                    break;
-                }
-                case R.id.menu_do_not_repeat: {
-                    repeatMode = RepeatMode.NONE;
-                    break;
-                }
-            }
-            presenter.onRepeatModeChanged(repeatMode);
-            return true;
-        });
-        insertMenuItemIcons(requireContext(), popup);
-        popup.show();
+        PopupMenuWindow.showPopup(view,
+                R.menu.repeat_mode_menu,
+                item -> {
+                    int repeatMode = RepeatMode.NONE;
+                    switch (item.getItemId()) {
+                        case R.id.menu_repeat_playlist: {
+                            repeatMode = RepeatMode.REPEAT_PLAY_LIST;
+                            break;
+                        }
+                        case R.id.menu_repeat_composition: {
+                            repeatMode = RepeatMode.REPEAT_COMPOSITION;
+                            break;
+                        }
+                        case R.id.menu_do_not_repeat: {
+                            repeatMode = RepeatMode.NONE;
+                            break;
+                        }
+                    }
+                    presenter.onRepeatModeChanged(repeatMode);
+                });
     }
 
     private void onShareCompositionClicked(Composition composition) {
-        shareFile(requireContext(), composition.getFilePath());
+        DialogUtils.shareComposition(requireContext(), composition);
     }
 }

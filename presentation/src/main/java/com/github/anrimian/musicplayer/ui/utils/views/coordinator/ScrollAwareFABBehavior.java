@@ -46,15 +46,8 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
     }
 
     @Override
-    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent,
-                                   @NonNull FloatingActionButton child,
-                                   @NonNull View dependency) {
-        return dependency instanceof RecyclerView;
-    }
-
-    @Override
     public boolean onDependentViewChanged(CoordinatorLayout parent,
-                                          FloatingActionButton child,
+                                          @NonNull FloatingActionButton child,
                                           View dependency) {
         if (!isAttachedToRecyclerView) {
             RecyclerView recyclerView = (RecyclerView) dependency;
@@ -80,9 +73,10 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                                int dyConsumed,
                                int dxUnconsumed,
                                int dyUnconsumed,
-                               int type) {
+                               int type,
+                               @NonNull int[] consumed) {
         super.onNestedScroll(coordinatorLayout, fab, target, dxConsumed, dyConsumed, dxUnconsumed,
-                dyUnconsumed, type);
+                dyUnconsumed, type, consumed);
         if (type == ViewCompat.TYPE_TOUCH) {
             if (dyConsumed > 0 && hideAnimator == null) {
                 if (showAnimator != null ) {

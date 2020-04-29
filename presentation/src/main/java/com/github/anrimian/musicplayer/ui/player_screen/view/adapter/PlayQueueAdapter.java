@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
@@ -62,7 +62,7 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
 
         boolean isCurrentItem = item.equals(currentItem);
         holder.showAsCurrentItem(isCurrentItem);
-        holder.showAsPlaying(isCurrentItem && play);
+        holder.showAsPlaying(isCurrentItem && play, false);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
 
             boolean isCurrentItem = holder.getPlayQueueItem().equals(currentItem);
             holder.showAsCurrentItem(isCurrentItem);
-            holder.showAsPlaying(isCurrentItem && play);
+            holder.showAsPlaying(isCurrentItem && play, true);
         }
     }
 
@@ -97,7 +97,7 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
         for (PlayQueueViewHolder holder: viewHolders) {
             boolean isCurrentItem = holder.getPlayQueueItem().equals(currentItem);
             holder.showAsCurrentItem(isCurrentItem);
-            holder.showAsPlaying(isCurrentItem && play);
+            holder.showAsPlaying(isCurrentItem && play, true);
         }
     }
 

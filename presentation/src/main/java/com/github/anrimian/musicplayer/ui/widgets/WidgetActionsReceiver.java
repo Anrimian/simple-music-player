@@ -7,7 +7,7 @@ import android.content.Intent;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;

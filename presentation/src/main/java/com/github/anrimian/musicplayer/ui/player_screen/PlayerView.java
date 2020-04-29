@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -45,9 +45,9 @@ public interface PlayerView extends MvpView {
     void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void scrollQueueToPosition(int position, boolean smoothScroll);
+    void scrollQueueToPosition(int position);
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updatePlayQueue(List<PlayQueueItem> items);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
@@ -63,7 +63,7 @@ public interface PlayerView extends MvpView {
     void showSelectPlayListDialog();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showShareMusicDialog(String filePath);
+    void showShareMusicDialog(Composition composition);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showAddingToPlayListError(ErrorCommand errorCommand);
@@ -100,4 +100,10 @@ public interface PlayerView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void startEditCompositionScreen(long id);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showErrorMessage(ErrorCommand errorCommand);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showDeletedItemMessage();
 }

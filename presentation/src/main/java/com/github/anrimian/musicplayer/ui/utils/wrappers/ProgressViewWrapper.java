@@ -6,10 +6,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.anrimian.musicplayer.R;
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
+
+import com.github.anrimian.musicplayer.R;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -20,7 +20,6 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibili
 /**
  * Created on 21.02.2016.
  */
-@SuppressWarnings("WeakerAccess")
 public class ProgressViewWrapper {
 
     private static final int NO_DRAWABLE = -1;
@@ -57,13 +56,13 @@ public class ProgressViewWrapper {
 
     public void hideAll(Runnable onHidden) {
         animateVisibility(progressStateContainer, INVISIBLE, onHidden);
-        progressStateContainer.setClickable(false);//maybe it is not necessary
+        progressStateContainer.setClickable(false);
         handler.removeCallbacksAndMessages(null);
     }
 
     public void hideAll() {
         progressStateContainer.setVisibility(INVISIBLE);
-        progressStateContainer.setClickable(false);//maybe it is not necessary
+        progressStateContainer.setClickable(false);
         handler.removeCallbacksAndMessages(null);
     }
 

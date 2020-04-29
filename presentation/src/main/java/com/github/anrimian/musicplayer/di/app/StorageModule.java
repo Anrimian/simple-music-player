@@ -2,20 +2,34 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.music.edit.EditorRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.music.folders.CompositionFoldersCache;
-import com.github.anrimian.musicplayer.data.repositories.music.folders.MusicFolderDataSource;
-import com.github.anrimian.musicplayer.data.storage.files.FileManager;
-import com.github.anrimian.musicplayer.data.storage.providers.MediaStorageRepositoryImpl;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicDataSource;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
+import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.artist.StorageArtistsProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.business.editor.CompositionEditorInteractor;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MediaStorageRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MusicProviderRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -34,68 +48,131 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
-    StorageMusicProvider storageMusicProvider(Context context) {
-        return new StorageMusicProvider(context);
+    StorageMusicProvider storageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
+        return new StorageMusicProvider(context, albumsProvider);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    FileManager fileManager() {
-        return new FileManager();
+    StorageArtistsProvider storageArtistProvider(Context context) {
+        return new StorageArtistsProvider(context);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    StorageMusicDataSource storageMusicDataSource(StorageMusicProvider musicProvider,
-                                                  FileManager fileManager,
-                                                  CompositionsDaoWrapper compositionsDao,
-                                                  @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new StorageMusicDataSource(musicProvider, compositionsDao, fileManager, scheduler);
+    StorageGenresProvider storageGenresProvider(Context context) {
+        return new StorageGenresProvider(context);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    CompositionFoldersCache compositionFoldersCache(CompositionsDaoWrapper compositionsDao) {
-        return new CompositionFoldersCache(compositionsDao);
+    StorageAlbumsProvider storageAlbumsProvider(Context context) {
+        return new StorageAlbumsProvider(context);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    MusicFolderDataSource musicFolderDataSource(CompositionFoldersCache storageMusicDataSource) {
-        return new MusicFolderDataSource(storageMusicDataSource);
+    CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider) {
+        return new CompositionSourceEditor(musicProvider);
     }
 
     @Provides
     @Nonnull
-    EditorRepository compositionEditorRepository(StorageMusicDataSource storageMusicDataSource,
+    @Singleton
+    EditorRepository compositionEditorRepository(CompositionSourceEditor sourceEditor,
+                                                 StorageFilesDataSource filesDataSource,
+                                                 CompositionsDaoWrapper compositionsDao,
+                                                 AlbumsDaoWrapper albumsDao,
+                                                 ArtistsDaoWrapper artistsDao,
+                                                 GenresDaoWrapper genresDao,
+                                                 FoldersDaoWrapper foldersDao,
+                                                 StorageMusicProvider storageMusicProvider,
+                                                 StorageGenresProvider storageGenresProvider,
+                                                 StateRepository stateRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new EditorRepositoryImpl(storageMusicDataSource, scheduler);
+        return new EditorRepositoryImpl(
+                sourceEditor,
+                filesDataSource,
+                compositionsDao,
+                albumsDao,
+                artistsDao,
+                genresDao,
+                foldersDao,
+                storageMusicProvider,
+                storageGenresProvider,
+                stateRepository,
+                scheduler);
     }
 
     @Provides
     @Nonnull
-    CompositionEditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
-                                                            MusicProviderRepository musicProviderRepository) {
-        return new CompositionEditorInteractor(editorRepository, musicProviderRepository);
+    StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
+        return new StorageFilesDataSource(musicProvider);
+    }
+
+    @Provides
+    @Nonnull
+    EditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
+                                                 LibraryRepository musicProviderRepository) {
+        return new EditorInteractor(editorRepository, musicProviderRepository);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    MediaStorageRepository mediaStorageRepository(StorageMusicProvider musicProvider,
+    MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
-                                                  CompositionsDaoWrapper compositionsDao,
-                                                  PlayListsDaoWrapper playListsDao,
+                                                  StorageGenresProvider genresProvider,
+                                                  GenresDaoWrapper genresDao,
+                                                  StorageCompositionAnalyzer compositionAnalyzer,
+                                                  StoragePlaylistAnalyzer storagePlaylistAnalyzer,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new MediaStorageRepositoryImpl(musicProvider,
+        return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
-                compositionsDao,
-                playListsDao,
+                genresProvider,
+                genresDao,
+                compositionAnalyzer,
+                storagePlaylistAnalyzer,
                 scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    StorageCompositionAnalyzer compositionAnalyzer(CompositionsDaoWrapper compositionsDao,
+                                                   FoldersDaoWrapper foldersDaoWrapper,
+                                                   StateRepository stateRepository,
+                                                   StorageCompositionsInserter compositionsInserter) {
+        return new StorageCompositionAnalyzer(compositionsDao,
+                foldersDaoWrapper,
+                stateRepository,
+                compositionsInserter);
+    }
+
+    @Provides
+    @Nonnull
+    StoragePlaylistAnalyzer storagePlaylistAnalyzer(PlayListsDaoWrapper playListsDao,
+                                                    StoragePlayListsProvider playListsProvider) {
+        return new StoragePlaylistAnalyzer(playListsDao, playListsProvider);
+    }
+
+    @Provides
+    @Nonnull
+    StorageCompositionsInserter compositionsInserter(AppDatabase appDatabase,
+                                                     CompositionsDao compositionsDao,
+                                                     CompositionsDaoWrapper compositionsDaoWrapper,
+                                                     FoldersDao foldersDao,
+                                                     ArtistsDao artistsDao,
+                                                     AlbumsDao albumsDao) {
+        return new StorageCompositionsInserter(appDatabase,
+                compositionsDao,
+                compositionsDaoWrapper,
+                foldersDao,
+                artistsDao,
+                albumsDao);
     }
 
 }

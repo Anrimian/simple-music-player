@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.domain.models.composition;
 
+import com.github.anrimian.musicplayer.domain.utils.Objects;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -15,10 +17,10 @@ public class Composition {
     private final String artist;
     @Nullable
     private final String title;
+    @Nonnull
+    private final String fileName;
     @Nullable
     private final String album;
-    @Nonnull
-    private final String filePath;
 
     private final long duration;
     private final long size;
@@ -35,21 +37,22 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
-    public Composition(@Nullable String artist,
-                       @Nullable String title,
-                       @Nullable String album,
-                       @Nonnull String filePath,
+    @SuppressWarnings("NullableProblems")//annotations break room annotations processing
+    public Composition(String artist,
+                       String title,
+                       String fileName,
+                       String album,
                        long duration,
                        long size,
                        long id,
-                       @Nullable Long storageId,
-                       @Nonnull Date dateAdded,
-                       @Nonnull Date dateModified,
-                       @Nullable CorruptionType corruptionType) {
+                       Long storageId,
+                       Date dateAdded,
+                       Date dateModified,
+                       CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
+        this.fileName = fileName;
         this.album = album;
-        this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.id = id;
@@ -57,20 +60,6 @@ public class Composition {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
-    }
-
-    public Composition copy(String newPath) {
-        return new Composition(artist,
-                title,
-                album,
-                newPath,
-                duration,
-                size,
-                id,
-                storageId,
-                dateAdded,
-                dateModified,
-                corruptionType);
     }
 
     @Nullable
@@ -88,14 +77,14 @@ public class Composition {
         return title;
     }
 
+    @Nonnull
+    public String getFileName() {
+        return fileName;
+    }
+
     @Nullable
     public String getAlbum() {
         return album;
-    }
-
-    @Nonnull
-    public String getFilePath() {
-        return filePath;
     }
 
     public long getDuration() {
@@ -128,12 +117,9 @@ public class Composition {
     @Override
     public String toString() {
         return "Composition{" +
-                "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
-                "\n duration=" + duration +
-                "\n size=" + size +
-                "\n dateAdded=" + dateAdded +
-                "\n dateModified=" + dateModified +
+                "title='" + title + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", id=" + id +
                 '}';
     }
 

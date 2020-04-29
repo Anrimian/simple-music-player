@@ -14,10 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnectionReceiver;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,11 +48,7 @@ public class HeadsetSettingsFragment extends Fragment {
         toolbar.setSubtitle(R.string.headset);
         toolbar.setTitleClickListener(null);
 
-        SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-        SlidrPanel.replace(nsvContainer,
-                slidrConfig,
-                () -> FragmentNavigation.from(requireFragmentManager()).goBack(0),
-                toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(nsvContainer, this, toolbar::onStackFragmentSlided);
 
         onCheckChanged(cbDecreaseVolume, checked ->
                 BluetoothConnectionReceiver.setEnabled(requireContext(), checked)

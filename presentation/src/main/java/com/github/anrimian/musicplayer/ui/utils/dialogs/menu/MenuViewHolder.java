@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.LayoutRes;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
@@ -26,8 +27,9 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
 
     MenuViewHolder(LayoutInflater inflater,
                    ViewGroup parent,
+                   @LayoutRes int menuViewRes,
                    OnItemClickListener<MenuItem> onItemClickListener) {
-        super(inflater.inflate(R.layout.item_menu, parent, false));
+        super(inflater.inflate(menuViewRes, parent, false));
         ButterKnife.bind(this, itemView);
 
         itemView.setOnClickListener(v -> onItemClickListener.onItemClick(menuItem));

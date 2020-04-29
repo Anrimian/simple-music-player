@@ -28,12 +28,26 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
+    <style name="ButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/bg_click_inverse</item>
+    </style>
+
+    <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>
 
     <style name="TextStyleItemPrimary" parent="TextStyle">
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.Chip">
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxWidth">240dp</item>
     </style>
 
     <style name="TextStyleItemPrimary.Medium">
@@ -59,6 +73,8 @@
 
     <style name="TextStyleDialogItem" parent="@style/TextStyle">
         <item name="android:textSize">15sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
@@ -132,6 +148,11 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextStyle.Snackbar">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="TextStyle.Progress">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:textSize">13sp</item>
@@ -142,5 +163,12 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textColorHint">?android:attr/textColorSecondary</item>
     </style>
+
+    <style name="TextStyle.ContentTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
 </resources>

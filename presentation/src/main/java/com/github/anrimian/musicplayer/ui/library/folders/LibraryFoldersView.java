@@ -1,17 +1,17 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.order.Order;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategyStrategy;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import moxy.MvpView;
 import moxy.viewstate.strategy.AddToEndSingleStrategy;
@@ -26,7 +26,8 @@ import moxy.viewstate.strategy.StateStrategyType;
 public interface LibraryFoldersView extends MvpView {
 
     String LIST_STATE = "list_state";
-    String BACK_PATH_BUTTON_STATE = "back_path_button_state";
+    String FOLDER_STATE = "back_path_button_state";
+    String PROGRESS_DIALOG_STATE = "progress_dialog_state";
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showEmptyList();
@@ -43,16 +44,28 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showError(ErrorCommand errorCommand);
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
-    void showBackPathButton(@Nonnull String path);
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
+    void showFolderInfo(FolderFileSource folder);
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = BACK_PATH_BUTTON_STATE)
-    void hideBackPathButton();
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
+    void hideFolderInfo();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void hideProgressDialog();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showMoveProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showDeleteProgress();
+
+    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
+    void showRenameProgress();
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void goBackToParentFolderScreen();
 
-    @StateStrategyType(ListStateStrategyStrategy.class)
+    @StateStrategyType(ListStateStrategy.class)
     void updateList(List<FileSource> update);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
@@ -68,7 +81,7 @@ public interface LibraryFoldersView extends MvpView {
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void showSelectPlayListForFolderDialog();
+    void showSelectPlayListForFolderDialog(FolderFileSource folder);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
@@ -86,16 +99,13 @@ public interface LibraryFoldersView extends MvpView {
     void showSearchMode(boolean show);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
-    void sendCompositions(List<String> paths);
+    void sendCompositions(List<Composition> compositions);
 
     @StateStrategyType(OneExecutionStateStrategy.class)
     void showReceiveCompositionsForSendError(ErrorCommand errorCommand);
 
     @StateStrategyType(SkipStrategy.class)
-    void goToMusicStorageScreen(String path);
-
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showCurrentPlayingComposition(Composition composition);
+    void goToMusicStorageScreen(Long folderId);
 
     @StateStrategyType(SkipStrategy.class)
     void showCompositionActionDialog(Composition composition);
@@ -104,13 +114,10 @@ public interface LibraryFoldersView extends MvpView {
     void showErrorMessage(ErrorCommand errorCommand);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showQueueActions(boolean show);
-
-    @StateStrategyType(AddToEndSingleStrategy.class)
     void setDisplayCoversEnabled(boolean isCoversEnabled);
 
     @StateStrategyType(SkipStrategy.class)
-    void showInputFolderNameDialog(String path);
+    void showInputFolderNameDialog(FolderFileSource folder);
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showSelectionMode(int count);
@@ -133,6 +140,15 @@ public interface LibraryFoldersView extends MvpView {
     @StateStrategyType(SkipStrategy.class)
     void showInputNewFolderNameDialog();
 
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void showAddedIgnoredFolderMessage(IgnoredFolder folder);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+
+    @StateStrategyType(OneExecutionStateStrategy.class)
+    void onCompositionsAddedToQueue(List<Composition> compositions);
+
     @StateStrategyType(AddToEndSingleStrategy.class)
-    void showPlayState(boolean play);
+    void showCurrentComposition(CurrentComposition currentComposition);
 }

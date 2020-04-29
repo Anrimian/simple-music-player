@@ -35,6 +35,9 @@
             android:importantForAccessibility="no"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="@dimen/content_spacing_margin"
+            android:paddingBottom="@dimen/content_spacing_margin"
+            android:clipToPadding="false"
             tools:listitem="@layout/item_play_list" />
 
         <FrameLayout

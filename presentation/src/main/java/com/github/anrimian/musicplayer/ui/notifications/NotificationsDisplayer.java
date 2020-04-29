@@ -4,10 +4,12 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.annotation.Nullable;
@@ -16,10 +18,10 @@ import androidx.core.app.NotificationCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.ui.common.format.ImageFormatUtils;
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 
@@ -29,7 +31,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
@@ -40,19 +42,26 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class NotificationsDisplayer {
 
-    public static final int FOREGROUND_NOTIFICATION_ID = 1;
-    public static final int ERROR_NOTIFICATION_ID = 2;
+    private static final int FOREGROUND_NOTIFICATION_ID = 1;
+    private static final int ERROR_NOTIFICATION_ID = 2;
 
     public static final String FOREGROUND_CHANNEL_ID = "0";
-    public static final String ERROR_CHANNEL_ID = "1";
+    private static final String ERROR_CHANNEL_ID = "1";
 
     private final Context context;
     private final NotificationManager notificationManager;
     private final AppNotificationBuilder notificationBuilder;
+    private final CoverImageLoader coverImageLoader;
 
-    public NotificationsDisplayer(Context context, AppNotificationBuilder notificationBuilder) {
+    private Bitmap currentNotificationBitmap;
+    private Runnable cancellationRunnable;
+
+    public NotificationsDisplayer(Context context,
+                                  AppNotificationBuilder notificationBuilder,
+                                  CoverImageLoader coverImageLoader) {
         this.context = context;
         this.notificationBuilder = notificationBuilder;
+        this.coverImageLoader = coverImageLoader;
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -98,24 +107,71 @@ public class NotificationsDisplayer {
         notificationManager.cancel(ERROR_NOTIFICATION_ID);
     }
 
-    public Notification getForegroundNotification(boolean play,
-                                                  @Nullable PlayQueueItem composition,
-                                                  MediaSessionCompat mediaSession,
-                                                  @Nullable MusicNotificationSetting notificationSetting) {
-        return getDefaultMusicNotification(play, composition, mediaSession, notificationSetting)
+    public void startForegroundNotification(Service service,
+                                            boolean play,
+                                            @Nullable PlayQueueItem queueItem,
+                                            MediaSessionCompat mediaSession,
+                                            @Nullable MusicNotificationSetting notificationSetting) {
+        Notification notification = getDefaultMusicNotification(play,
+                queueItem,
+                mediaSession,
+                notificationSetting)
                 .build();
+        service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
+
+        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
     }
 
     public void updateForegroundNotification(boolean play,
-                                             @Nullable PlayQueueItem composition,
+                                             @Nullable PlayQueueItem queueItem,
                                              MediaSessionCompat mediaSession,
                                              MusicNotificationSetting notificationSetting) {
+        if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
+            return;
+        }
+
         Notification notification = getDefaultMusicNotification(play,
-                composition,
+                queueItem,
                 mediaSession,
                 notificationSetting)
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
+
+        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+    }
+
+    private void showMusicNotificationWithCover(boolean play,
+                                                @Nullable PlayQueueItem queueItem,
+                                                MediaSessionCompat mediaSession,
+                                                MusicNotificationSetting notificationSetting) {
+        if (cancellationRunnable != null) {
+            cancellationRunnable.run();
+        }
+
+        if (queueItem == null) {
+            return;
+        }
+
+        boolean showCovers = false;
+        if (notificationSetting != null) {
+            showCovers = notificationSetting.isShowCovers();
+        }
+        if (!showCovers) {
+            return;
+        }
+
+        Composition composition = queueItem.getComposition();
+
+        cancellationRunnable = coverImageLoader.loadNotificationImage(composition, bitmap -> {
+            NotificationCompat.Builder builder = getDefaultMusicNotification(play,
+                    queueItem,
+                    mediaSession,
+                    notificationSetting);
+
+            builder.setLargeIcon(bitmap);
+            currentNotificationBitmap = bitmap;
+            notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
+        });
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
@@ -166,7 +222,6 @@ public class NotificationsDisplayer {
 
         NotificationCompat.Builder builder = notificationBuilder.buildMusicNotification(context)
                 .setColorized(coloredNotification)
-                .setColor(getColor(context, R.color.default_notification_color))
                 .setSmallIcon(R.drawable.ic_music_box)
                 .setContentIntent(pIntent)
                 .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
@@ -181,7 +236,10 @@ public class NotificationsDisplayer {
             Composition composition = queueItem.getComposition();
 
             if (showCovers) {
-                Bitmap bitmap = ImageFormatUtils.getNotificationImage(composition);
+                Bitmap bitmap = currentNotificationBitmap;
+                if (bitmap == null || bitmap.isRecycled()) {
+                    bitmap = coverImageLoader.getDefaultNotificationBitmap();
+                }
                 builder.setLargeIcon(bitmap);
             }
 
@@ -189,6 +247,19 @@ public class NotificationsDisplayer {
                     .setContentText(formatCompositionAuthor(composition, context));
         }
         return builder;
+    }
+
+    private boolean isNotificationVisible(NotificationManager notificationManager,
+                                          int notificationId) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+            for (StatusBarNotification notification : notifications) {
+                if (notification.getId() == notificationId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private String getString(@StringRes int resId) {

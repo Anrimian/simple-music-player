@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.di.app.library.files.folder;
 
-import com.github.anrimian.musicplayer.domain.business.library.LibraryFilesInteractor;
-import com.github.anrimian.musicplayer.domain.business.player.MusicPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.business.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
 
@@ -24,20 +24,20 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 public class FolderModule {
 
     @Nullable
-    private String path;
+    private Long folderId;
 
-    public FolderModule(@Nullable String path) {
-        this.path = path;
+    public FolderModule(@Nullable Long folderId) {
+        this.folderId = folderId;
     }
 
     @Provides
     @Nonnull
-    LibraryFoldersPresenter libraryFoldersPresenter(LibraryFilesInteractor interactor,
+    LibraryFoldersPresenter libraryFoldersPresenter(LibraryFoldersScreenInteractor interactor,
                                                     MusicPlayerInteractor playerInteractor,
                                                     DisplaySettingsInteractor displaySettingsInteractor,
                                                     ErrorParser errorParser,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new LibraryFoldersPresenter(path,
+        return new LibraryFoldersPresenter(folderId,
                 interactor,
                 playerInteractor,
                 displaySettingsInteractor,

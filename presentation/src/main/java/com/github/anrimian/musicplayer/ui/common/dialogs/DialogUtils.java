@@ -11,9 +11,11 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
@@ -21,15 +23,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.github.anrimian.musicplayer.domain.models.composition.CompositionModelHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.getLastPathSegment;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 
 public class DialogUtils {
 
     public static void showConfirmDeleteDialog(Context context,
-                                        List<Composition> compositions,
-                                        Runnable deleteCallback) {
+                                               List<Composition> compositions,
+                                               Runnable deleteCallback) {
         String message = compositions.size() == 1?
                 context.getString(R.string.delete_composition_template, formatCompositionName(compositions.get(0))):
                 context.getString(R.string.delete_template, getDativCompositionsMessage(context, compositions.size()));
@@ -37,11 +40,19 @@ public class DialogUtils {
     }
 
     public static void showConfirmDeleteDialog(Context context,
-                                               FolderFileSource folderFileSource,
+                                               FolderFileSource folder,
                                                Runnable deleteCallback) {
-        String message = context.getString(R.string.delete_folder_template,
-                getLastPathSegment(folderFileSource.getPath()),
-                getDativCompositionsMessage(context, folderFileSource.getFilesCount()));
+        int filesCount = folder.getFilesCount();
+        String name = folder.getName();
+        String message;
+        if (filesCount == 0) {
+            message = context.getString(R.string.delete_empty_folder, name);
+        } else {
+            message = context.getString(R.string.delete_folder_template,
+                    name,
+                    getDativCompositionsMessage(context, filesCount));
+        }
+
         showConfirmDeleteDialog(context, message, deleteCallback);
     }
 
@@ -64,45 +75,38 @@ public class DialogUtils {
                 .show();
     }
 
-    public static void shareFile(Context context, String filePath) {
+    public static void shareComposition(Context context, Composition composition) {
+        Components.getAppComponent().sourceRepository()
+                .getCompositionUri(composition.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(uri -> shareComposition(context, uri))
+                .doOnError(t -> showShareCompositionErrorMessage(t, context))
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    public static void shareComposition(Context context, Uri fileUri) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("audio/*");
-
-        Uri fileUri = createUri(context, filePath);
-        if (fileUri == null) {
-            return;
-        }
         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.share)));
     }
 
-    public static void shareCompositions(Context context, Collection<Composition> filePaths) {
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (Composition composition : filePaths) {
-            Uri fileUri = createUri(context, composition.getFilePath());
-            if (fileUri == null) {
-                return;
-            }
-            uris.add(fileUri);
-        }
-        shareFiles(context, uris);
+    public static void shareCompositions(Context context, Collection<Composition> compositions) {
+        Components.getAppComponent().sourceRepository()
+                .getCompositionUris(compositions)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(uris -> shareCompositions(context, uris))
+                .doOnError(t -> showShareCompositionErrorMessage(t, context))
+                .ignoreElement()
+                .onErrorComplete()
+                .subscribe();
     }
 
-    public static void shareFiles(Context context, Collection<String> filePaths) {
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (String path : filePaths) {
-            Uri fileUri = createUri(context, path);
-            if (fileUri == null) {
-                return;
-            }
-            uris.add(fileUri);
-        }
-        shareFiles(context, uris);
-    }
-
-    public static void shareFiles(Context context, ArrayList<Uri> uris) {
+    public static void shareCompositions(Context context, ArrayList<Uri> uris) {
         Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         intent.setType("audio/*");
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
@@ -144,6 +148,14 @@ public class DialogUtils {
                     Toast.LENGTH_LONG).show();
             return null;
         }
+    }
+
+    private static void showShareCompositionErrorMessage(Throwable throwable, Context context) {
+        ErrorCommand errorCommand = Components.getAppComponent()
+                .errorParser()
+                .parseError(throwable);
+
+        Toast.makeText(context, errorCommand.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     private static String getDativCompositionsMessage(Context context, int count) {

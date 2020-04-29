@@ -3,29 +3,17 @@ package com.github.anrimian.musicplayer.domain.models.playlist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class PlayListItem {
 
     private final long itemId;
 
-    @Nullable
-    private final Long storageItemId;
-
     @Nonnull
     private final Composition composition;
 
-    public PlayListItem(long itemId,
-                        @Nullable Long storageItemId,
-                        @Nonnull Composition composition) {
+    public PlayListItem(long itemId, @Nonnull Composition composition) {
         this.itemId = itemId;
-        this.storageItemId = storageItemId;
         this.composition = composition;
-    }
-
-    @Nullable
-    public Long getStorageItemId() {
-        return storageItemId;
     }
 
     public long getItemId() {

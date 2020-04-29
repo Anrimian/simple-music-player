@@ -42,7 +42,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        rxPermissions = new RxPermissions(requireActivity());
+        rxPermissions = new RxPermissions(this);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onTryAgainButtonClicked);
@@ -69,7 +69,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
         AppComponent appComponent = Components.getAppComponent();
         appComponent.widgetUpdater().start();
         appComponent.notificationDisplayer().removeErrorNotification();
-        appComponent.mediaStorageRepository().initialize();
+        appComponent.mediaScannerRepository().runStorageObserver();
     }
 
     @Override
