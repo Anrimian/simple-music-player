@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.settings;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +25,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 
-import butterknife.BindView;
-
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 /**
@@ -38,35 +34,20 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 
 public class SettingsFragment extends Fragment implements FragmentLayerListener {
 
-    @BindView(R.id.fl_container)
-    View flContainer;
-
-    @BindView(R.id.tv_display)
-    TextView tvDisplay;
-
-    @BindView(R.id.tv_player)
-    TextView tvPlayer;
-
-    @BindView(R.id.tv_theme_name)
-    TextView tvTheme;
-
-    @BindView(R.id.tv_headset)
-    TextView tvHeadset;
-
-    @BindView(R.id.tv_library)
-    TextView tvLibrary;
+    private View flContainer;
+    private TextView tvDisplay;
+    private TextView tvPlayer;
+    private TextView tvTheme;
+    private TextView tvHeadset;
+    private TextView tvLibrary;
 
     private FragmentNavigation navigation;
-
-    long start;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        start = System.currentTimeMillis();
-
         Context context = requireContext();
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
@@ -74,69 +55,40 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-//        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-//        linearLayout.setDividerPadding();
-//        linearLayout.setDividerPadding(200);
-//        linearLayout.setDividerDrawable(ContextCompat.getDrawable(context, R.drawable.divider));
         linearLayout.setBackgroundColor(getColorFromAttr(context, android.R.attr.colorBackground));
+
         flContainer = linearLayout;
         frameLayout.addView(linearLayout);
 
-        TextView textView = new TextView(context, null, 0, R.style.TextStyleButton);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        textView.setText(R.string.display);
-        tvDisplay = textView;
-        linearLayout.addView(textView);
+        tvDisplay = LayoutBuilder.simpleTextView(context, R.string.display);
+        linearLayout.addView(tvDisplay);
 
-        View divider = LayoutBuilder.divider(context);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, 1);
-        params.setMarginStart(context.getResources().getDimensionPixelSize(R.dimen.toolbar_content_start));
-        divider.setLayoutParams(params);
-        linearLayout.addView(divider);
+        linearLayout.addView(LayoutBuilder.divider(context));
 
-        textView = new TextView(context, null, 0, R.style.TextStyleButton);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        textView.setText(R.string.playing);
-        tvPlayer = textView;
-        linearLayout.addView(textView);
+        tvLibrary = LayoutBuilder.simpleTextView(context, R.string.library);
+        linearLayout.addView(tvLibrary);
 
-        divider = LayoutBuilder.divider(context);
-        params = new LinearLayout.LayoutParams(MATCH_PARENT, 1);
-        params.setMarginStart(context.getResources().getDimensionPixelSize(R.dimen.toolbar_content_start));
-        divider.setLayoutParams(params);
-        linearLayout.addView(divider);
+        linearLayout.addView(LayoutBuilder.divider(context));
 
-        textView = new TextView(context, null, 0, R.style.TextStyleButton);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        textView.setText(R.string.headset);
-        tvHeadset = textView;
-        linearLayout.addView(textView);
+        tvPlayer = LayoutBuilder.simpleTextView(context, R.string.playing);
+        linearLayout.addView(tvPlayer);
 
-        divider = LayoutBuilder.divider(context);
-        params = new LinearLayout.LayoutParams(MATCH_PARENT, 1);
-        params.setMarginStart(context.getResources().getDimensionPixelSize(R.dimen.toolbar_content_start));
-        divider.setLayoutParams(params);
-        linearLayout.addView(divider);
+        linearLayout.addView(LayoutBuilder.divider(context));
 
-        textView = new TextView(context, null, 0, R.style.TextStyleButton);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        textView.setText(R.string.theme);
-        tvTheme = textView;
-        linearLayout.addView(textView);
+        tvHeadset = LayoutBuilder.simpleTextView(context, R.string.headset);
+        linearLayout.addView(tvHeadset);
+
+        linearLayout.addView(LayoutBuilder.divider(context));
+
+        tvTheme = LayoutBuilder.simpleTextView(context, R.string.theme);
+        linearLayout.addView(tvTheme);
 
         return frameLayout;
-
-//        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-//        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//        ButterKnife.bind(this, view);
-
-        Log.d("KEK3", "view created for: " + (System.currentTimeMillis() - start) + "ms");
-
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
 
         navigation = FragmentNavigation.from(requireFragmentManager());
