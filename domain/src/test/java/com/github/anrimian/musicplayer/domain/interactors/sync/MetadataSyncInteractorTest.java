@@ -13,6 +13,9 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Date;
 
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
+
 import static com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryState.DISABLED_VERSION_TOO_HIGH;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,11 +26,13 @@ public class MetadataSyncInteractorTest {
 
     private SyncSettingsRepository syncSettingsRepository = mock(SyncSettingsRepository.class);
     private RemoteStoragesRepository remoteStoragesRepository = mock(RemoteStoragesRepository.class);
+    private Scheduler scheduler = Schedulers.trampoline();
 
     private MetadataSyncInteractor syncInteractor = new MetadataSyncInteractor(
             1,
             syncSettingsRepository,
-            remoteStoragesRepository);
+            remoteStoragesRepository,
+            scheduler);
 
 
     private RemoteRepositoryType remoteRepositoryType1 = new RemoteRepositoryType("1");

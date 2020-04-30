@@ -4,14 +4,16 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetada
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RunningSyncState;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.exceptions.TooHighRemoteRepositoryVersion;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 
 import java.util.List;
 
-import io.reactivex.Maybe;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryState.DISABLED_VERSION_TOO_HIGH;
@@ -21,30 +23,29 @@ public class MetadataSyncInteractor {
     private final int metadataVersion;
     private final SyncSettingsRepository syncSettingsRepository;
     private final RemoteStoragesRepository remoteStoragesRepository;
+    private final Scheduler scheduler;//single thread pool scheduler
 
     private final BehaviorSubject<RunningSyncState> syncStateSubject = BehaviorSubject.create();
     private final BehaviorSubject<RemoteRepositoryType> currentSyncingRepositorySubject = BehaviorSubject.create();
 
     public MetadataSyncInteractor(int metadataVersion,
                                   SyncSettingsRepository syncSettingsRepository,
-                                  RemoteStoragesRepository remoteStoragesRepository) {
+                                  RemoteStoragesRepository remoteStoragesRepository,
+                                  Scheduler scheduler) {
         this.metadataVersion = metadataVersion;
         this.syncSettingsRepository = syncSettingsRepository;
         this.remoteStoragesRepository = remoteStoragesRepository;
+        this.scheduler = scheduler;
     }
 
-    public synchronized void runSync() {
+    public void runSync() {
         Observable.fromIterable(syncSettingsRepository.getEnabledRemoteRepositories())
-                .flatMapMaybe(this::runSyncFor2)
-                //scheduler
-                //do on error.. send state in syncStateSubject? Sounds good
-                .doFinally(() -> syncStateSubject.onNext(RunningSyncState.IDLE))
+                .flatMapCompletable(this::runSyncFor)
+                .doOnError(this::onSyncError)
+                .onErrorComplete()
+                .doFinally(() -> syncStateSubject.onNext(new RunningSyncState.Idle()))
+                .subscribeOn(scheduler)
                 .subscribe();
-
-        for (RemoteRepositoryType repositoryType: syncSettingsRepository.getEnabledRemoteRepositories()) {
-            currentSyncingRepositorySubject.onNext(repositoryType);
-            runSyncFor(repositoryType);
-        }
     }
 
     public Observable<RunningSyncState> getRunningSyncStateObservable() {
@@ -55,29 +56,32 @@ public class MetadataSyncInteractor {
         return currentSyncingRepositorySubject;
     }
 
-    private Maybe<?> runSyncFor2(RemoteRepositoryType repositoryType) {
-        return Maybe.create(emitter -> {
+    private void onSyncError(Throwable throwable) {
+        syncStateSubject.onNext(new RunningSyncState.Error(throwable));
+    }
 
+    private Completable runSyncFor(RemoteRepositoryType repositoryType) {
+        return Completable.fromAction(() -> {
+            RemoteRepository remoteRepository = remoteStoragesRepository.getRemoteRepository(repositoryType);
+            runSyncForRepository(remoteRepository, repositoryType);
         });
     }
 
-    //handle errors?
-    private void runSyncFor(RemoteRepositoryType repositoryType) {
-        RemoteRepository remoteRepository = remoteStoragesRepository.getRemoteRepository(repositoryType);
-
+    //on error stop sync
+    private void runSyncForRepository(RemoteRepository remoteRepository, RemoteRepositoryType repositoryType) {
         //get metadata from remote
-        syncStateSubject.onNext(RunningSyncState.GET_REMOTE_METADATA);
+        syncStateSubject.onNext(new RunningSyncState.GetRemoteMetadata(repositoryType));
         RemoteFilesMetadata remoteMetadata = remoteRepository.getMetadata();
 
         //check metadata version
         if (remoteMetadata.getVersion() > metadataVersion) {
             remoteStoragesRepository.setEnabledState(repositoryType, DISABLED_VERSION_TOO_HIGH);
-            return;
+            throw new TooHighRemoteRepositoryVersion();
         }
 
         List<FileMetadata> remoteFiles = remoteMetadata.getFiles();
 
-        syncStateSubject.onNext(RunningSyncState.GET_REMOTE_FILE_TABLE);
+        syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
         //get remote real file list
         //get metadata from local
         //get local real file list
