@@ -6,10 +6,10 @@ public abstract class RunningSyncState {
 
     }
 
-    public static class GetRemoteMetadata extends RunningSyncState {
+    public abstract static class Running extends RunningSyncState {
         private RemoteRepositoryType repositoryType;
 
-        public GetRemoteMetadata(RemoteRepositoryType repositoryType) {
+        public Running(RemoteRepositoryType repositoryType) {
             this.repositoryType = repositoryType;
         }
 
@@ -18,16 +18,21 @@ public abstract class RunningSyncState {
         }
     }
 
-    public static class GetRemoteFileTable extends RunningSyncState {
-        private RemoteRepositoryType repositoryType;
+    public static class GetRemoteMetadata extends Running {
+
+        public GetRemoteMetadata(RemoteRepositoryType repositoryType) {
+            super(repositoryType);
+        }
+    }
+
+    public static class GetRemoteFileTable extends Running {
 
         public GetRemoteFileTable(RemoteRepositoryType repositoryType) {
-            this.repositoryType = repositoryType;
+            super(repositoryType);
         }
+    }
 
-        public RemoteRepositoryType getRepositoryType() {
-            return repositoryType;
-        }
+    public static class CollectLocalFileInfo extends RunningSyncState {
     }
 
     public static class Error extends RunningSyncState {

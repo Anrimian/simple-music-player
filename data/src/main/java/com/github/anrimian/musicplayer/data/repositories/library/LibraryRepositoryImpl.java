@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -244,6 +245,11 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     public Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder) {
         return Single.fromCallable(() -> foldersDao.getAllParentFoldersId(currentFolder))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public List<FileMetadata> getFilesList() {
+        return null;
     }
 
     private List<Long> extractFolderIds(List<FileSource> sources) {

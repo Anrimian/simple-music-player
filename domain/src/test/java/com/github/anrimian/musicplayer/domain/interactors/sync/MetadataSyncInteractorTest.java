@@ -32,7 +32,7 @@ public class MetadataSyncInteractorTest {
             1,
             syncSettingsRepository,
             remoteStoragesRepository,
-            scheduler);
+            libraryRepository, scheduler);
 
 
     private RemoteRepositoryType remoteRepositoryType1 = new RemoteRepositoryType("1");

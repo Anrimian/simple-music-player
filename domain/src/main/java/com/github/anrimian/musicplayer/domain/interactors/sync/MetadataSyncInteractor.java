@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.sync;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
@@ -8,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.exceptions
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class MetadataSyncInteractor {
     private final int metadataVersion;
     private final SyncSettingsRepository syncSettingsRepository;
     private final RemoteStoragesRepository remoteStoragesRepository;
+    private final LibraryRepository libraryRepository;
     private final Scheduler scheduler;//single thread pool scheduler
 
     private final BehaviorSubject<RunningSyncState> syncStateSubject = BehaviorSubject.create();
@@ -31,10 +34,12 @@ public class MetadataSyncInteractor {
     public MetadataSyncInteractor(int metadataVersion,
                                   SyncSettingsRepository syncSettingsRepository,
                                   RemoteStoragesRepository remoteStoragesRepository,
+                                  LibraryRepository libraryRepository,
                                   Scheduler scheduler) {
         this.metadataVersion = metadataVersion;
         this.syncSettingsRepository = syncSettingsRepository;
         this.remoteStoragesRepository = remoteStoragesRepository;
+        this.libraryRepository = libraryRepository;
         this.scheduler = scheduler;
     }
 
@@ -81,9 +86,14 @@ public class MetadataSyncInteractor {
 
         List<FileMetadata> remoteFiles = remoteMetadata.getFiles();
 
-        syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
         //get remote real file list
+        syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
+        List<FileKey> remoteRealFilesList = remoteRepository.getRealFileList();
+
         //get metadata from local
+        syncStateSubject.onNext(new RunningSyncState.CollectLocalFileInfo());
+        List<FileMetadata> localFiles = libraryRepository.getFilesList();
+
         //get local real file list
         //calculate changes
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
