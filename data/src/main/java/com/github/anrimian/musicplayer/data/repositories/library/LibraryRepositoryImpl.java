@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
-import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -248,7 +248,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public List<FileMetadata> getFilesList() {
+    public LocalFilesMetadata getLocalFilesMetadata() {
         return null;
     }
 

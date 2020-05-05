@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -87,5 +87,5 @@ public interface LibraryRepository {
 
     Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
 
-    List<FileMetadata> getFilesList();
+    LocalFilesMetadata getLocalFilesMetadata();
 }

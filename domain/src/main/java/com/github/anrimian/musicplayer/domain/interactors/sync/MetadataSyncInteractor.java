@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.domain.interactors.sync;
 
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RunningSyncState;
@@ -11,7 +12,8 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.Remo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -44,6 +46,7 @@ public class MetadataSyncInteractor {
     }
 
     public void runSync() {
+        //filter possible often calls?
         Observable.fromIterable(syncSettingsRepository.getEnabledRemoteRepositories())
                 .flatMapCompletable(this::runSyncFor)
                 .doOnError(this::onSyncError)
@@ -84,18 +87,23 @@ public class MetadataSyncInteractor {
             throw new TooHighRemoteRepositoryVersion();
         }
 
-        List<FileMetadata> remoteFiles = remoteMetadata.getFiles();
+        Map<FileKey, FileMetadata> remoteFiles = remoteMetadata.getFiles();
+        Set<FileKey> remoteRemovedFiles = remoteMetadata.getRemovedFiles();
 
         //get remote real file list
         syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
-        List<FileKey> remoteRealFilesList = remoteRepository.getRealFileList();
+        Set<FileKey> remoteRealFiles = remoteRepository.getRealFileList();
 
         //get metadata from local
         syncStateSubject.onNext(new RunningSyncState.CollectLocalFileInfo());
-        List<FileMetadata> localFiles = libraryRepository.getFilesList();
+        LocalFilesMetadata localFilesMetadata = libraryRepository.getLocalFilesMetadata();
+        Map<FileKey, FileMetadata> localFiles = localFilesMetadata.getLocalFiles();
+        Set<FileKey> localRealFiles = localFilesMetadata.getRealFilesList();
+        Set<FileKey> localRemovedFiles = localFilesMetadata.getRemovedFiles();
 
-        //get local real file list
         //calculate changes
+//        FileStructMerger.mergeFilesMap();
+
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
         //save local metadata
         //schedule file tasks

@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +15,8 @@ import java.util.Set;
 public class FileStructMerger {
 
     //move change(+ move command list) - not here, it covers with change case
-    public static <K, T> void mergeFilesMap(
+    //compare create date in removed items set, different type for removed item?
+    public static <K/* extends ItemKey*/, T> void mergeFilesMap(
             Map<K, T> localItems,
             Map<K, T> remoteItems,
             Set<K> localRemovedItems,
@@ -117,5 +119,9 @@ public class FileStructMerger {
                 outRemoteFileToDownload.call(item);
             }
         }
+    }
+
+    public interface ItemKey {
+        Date getCreateDate();
     }
 }

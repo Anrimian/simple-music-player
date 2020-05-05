@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import org.junit.Before;
@@ -26,13 +27,15 @@ public class MetadataSyncInteractorTest {
 
     private SyncSettingsRepository syncSettingsRepository = mock(SyncSettingsRepository.class);
     private RemoteStoragesRepository remoteStoragesRepository = mock(RemoteStoragesRepository.class);
+    private LibraryRepository libraryRepository = mock(LibraryRepository.class);
     private Scheduler scheduler = Schedulers.trampoline();
 
     private MetadataSyncInteractor syncInteractor = new MetadataSyncInteractor(
             1,
             syncSettingsRepository,
             remoteStoragesRepository,
-            libraryRepository, scheduler);
+            libraryRepository,
+            scheduler);
 
 
     private RemoteRepositoryType remoteRepositoryType1 = new RemoteRepositoryType("1");
@@ -65,6 +68,6 @@ public class MetadataSyncInteractorTest {
     }
 
     private RemoteFilesMetadata metadata(int version) {
-        return new RemoteFilesMetadata(version, new Date(), Collections.emptyList());
+        return new RemoteFilesMetadata(version, new Date(), Collections.emptyMap(), Collections.emptySet());
     }
 }
