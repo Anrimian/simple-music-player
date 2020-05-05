@@ -45,4 +45,6 @@ public interface PlayQueueRepository {
     Completable addCompositionsToEnd(List<Composition> compositions);
 
     Single<Boolean> isCurrentCompositionAtEndOfQueue();
+
+    void clearPlayQueue();
 }

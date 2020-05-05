@@ -246,6 +246,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
+    void onClearPlayQueueClicked() {
+        playerInteractor.clearPlayQueue();
+    }
+
     private void swapItems(int from, int to) {
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);

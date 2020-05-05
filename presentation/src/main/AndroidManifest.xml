@@ -22,8 +22,8 @@
     <!--suppress AndroidUnknownAttribute -->
     <application
         android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher_2"
-        android:roundIcon="@mipmap/ic_launcher_2_round"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:allowBackup="false"

@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -129,6 +130,8 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(compositionId))
+                .override(150, 150)
+                .downsample(DownsampleStrategy.AT_MOST)
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
@@ -170,7 +173,9 @@ public class CoverImageLoader {
             }
 
             @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {}
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                callback.call(null);
+            }
         };
     }
 }

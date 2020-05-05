@@ -21,7 +21,7 @@
     <string name="compositions_on_device_not_found">No songs found on device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
     <string name="compositions_for_search_not_found">No matching search results found</string>
-    <string name="foreground_channel_description">Music play notifications</string>
+    <string name="foreground_channel_description">Foreground player notification</string>
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
@@ -212,6 +212,7 @@
     <string name="delete_file">Delete file</string>
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
+    <string name="clear_play_queue">Clear play queue</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

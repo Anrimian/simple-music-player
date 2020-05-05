@@ -699,7 +699,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         playerPanelWrapper.openPlayQueue();
     }
 
-    private boolean onPlayQueueMenuItemClicked(MenuItem menuItem) {
+    private void onPlayQueueMenuItemClicked(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_save_as_playlist: {
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
@@ -707,8 +707,11 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
                 break;
             }
+            case R.id.menu_clear_play_queue: {
+                presenter.onClearPlayQueueClicked();
+                break;
+            }
         }
-        return true;
     }
 
     private void onNavigationIconClicked() {
