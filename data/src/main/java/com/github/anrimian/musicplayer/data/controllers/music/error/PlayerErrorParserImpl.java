@@ -32,6 +32,7 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
         if (throwable instanceof ExoPlaybackException) {
             Throwable cause = throwable.getCause();
             if (cause instanceof Loader.UnexpectedLoaderException) {
+                analytics.processNonFatalError(throwable);
                 return ErrorType.IGNORED;
             }
             if (cause instanceof UnrecognizedInputFormatException) {

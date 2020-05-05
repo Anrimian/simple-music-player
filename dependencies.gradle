@@ -32,7 +32,7 @@ ext {
     butterKnifeVersion = "10.2.1"
     daggerVersion = "2.27"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.11.3"
+    exoPlayerVersion = "2.11.4"
     roomVersion = "2.2.5"
     jTaggerVersion = '2.0.3'
     circleImageViewVersion = "3.1.0"
