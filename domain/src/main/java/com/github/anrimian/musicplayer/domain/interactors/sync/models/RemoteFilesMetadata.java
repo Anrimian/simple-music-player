@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.domain.interactors.sync.models;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 public class RemoteFilesMetadata {
 
@@ -10,12 +9,12 @@ public class RemoteFilesMetadata {
     private final Date modifyTime;
 
     private final Map<FileKey, FileMetadata> files;
-    private final Set<FileKey> removedFiles;
+    private final Map<FileKey, RemovedFileMetadata> removedFiles;
 
     public RemoteFilesMetadata(int version,
                                Date modifyTime,
                                Map<FileKey, FileMetadata> files,
-                               Set<FileKey> removedFiles) {
+                               Map<FileKey, RemovedFileMetadata> removedFiles) {
         this.version = version;
         this.modifyTime = modifyTime;
         this.files = files;
@@ -26,7 +25,7 @@ public class RemoteFilesMetadata {
         return files;
     }
 
-    public Set<FileKey> getRemovedFiles() {
+    public Map<FileKey, RemovedFileMetadata> getRemovedFiles() {
         return removedFiles;
     }
 

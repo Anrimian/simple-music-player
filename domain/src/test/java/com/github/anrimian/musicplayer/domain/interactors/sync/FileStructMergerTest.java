@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,12 +32,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 emptySet(),
                 Collections.emptySet(),
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
@@ -77,19 +79,20 @@ public class FileStructMergerTest {
         remoteItems.put(3, "3");
         remoteItems.put(4, "4");
 
-        Set<Integer> localRemovedItems = new HashSet<>();
-        localRemovedItems.add(4);
+        Map<Integer, Object> localRemovedItems = new HashMap<>();
+        localRemovedItems.put(4, new Object());
 
         List<String> outRemoteFilesToDelete = new ArrayList<>();
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 localRemovedItems,
-                emptySet(),
+                emptyMap(),
                 emptySet(),
                 Collections.emptySet(),
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 outRemoteFilesToDelete::add,
@@ -111,6 +114,54 @@ public class FileStructMergerTest {
     }
 
     @Test
+    public void testIrrelevantDeleteFromLocal() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "1");
+        localItems.put(2, "2");
+        localItems.put(3, "3");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+        remoteItems.put(2, "2");
+        remoteItems.put(3, "3");
+        remoteItems.put(4, "4");
+
+        Map<Integer, Object> localRemovedItems = new HashMap<>();
+        localRemovedItems.put(4, new Object());
+
+        List<String> outRemoteFilesToDelete = new ArrayList<>();
+
+        FileStructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                localRemovedItems,
+                emptyMap(),
+                emptySet(),
+                Collections.emptySet(),
+                (local, remote) -> false,
+                (local, remote) -> false,
+                (item, deletedItem) -> false,
+                String::valueOf,
+                item -> {},
+                outRemoteFilesToDelete::add,
+                item -> {},
+                item -> {},
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> remoteItems.remove(key),
+                (key, oldItem, item) -> {});
+
+        assertEquals(4, remoteItems.size());
+        assertEquals("4", remoteItems.get(4));
+
+        assertEquals(4, localItems.size());
+        assertEquals("4", localItems.get(4));
+
+        assertTrue(outRemoteFilesToDelete.isEmpty());
+    }
+
+    @Test
     public void testDeleteFromRemote() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
@@ -123,19 +174,20 @@ public class FileStructMergerTest {
         remoteItems.put(2, "2");
         remoteItems.put(3, "3");
 
-        Set<Integer> remoteRemovedItems = new HashSet<>();
-        remoteRemovedItems.add(4);
+        Map<Integer, Object> remoteRemovedItems = new HashMap<>();
+        remoteRemovedItems.put(4, new Object());
 
         List<String> outLocalFilesToDelete = new ArrayList<>();
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
+                emptyMap(),
                 remoteRemovedItems,
                 emptySet(),
                 Collections.emptySet(),
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 outLocalFilesToDelete::add,
                 item -> {},
@@ -157,6 +209,54 @@ public class FileStructMergerTest {
     }
 
     @Test
+    public void testIrrelevantDeleteFromRemote() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "1");
+        localItems.put(2, "2");
+        localItems.put(3, "3");
+        localItems.put(4, "4");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+        remoteItems.put(2, "2");
+        remoteItems.put(3, "3");
+
+        Map<Integer, Object> remoteRemovedItems = new HashMap<>();
+        remoteRemovedItems.put(4, new Object());
+
+        List<String> outLocalFilesToDelete = new ArrayList<>();
+
+        FileStructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                emptyMap(),
+                remoteRemovedItems,
+                emptySet(),
+                Collections.emptySet(),
+                (local, remote) -> false,
+                (local, remote) -> false,
+                (item, deletedItem) -> false,
+                String::valueOf,
+                outLocalFilesToDelete::add,
+                item -> {},
+                item -> {},
+                item -> {},
+                localItems::put,
+                (key, item) -> localItems.remove(key),
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {});
+
+        assertEquals(4, remoteItems.size());
+        assertEquals("4", remoteItems.get(4));
+
+        assertEquals(4, localItems.size());
+        assertEquals("4", localItems.get(4));
+
+        assertTrue(outLocalFilesToDelete.isEmpty());
+    }
+
+    @Test
     public void testUploadMissingFilesToRemote() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
@@ -175,12 +275,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 emptySet(),
                 remoteExistingFiles,
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
@@ -221,12 +322,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 localExistingFiles,
                 emptySet(),
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
@@ -272,12 +374,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 localExistingFiles,
                 remoteExistingFiles,
                 (local, remote) -> false,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
@@ -319,12 +422,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 localExistingFiles,
                 remoteExistingFiles,
                 (local, remote) -> true,
                 (local, remote) -> true,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},
@@ -364,12 +468,13 @@ public class FileStructMergerTest {
 
         FileStructMerger.mergeFilesMap(localItems,
                 remoteItems,
-                emptySet(),
-                emptySet(),
+                emptyMap(),
+                emptyMap(),
                 localExistingFiles,
                 remoteExistingFiles,
                 (local, remote) -> true,
                 (local, remote) -> false,
+                (item, deletedItem) -> true,
                 String::valueOf,
                 item -> {},
                 item -> {},

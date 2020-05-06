@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetada
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RunningSyncState;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.exceptions.TooHighRemoteRepositoryVersion;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
@@ -88,7 +89,7 @@ public class MetadataSyncInteractor {
         }
 
         Map<FileKey, FileMetadata> remoteFiles = remoteMetadata.getFiles();
-        Set<FileKey> remoteRemovedFiles = remoteMetadata.getRemovedFiles();
+        Map<FileKey, RemovedFileMetadata> remoteRemovedFiles = remoteMetadata.getRemovedFiles();
 
         //get remote real file list
         syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
@@ -99,14 +100,16 @@ public class MetadataSyncInteractor {
         LocalFilesMetadata localFilesMetadata = libraryRepository.getLocalFilesMetadata();
         Map<FileKey, FileMetadata> localFiles = localFilesMetadata.getLocalFiles();
         Set<FileKey> localRealFiles = localFilesMetadata.getRealFilesList();
-        Set<FileKey> localRemovedFiles = localFilesMetadata.getRemovedFiles();
+        Map<FileKey, RemovedFileMetadata> localRemovedFiles = localFilesMetadata.getRemovedFiles();
 
         //calculate changes
 //        FileStructMerger.mergeFilesMap();
 
+        //merge removed items
+
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
         //save local metadata
-        //schedule file tasks
+        //schedule file tasks(+move change(+ move command list))
     }
 
 }

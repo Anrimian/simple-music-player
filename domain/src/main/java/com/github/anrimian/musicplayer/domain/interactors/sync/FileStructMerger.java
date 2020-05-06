@@ -14,17 +14,17 @@ import java.util.Set;
 
 public class FileStructMerger {
 
-    //move change(+ move command list) - not here, it covers with change case
-    //compare create date in removed items set, different type for removed item?
-    public static <K/* extends ItemKey*/, T> void mergeFilesMap(
+    //delete file from remote case?
+    public static <K, T, R> void mergeFilesMap(
             Map<K, T> localItems,
             Map<K, T> remoteItems,
-            Set<K> localRemovedItems,
-            Set<K> remoteRemovedItems,
+            Map<K, R> localRemovedItems,
+            Map<K, R> remoteRemovedItems,
             Set<K> localExistingFiles,
             Set<K> remoteExistingFiles,
             BiFunction<T, T, Boolean> changeInspector,//we really need it?
             BiFunction<T, T, Boolean> itemPriorityFunction,
+            BiFunction<T, R, Boolean> removedItemPriorityFunction,
             Mapper<K, T> itemDataCreator,
             Callback<T> outLocalFileToDelete,
             Callback<T> outRemoteFileToDelete,
@@ -43,7 +43,8 @@ public class FileStructMerger {
             T remoteItem = remoteItems.get(localKey);
 
             //delete local
-            if (remoteRemovedItems.contains(localKey)) {
+            R remoteRemovedItem = remoteRemovedItems.get(localKey);
+            if (remoteRemovedItem != null && removedItemPriorityFunction.call(localItem, remoteRemovedItem)) {
                 onLocalItemRemoved.call(localKey, localItem);
                 outLocalFileToDelete.call(localItem);
                 continue;
@@ -79,7 +80,8 @@ public class FileStructMerger {
             T localItem = localItems.get(remoteKey);
 
             //delete remote
-            if (localRemovedItems.contains(remoteKey)) {
+            R localRemovedItem = localRemovedItems.get(remoteKey);
+            if (localRemovedItem != null && removedItemPriorityFunction.call(remoteItem, localRemovedItem)) {
                 omRemoteItemRemoved.call(remoteKey, remoteItem);
                 outRemoteFileToDelete.call(remoteItem);
                 continue;
@@ -111,8 +113,8 @@ public class FileStructMerger {
             //file was uploaded to cloud case
             if (!localItems.containsKey(remoteExistingFileKey)
                     && !remoteItems.containsKey(remoteExistingFileKey)
-                    && !localRemovedItems.contains(remoteExistingFileKey)
-                    && !remoteRemovedItems.contains(remoteExistingFileKey)) {
+                    && !localRemovedItems.containsKey(remoteExistingFileKey)
+                    && !remoteRemovedItems.containsKey(remoteExistingFileKey)) {
                 T item = itemDataCreator.map(remoteExistingFileKey);
                 onLocalItemAdded.call(remoteExistingFileKey, item);
                 onRemoteItemAdded.call(remoteExistingFileKey, item);

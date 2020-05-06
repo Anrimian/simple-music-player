@@ -7,17 +7,17 @@ public class LocalFilesMetadata {
 
     private final Map<FileKey, FileMetadata> localFiles;
     private final Set<FileKey> realFilesList;
-    private final Set<FileKey> removedFiles;
+    private final Map<FileKey, RemovedFileMetadata> removedFiles;
 
     public LocalFilesMetadata(Map<FileKey, FileMetadata> localFiles,
                               Set<FileKey> realFilesList,
-                              Set<FileKey> removedFiles) {
+                              Map<FileKey, RemovedFileMetadata> removedFiles) {
         this.localFiles = localFiles;
         this.realFilesList = realFilesList;
         this.removedFiles = removedFiles;
     }
 
-    public Set<FileKey> getRemovedFiles() {
+    public Map<FileKey, RemovedFileMetadata> getRemovedFiles() {
         return removedFiles;
     }
 
