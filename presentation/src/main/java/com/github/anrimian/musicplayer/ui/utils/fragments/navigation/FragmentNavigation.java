@@ -55,7 +55,7 @@ public class FragmentNavigation {
             container = new NavigationFragment();
             fm.beginTransaction()
                     .add(container, NAVIGATION_FRAGMENT_TAG)
-                    .commit();
+                    .commitAllowingStateLoss();
         }
         return container.getFragmentNavigation();
     }
@@ -170,7 +170,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -195,7 +195,7 @@ public class FragmentNavigation {
                         notifyStackListeners();
                         notifyFragmentMovedToTop(getFragmentOnTop());
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -292,7 +292,7 @@ public class FragmentNavigation {
                 ft.remove(fragmentOnBottom);
             }
             ft.runOnCommit(this::notifyStackListeners)
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -472,7 +472,7 @@ public class FragmentNavigation {
                                 notifyStackListeners();
                                 scheduleFragmentAtBottomReplacing(getAnimationDuration(exitAnimation));
                             })
-                            .commit();
+                            .commitAllowingStateLoss();
                 }
             });
             try {

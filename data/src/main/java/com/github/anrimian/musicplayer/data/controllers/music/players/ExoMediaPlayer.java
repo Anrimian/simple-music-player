@@ -11,12 +11,14 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.Loader;
 
 import java.util.concurrent.TimeUnit;
 
@@ -150,6 +152,12 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void sendErrorEvent(Throwable throwable) {
         if (currentComposition != null) {
+            //workaround for prepareError in newest exo player versions
+            if (isStrangeLoaderException(throwable)) {
+                prepareToPlay(currentComposition, player.getCurrentPosition());
+                return;
+            }
+
             playerEventSubject.onNext(new ErrorEvent(
                     playerErrorParser.getErrorType(throwable),
                     currentComposition)
@@ -179,6 +187,14 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                 .observeOn(scheduler)
                 .doOnSuccess(player::prepare)
                 .ignoreElement();
+    }
+
+    private boolean isStrangeLoaderException(Throwable throwable) {
+        if (throwable instanceof ExoPlaybackException) {
+            Throwable cause = throwable.getCause();
+            return cause instanceof Loader.UnexpectedLoaderException;
+        }
+        return false;
     }
 
     private Single<MediaSource> createMediaSource(Uri uri) {
