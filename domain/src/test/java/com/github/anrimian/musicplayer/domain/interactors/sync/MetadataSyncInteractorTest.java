@@ -67,7 +67,19 @@ public class MetadataSyncInteractorTest {
         verify(remoteStoragesRepository, never()).setEnabledState(remoteRepositoryType2, DISABLED_VERSION_TOO_HIGH);
     }
 
+    //test add from remote
+    //test create file from remote
+    //test add from local
+    //test delete from remote
+    //test irrelevant delete from remote
+    //test delete from local
+    //test irrelevant delete from local
+    //test change to remote
+    //test irrelevant change to remote
+    //test change to local
+    //test irrelevant change to local
+
     private RemoteFilesMetadata metadata(int version) {
-        return new RemoteFilesMetadata(version, new Date(), Collections.emptyMap(), Collections.emptySet());
+        return new RemoteFilesMetadata(version, new Date(), Collections.emptyMap(), Collections.emptyMap());
     }
 }

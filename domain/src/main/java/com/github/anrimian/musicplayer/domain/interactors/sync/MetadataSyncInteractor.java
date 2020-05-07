@@ -12,7 +12,10 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.Remo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,14 +105,67 @@ public class MetadataSyncInteractor {
         Set<FileKey> localRealFiles = localFilesMetadata.getRealFilesList();
         Map<FileKey, RemovedFileMetadata> localRemovedFiles = localFilesMetadata.getRemovedFiles();
 
+        syncStateSubject.onNext(new RunningSyncState.CalculateChanges());
+
         //calculate changes
-//        FileStructMerger.mergeFilesMap();
+        //file task lists
+        List<FileMetadata> localFilesToDelete = new LinkedList<>();
+        List<FileMetadata> remoteFilesToDelete = new LinkedList<>();
+        List<FileMetadata> localFilesToUpload = new LinkedList<>();
+        List<FileMetadata> remoteFilesToDownload = new LinkedList<>();
+
+        //elements result lists
+        List<FileMetadata> localItemsToAdd = new LinkedList<>();
+        List<FileMetadata> localItemToDelete = new LinkedList<>();
+        List<Change<FileMetadata>> localChangedItems = new LinkedList<>();
+
+        List<FileMetadata> remoteItemsToAdd = new LinkedList<>();
+        List<FileMetadata> remoteItemToDelete = new LinkedList<>();
+        List<Change<FileMetadata>> remoteChangedItems = new LinkedList<>();
+
+        FileStructMerger.mergeFilesMap(localFiles,
+                remoteFiles,
+                localRemovedFiles,
+                remoteRemovedFiles,
+                localRealFiles,
+                remoteRealFiles,
+                this::hasItemChanges,
+                this::isLocalItemNewerThanRemote,
+                this::isRemovedItemActual,
+                this::createMetadataForFile,
+                localFilesToDelete::add,
+                remoteFilesToDelete::add,
+                localFilesToUpload::add,
+                remoteFilesToDownload::add,
+                (key, item) -> localItemsToAdd.add(item),
+                (key, item) -> localItemToDelete.add(item),
+                (key, oldLocalItem, newRemoteItem) -> localChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)),
+                (key, item) -> remoteItemsToAdd.add(item),
+                (key, item) -> remoteItemToDelete.add(item),
+                (key, oldLocalItem, newRemoteItem) -> remoteChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)));
 
         //merge removed items
 
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
         //save local metadata
         //schedule file tasks(+move change(+ move command list))
+    }
+
+    //async creation?
+    private FileMetadata createMetadataForFile(FileKey key) {
+        return null;
+    }
+
+    private boolean isRemovedItemActual(FileMetadata metadata, RemovedFileMetadata removedFile) {
+        return true;
+    }
+
+    private boolean isLocalItemNewerThanRemote(FileMetadata local, FileMetadata remote) {
+        return false;
+    }
+
+    private boolean hasItemChanges(FileMetadata first, FileMetadata decond) {
+        return false;
     }
 
 }

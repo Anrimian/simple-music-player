@@ -35,6 +35,9 @@ public abstract class RunningSyncState {
     public static class CollectLocalFileInfo extends RunningSyncState {
     }
 
+    public static class CalculateChanges extends RunningSyncState {
+    }
+
     public static class Error extends RunningSyncState {
         private Throwable throwable;
 
