@@ -15,7 +15,7 @@ import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FileStructMergerTest {
+public class StructMergerTest {
 
     @Test
     public void testMergeAddFromBothSide() {
@@ -30,7 +30,7 @@ public class FileStructMergerTest {
         List<String> outLocalFilesToUpload = new ArrayList<>();
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),
@@ -84,7 +84,7 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFilesToDelete = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 localRemovedItems,
                 emptyMap(),
@@ -131,7 +131,7 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFilesToDelete = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 localRemovedItems,
                 emptyMap(),
@@ -179,7 +179,7 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToDelete = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 remoteRemovedItems,
@@ -226,7 +226,7 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToDelete = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 remoteRemovedItems,
@@ -273,7 +273,7 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToUpload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),
@@ -320,7 +320,7 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),
@@ -372,7 +372,7 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),
@@ -420,7 +420,7 @@ public class FileStructMergerTest {
 
         List<String> outLocalFilesToUpload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),
@@ -466,7 +466,7 @@ public class FileStructMergerTest {
 
         List<String> outRemoteFileToDownload = new ArrayList<>();
 
-        FileStructMerger.mergeFilesMap(localItems,
+        StructMerger.mergeFilesMap(localItems,
                 remoteItems,
                 emptyMap(),
                 emptyMap(),

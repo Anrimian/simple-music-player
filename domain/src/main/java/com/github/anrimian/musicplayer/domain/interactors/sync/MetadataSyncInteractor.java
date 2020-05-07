@@ -123,7 +123,7 @@ public class MetadataSyncInteractor {
         List<FileMetadata> remoteItemToDelete = new LinkedList<>();
         List<Change<FileMetadata>> remoteChangedItems = new LinkedList<>();
 
-        FileStructMerger.mergeFilesMap(localFiles,
+        StructMerger.mergeFilesMap(localFiles,
                 remoteFiles,
                 localRemovedFiles,
                 remoteRemovedFiles,
@@ -145,6 +145,19 @@ public class MetadataSyncInteractor {
                 (key, oldLocalItem, newRemoteItem) -> remoteChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)));
 
         //merge removed items
+        List<RemovedFileMetadata> localRemovedItemsToAdd = new LinkedList<>();
+        List<RemovedFileMetadata> localRemovedItemToDelete = new LinkedList<>();
+        List<RemovedFileMetadata> remoteRemovedItemsToAdd = new LinkedList<>();
+        List<RemovedFileMetadata> remoteRemovedItemToDelete = new LinkedList<>();
+        StructMerger.mergeMaps(localRemovedFiles,
+                remoteRemovedFiles,
+                this::isRemovedItemActual,
+                (key, item) -> localRemovedItemsToAdd.add(item),
+                (key, item) -> localRemovedItemToDelete.add(item),
+                (key, item) -> remoteRemovedItemsToAdd.add(item),
+                (key, item) -> remoteRemovedItemToDelete.add(item));
+
+        //merge playlists
 
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
         //save local metadata
@@ -158,6 +171,10 @@ public class MetadataSyncInteractor {
 
     private boolean isRemovedItemActual(FileMetadata metadata, RemovedFileMetadata removedFile) {
         return true;
+    }
+
+    private boolean isRemovedItemActual(RemovedFileMetadata removedFile) {
+        return true;//return time compare result
     }
 
     private boolean isLocalItemNewerThanRemote(FileMetadata local, FileMetadata remote) {

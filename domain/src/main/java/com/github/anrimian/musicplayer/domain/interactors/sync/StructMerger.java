@@ -7,12 +7,11 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 
-public class FileStructMerger {
+public class StructMerger {
 
     //delete file from remote case?
     public static <K, T, R> void mergeFilesMap(
@@ -123,7 +122,46 @@ public class FileStructMerger {
         }
     }
 
-    public interface ItemKey {
-        Date getCreateDate();
+    //actual item callback?
+    public static <K, T> void mergeMaps(
+            Map<K, T> localItems,
+            Map<K, T> remoteItems,
+            Mapper<T, Boolean> isItemActual,
+            BiCallback<K, T> onLocalItemAdded,
+            BiCallback<K, T> onLocalItemRemoved,
+            BiCallback<K, T> onRemoteItemAdded,
+            BiCallback<K, T> omRemoteItemRemoved) {
+
+        for (Map.Entry<K, T> entry: localItems.entrySet()) {
+            K localKey = entry.getKey();
+            T localItem = entry.getValue();
+            T remoteItem = remoteItems.get(localKey);
+
+            if (!isItemActual.map(localItem)) {
+                onLocalItemRemoved.call(localKey, localItem);
+                continue;
+            }
+
+            if (remoteItem == null) {
+                //remote not exists
+                onRemoteItemAdded.call(localKey, localItem);
+            }
+        }
+
+        for (Map.Entry<K, T> entry : remoteItems.entrySet()) {
+            K remoteKey = entry.getKey();
+            T remoteItem = entry.getValue();
+            T localItem = localItems.get(remoteKey);
+
+            if (!isItemActual.map(remoteItem)) {
+                omRemoteItemRemoved.call(remoteKey, remoteItem);
+                continue;
+            }
+
+            if (localItem == null) {
+                onLocalItemAdded.call(remoteKey, remoteItem);
+            }
+        }
     }
+
 }
