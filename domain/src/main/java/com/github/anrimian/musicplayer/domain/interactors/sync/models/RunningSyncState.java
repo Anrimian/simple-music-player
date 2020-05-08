@@ -38,6 +38,19 @@ public abstract class RunningSyncState {
     public static class CalculateChanges extends RunningSyncState {
     }
 
+    public static class SaveRemoteFileTable extends Running {
+
+        public SaveRemoteFileTable(RemoteRepositoryType repositoryType) {
+            super(repositoryType);
+        }
+    }
+
+    public static class SaveLocalFileTable extends RunningSyncState {
+    }
+
+    public static class ScheduleFileTasks extends RunningSyncState {
+    }
+
     public static class Error extends RunningSyncState {
         private Throwable throwable;
 

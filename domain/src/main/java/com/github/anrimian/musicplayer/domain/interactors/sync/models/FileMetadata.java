@@ -110,4 +110,11 @@ public class FileMetadata {
     public int hashCode() {
         return fileKey.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "FileMetadata{" +
+                "fileKey=" + fileKey +
+                '}';
+    }
 }

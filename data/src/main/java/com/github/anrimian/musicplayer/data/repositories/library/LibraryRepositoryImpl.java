@@ -6,7 +6,9 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -19,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -250,6 +253,16 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public LocalFilesMetadata getLocalFilesMetadata() {
         return null;
+    }
+
+    @Override
+    public void updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
+                                         List<FileMetadata> localItemsToAdd,
+                                         List<FileMetadata> localItemsToDelete,
+                                         List<Change<FileMetadata>> localChangedItems,
+                                         List<RemovedFileMetadata> localRemovedItemsToAdd,
+                                         List<RemovedFileMetadata> localRemovedItemToDelete) {
+
     }
 
     private List<Long> extractFolderIds(List<FileSource> sources) {

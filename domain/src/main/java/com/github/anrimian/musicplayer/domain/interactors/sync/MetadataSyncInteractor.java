@@ -32,6 +32,7 @@ public class MetadataSyncInteractor {
     private final SyncSettingsRepository syncSettingsRepository;
     private final RemoteStoragesRepository remoteStoragesRepository;
     private final LibraryRepository libraryRepository;
+    private final FileSyncInteractor fileSyncInteractor;
     private final Scheduler scheduler;//single thread pool scheduler
 
     private final BehaviorSubject<RunningSyncState> syncStateSubject = BehaviorSubject.create();
@@ -41,11 +42,13 @@ public class MetadataSyncInteractor {
                                   SyncSettingsRepository syncSettingsRepository,
                                   RemoteStoragesRepository remoteStoragesRepository,
                                   LibraryRepository libraryRepository,
+                                  FileSyncInteractor fileSyncInteractor,
                                   Scheduler scheduler) {
         this.metadataVersion = metadataVersion;
         this.syncSettingsRepository = syncSettingsRepository;
         this.remoteStoragesRepository = remoteStoragesRepository;
         this.libraryRepository = libraryRepository;
+        this.fileSyncInteractor = fileSyncInteractor;
         this.scheduler = scheduler;
     }
 
@@ -116,11 +119,11 @@ public class MetadataSyncInteractor {
 
         //elements result lists
         List<FileMetadata> localItemsToAdd = new LinkedList<>();
-        List<FileMetadata> localItemToDelete = new LinkedList<>();
+        List<FileMetadata> localItemsToDelete = new LinkedList<>();
         List<Change<FileMetadata>> localChangedItems = new LinkedList<>();
 
         List<FileMetadata> remoteItemsToAdd = new LinkedList<>();
-        List<FileMetadata> remoteItemToDelete = new LinkedList<>();
+        List<FileMetadata> remoteItemsToDelete = new LinkedList<>();
         List<Change<FileMetadata>> remoteChangedItems = new LinkedList<>();
 
         StructMerger.mergeFilesMap(localFiles,
@@ -138,10 +141,10 @@ public class MetadataSyncInteractor {
                 localFilesToUpload::add,
                 remoteFilesToDownload::add,
                 (key, item) -> localItemsToAdd.add(item),
-                (key, item) -> localItemToDelete.add(item),
+                (key, item) -> localItemsToDelete.add(item),
                 (key, oldLocalItem, newRemoteItem) -> localChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)),
                 (key, item) -> remoteItemsToAdd.add(item),
-                (key, item) -> remoteItemToDelete.add(item),
+                (key, item) -> remoteItemsToDelete.add(item),
                 (key, oldLocalItem, newRemoteItem) -> remoteChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)));
 
         //merge removed items
@@ -159,9 +162,35 @@ public class MetadataSyncInteractor {
 
         //merge playlists
 
+        //skip saving if no changes was found
+        syncStateSubject.onNext(new RunningSyncState.SaveRemoteFileTable(repositoryType));
+
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
+        remoteRepository.updateMetadata(remoteMetadata,
+                remoteItemsToAdd,
+                remoteItemsToDelete,
+                remoteChangedItems,
+                remoteRemovedItemsToAdd,
+                remoteRemovedItemToDelete);
+
+        syncStateSubject.onNext(new RunningSyncState.SaveLocalFileTable());
+
         //save local metadata
+        libraryRepository.updateLocalFilesMetadata(localFilesMetadata,
+                localItemsToAdd,
+                localItemsToDelete,
+                localChangedItems,
+                localRemovedItemsToAdd,
+                localRemovedItemToDelete);
+
+        syncStateSubject.onNext(new RunningSyncState.ScheduleFileTasks());
+
         //schedule file tasks(+move change(+ move command list))
+        fileSyncInteractor.scheduleFileTasks(repositoryType,
+                localFilesToDelete,
+                remoteFilesToDelete,
+                localFilesToUpload,
+                remoteFilesToDownload);
     }
 
     //async creation?

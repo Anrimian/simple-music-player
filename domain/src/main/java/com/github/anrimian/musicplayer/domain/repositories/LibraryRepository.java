@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -11,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.List;
 
@@ -88,4 +91,11 @@ public interface LibraryRepository {
     Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
 
     LocalFilesMetadata getLocalFilesMetadata();
+
+    void updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
+                                  List<FileMetadata> localItemsToAdd,
+                                  List<FileMetadata> localItemsToDelete,
+                                  List<Change<FileMetadata>> localChangedItems,
+                                  List<RemovedFileMetadata> localRemovedItemsToAdd,
+                                  List<RemovedFileMetadata> localRemovedItemToDelete);
 }
