@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetada
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
@@ -25,6 +26,8 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryState.DISABLED_VERSION_TOO_HIGH;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -99,24 +102,130 @@ public class MetadataSyncInteractorTest {
         verify(libraryRepository).updateLocalFilesMetadata(
                 any(),
                 eq(asList(metadataToAdd)),
-                any(),
-                any(),
-                any(),
-                any()
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
         );
 
         verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
-                any(),
-                any(),
-                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
                 eq(asList(metadataToAdd))
         );
     }
 
-    //test create file from remote
-    //test add from local
-    //test delete from remote
-    //test irrelevant delete from remote
+    @Test
+    public void testAddFromLocal() {
+        FileMetadata metadataToAdd = simpleFileMetadata("", "file2");
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1")
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                metadataToAdd
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(asList(metadataToAdd)),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(metadataToAdd)),
+                eq(emptyList())
+        );
+    }
+
+    @Test
+    public void testDeleteFromRemote() {
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                metadataToDelete
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                removedMetadataMap(removedFileMetadata),
+                simpleFileMetadata("", "file1")
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(asList(metadataToDelete)),
+                eq(emptyList()),
+                eq(asList(removedFileMetadata)),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(asList(metadataToDelete)),
+                eq(emptyList()),
+                eq(emptyList())
+        );
+    }
+
+    @Test
+    public void testIrrelevantFromRemote() {
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2", new Date(1000));
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1));
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                metadataToDelete
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                removedMetadataMap(removedFileMetadata),
+                simpleFileMetadata("", "file1")
+        ));
+
+        syncInteractor.runSync();
+
+        //we need to not save irrelevant removed item
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(asList(metadataToDelete)),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(removedMetadataMap(removedFileMetadata))
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(metadataToDelete))
+        );
+    }
+
     //test delete from local
     //test irrelevant delete from local
     //test change to remote
@@ -125,8 +234,16 @@ public class MetadataSyncInteractorTest {
     //test irrelevant change to local
     //test sync without changes
     //test sync error state
+    //test create file from remote
+    //test sync with files but without remote metadata
+    //test delete file from local but without real file in local
+    //test delete file from remote but without real file in remote
 
     private FileMetadata simpleFileMetadata(String path, String name) {
+        return simpleFileMetadata(path, name, new Date(0));
+    }
+
+    private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded) {
         return new FileMetadata(new FileKey(name, path),
                 "artist",
                 "title",
@@ -135,8 +252,8 @@ public class MetadataSyncInteractorTest {
                 new String[]{ "genre" },
                 100,
                 100,
-                new Date(),
-                new Date());
+                dateAdded,
+                new Date(0));
     }
 
     private void makeRemoteRepositoryReturnFiles(RemoteRepository repository, FileMetadata... metadataList) {
@@ -145,11 +262,28 @@ public class MetadataSyncInteractorTest {
     }
 
     private RemoteFilesMetadata remoteFilesMetadata(FileMetadata... metadataList) {
-        return new RemoteFilesMetadata(1, new Date(), metadataMap(metadataList), Collections.emptyMap());
+        return new RemoteFilesMetadata(1, new Date(0), metadataMap(metadataList), Collections.emptyMap());
+    }
+
+    private LocalFilesMetadata localFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
+                                                  FileMetadata... metadataList) {
+        return new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), removedItems);
     }
 
     private LocalFilesMetadata localFilesMetadata(FileMetadata... metadataList) {
         return new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), Collections.emptyMap());
+    }
+
+    private RemovedFileMetadata removedFileMetadata(String path, String name, Date date) {
+        return new RemovedFileMetadata(new FileKey(name, path), date);
+    }
+
+    private Map<FileKey, RemovedFileMetadata> removedMetadataMap(RemovedFileMetadata... metadataList) {
+        Map<FileKey, RemovedFileMetadata> map = new HashMap<>();
+        for (RemovedFileMetadata metadata : metadataList) {
+            map.put(metadata.getFileKey(), metadata);
+        }
+        return map;
     }
 
     private Map<FileKey, FileMetadata> metadataMap(FileMetadata... metadataList) {
@@ -169,6 +303,6 @@ public class MetadataSyncInteractorTest {
     }
 
     private RemoteFilesMetadata versionMetadata(int version) {
-        return new RemoteFilesMetadata(version, new Date(), Collections.emptyMap(), Collections.emptyMap());
+        return new RemoteFilesMetadata(version, new Date(0), Collections.emptyMap(), Collections.emptyMap());
     }
 }

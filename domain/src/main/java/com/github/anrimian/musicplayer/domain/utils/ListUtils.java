@@ -89,6 +89,12 @@ public class ListUtils {
         Collections.swap(list, i, j);
     }
 
+    public static <K, V> void removeMap(Map<K, V> map, Map<K, V> mapToRemove) {
+        for (K key: mapToRemove.keySet()) {
+            map.remove(key);
+        }
+    }
+
     public interface MapperFunction<T, E> {
 
         E map(T t);

@@ -34,7 +34,9 @@ public class StructMerger {
             TripleCallback<K, T, T> onLocalItemChanged,
             BiCallback<K, T> onRemoteItemAdded,
             BiCallback<K, T> omRemoteItemRemoved,
-            TripleCallback<K, T, T> onRemoteItemChanged) {
+            TripleCallback<K, T, T> onRemoteItemChanged,
+            BiCallback<K, R> onLocalRemovedItemNotActual,
+            BiCallback<K, R> onRemoteRemovedItemNotActual) {
 
         for (Map.Entry<K, T> entry: localItems.entrySet()) {
             K localKey = entry.getKey();
@@ -43,10 +45,14 @@ public class StructMerger {
 
             //delete local
             R remoteRemovedItem = remoteRemovedItems.get(localKey);
-            if (remoteRemovedItem != null && removedItemPriorityFunction.call(localItem, remoteRemovedItem)) {
-                onLocalItemRemoved.call(localKey, localItem);
-                outLocalFileToDelete.call(localItem);
-                continue;
+            if (remoteRemovedItem != null) {
+                if (removedItemPriorityFunction.call(localItem, remoteRemovedItem)) {
+                    onLocalItemRemoved.call(localKey, localItem);
+                    outLocalFileToDelete.call(localItem);//check if exists
+                    continue;
+                } else {
+                    onRemoteRemovedItemNotActual.call(localKey, remoteRemovedItem);
+                }
             }
 
             if (remoteItem == null) {
@@ -80,10 +86,14 @@ public class StructMerger {
 
             //delete remote
             R localRemovedItem = localRemovedItems.get(remoteKey);
-            if (localRemovedItem != null && removedItemPriorityFunction.call(remoteItem, localRemovedItem)) {
-                omRemoteItemRemoved.call(remoteKey, remoteItem);
-                outRemoteFileToDelete.call(remoteItem);
-                continue;
+            if (localRemovedItem != null) {
+                if (removedItemPriorityFunction.call(remoteItem, localRemovedItem)) {
+                    omRemoteItemRemoved.call(remoteKey, remoteItem);
+                    outRemoteFileToDelete.call(remoteItem);
+                    continue;
+                } else {
+                    onLocalRemovedItemNotActual.call(remoteKey, localRemovedItem);
+                }
             }
 
             if (localItem == null) {

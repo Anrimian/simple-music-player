@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
@@ -16,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -97,5 +99,5 @@ public interface LibraryRepository {
                                   List<FileMetadata> localItemsToDelete,
                                   List<Change<FileMetadata>> localChangedItems,
                                   List<RemovedFileMetadata> localRemovedItemsToAdd,
-                                  List<RemovedFileMetadata> localRemovedItemToDelete);
+                                  Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete);
 }

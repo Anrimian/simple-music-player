@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFil
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface RemoteRepository {
@@ -20,5 +21,5 @@ public interface RemoteRepository {
                         List<FileMetadata> remoteItemsToDelete,
                         List<Change<FileMetadata>> remoteChangedItems,
                         List<RemovedFileMetadata> remoteRemovedItemsToAdd,
-                        List<RemovedFileMetadata> remoteRemovedItemToDelete);
+                        Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete);
 }

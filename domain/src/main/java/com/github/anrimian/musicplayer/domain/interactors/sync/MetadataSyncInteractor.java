@@ -12,8 +12,12 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.Remo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
+import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +130,9 @@ public class MetadataSyncInteractor {
         List<FileMetadata> remoteItemsToDelete = new LinkedList<>();
         List<Change<FileMetadata>> remoteChangedItems = new LinkedList<>();
 
+        Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete = new HashMap<>();
+        Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete = new HashMap<>();
+
         StructMerger.mergeFilesMap(localFiles,
                 remoteFiles,
                 localRemovedFiles,
@@ -145,20 +152,23 @@ public class MetadataSyncInteractor {
                 (key, oldLocalItem, newRemoteItem) -> localChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)),
                 (key, item) -> remoteItemsToAdd.add(item),
                 (key, item) -> remoteItemsToDelete.add(item),
-                (key, oldLocalItem, newRemoteItem) -> remoteChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)));
+                (key, oldLocalItem, newRemoteItem) -> remoteChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)),
+                localRemovedItemToDelete::put,
+                remoteRemovedItemToDelete::put);
 
         //merge removed items
         List<RemovedFileMetadata> localRemovedItemsToAdd = new LinkedList<>();
-        List<RemovedFileMetadata> localRemovedItemToDelete = new LinkedList<>();
         List<RemovedFileMetadata> remoteRemovedItemsToAdd = new LinkedList<>();
-        List<RemovedFileMetadata> remoteRemovedItemToDelete = new LinkedList<>();
+
+        ListUtils.removeMap(localRemovedFiles, localRemovedItemToDelete);
+        ListUtils.removeMap(remoteRemovedFiles, remoteRemovedItemToDelete);
         StructMerger.mergeMaps(localRemovedFiles,
                 remoteRemovedFiles,
-                this::isRemovedItemActual,
+                this::isRemovedItemIsNotTooOld,
                 (key, item) -> localRemovedItemsToAdd.add(item),
-                (key, item) -> localRemovedItemToDelete.add(item),
+                localRemovedItemToDelete::put,
                 (key, item) -> remoteRemovedItemsToAdd.add(item),
-                (key, item) -> remoteRemovedItemToDelete.add(item));
+                localRemovedItemToDelete::put);
 
         //merge playlists
 
@@ -199,10 +209,12 @@ public class MetadataSyncInteractor {
     }
 
     private boolean isRemovedItemActual(FileMetadata metadata, RemovedFileMetadata removedFile) {
-        return true;
+        Date deleteDate = removedFile.getAddDate();
+        return DateUtils.isAfter(deleteDate, metadata.getDateAdded())
+                && DateUtils.isAfter(deleteDate, metadata.getDateModified());
     }
 
-    private boolean isRemovedItemActual(RemovedFileMetadata removedFile) {
+    private boolean isRemovedItemIsNotTooOld(RemovedFileMetadata removedFile) {
         return true;//return time compare result
     }
 

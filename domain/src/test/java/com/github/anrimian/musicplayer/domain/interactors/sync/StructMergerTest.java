@@ -51,7 +51,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(4, localItems.size());
         assertEquals("3", localItems.get(3));
@@ -105,7 +107,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> remoteItems.remove(key),
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(3, remoteItems.size());
         assertEquals("1", remoteItems.get(1));
@@ -128,10 +132,12 @@ public class StructMergerTest {
         remoteItems.put(3, "3");
         remoteItems.put(4, "4");
 
-        Map<Integer, Object> localRemovedItems = new HashMap<>();
-        localRemovedItems.put(4, new Object());
+        Map<Integer, String> localRemovedItems = new HashMap<>();
+        localRemovedItems.put(4, "4R");
 
         List<String> outRemoteFilesToDelete = new ArrayList<>();
+
+        List<String> outNotActualRemovedFiles = new ArrayList<>();
 
         StructMerger.mergeFilesMap(localItems,
                 remoteItems,
@@ -152,13 +158,18 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> remoteItems.remove(key),
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> outNotActualRemovedFiles.add(item),
+                (key, item) -> {});
 
         assertEquals(4, remoteItems.size());
         assertEquals("4", remoteItems.get(4));
 
         assertEquals(4, localItems.size());
         assertEquals("4", localItems.get(4));
+
+        assertEquals(1, outNotActualRemovedFiles.size());
+        assertEquals("4R", outNotActualRemovedFiles.get(0));
 
         assertTrue(outRemoteFilesToDelete.isEmpty());
     }
@@ -200,7 +211,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(3, localItems.size());
         assertEquals("1", localItems.get(1));
@@ -223,10 +236,12 @@ public class StructMergerTest {
         remoteItems.put(2, "2");
         remoteItems.put(3, "3");
 
-        Map<Integer, Object> remoteRemovedItems = new HashMap<>();
-        remoteRemovedItems.put(4, new Object());
+        Map<Integer, String> remoteRemovedItems = new HashMap<>();
+        remoteRemovedItems.put(4, "4R");
 
         List<String> outLocalFilesToDelete = new ArrayList<>();
+
+        List<String> outNotActualRemovedFiles = new ArrayList<>();
 
         StructMerger.mergeFilesMap(localItems,
                 remoteItems,
@@ -247,13 +262,18 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> outNotActualRemovedFiles.add(item));
 
         assertEquals(4, remoteItems.size());
         assertEquals("4", remoteItems.get(4));
 
         assertEquals(4, localItems.size());
         assertEquals("4", localItems.get(4));
+
+        assertEquals(1, outNotActualRemovedFiles.size());
+        assertEquals("4R", outNotActualRemovedFiles.get(0));
 
         assertTrue(outLocalFilesToDelete.isEmpty());
     }
@@ -294,7 +314,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(3, remoteItems.size());
         assertEquals("1", remoteItems.get(1));
@@ -341,7 +363,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(3, localItems.size());
         assertEquals("1", localItems.get(1));
@@ -393,7 +417,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(2, localItems.size());
         assertEquals("1", localItems.get(1));
@@ -441,7 +467,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> {},
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> remoteItems.put(key, item));
+                (key, oldItem, item) -> remoteItems.put(key, item),
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(1, remoteItems.size());
         assertEquals("12", remoteItems.get(1));
@@ -487,7 +515,9 @@ public class StructMergerTest {
                 (key, oldItem, item) -> localItems.put(key, item),
                 remoteItems::put,
                 (key, item) -> {},
-                (key, oldItem, item) -> {});
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
 
         assertEquals(1, remoteItems.size());
         assertEquals("12", remoteItems.get(1));
