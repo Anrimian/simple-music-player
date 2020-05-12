@@ -13,9 +13,11 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.Remo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -219,11 +221,18 @@ public class MetadataSyncInteractor {
     }
 
     private boolean isLocalItemNewerThanRemote(FileMetadata local, FileMetadata remote) {
-        return false;
+        return DateUtils.isAfter(local.getDateAdded(), remote.getDateAdded())
+                || DateUtils.isAfter(local.getDateModified(), remote.getDateModified());
     }
 
-    private boolean hasItemChanges(FileMetadata first, FileMetadata decond) {
-        return false;
+    private boolean hasItemChanges(FileMetadata first, FileMetadata second) {
+        return !Objects.equals(first.getTitle(), second.getTitle())
+                || !Objects.equals(first.getArtist(), second.getArtist())
+                || !Objects.equals(first.getAlbum(), second.getAlbum())
+                || !Objects.equals(first.getAlbumArtist(), second.getAlbumArtist())
+                || !Arrays.equals(first.getGenres(), second.getGenres())
+                || first.getDuration() != second.getDuration()
+                || first.getSize() != second.getSize();
     }
 
 }

@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.Remo
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -320,7 +321,49 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test change to remote
+    @Test
+    public void testChangeFromLocalToRemote() {
+        FileMetadata newMetadata = simpleFileMetadata("", "file2", new Date(1000), "title2");
+        FileMetadata oldMetadata = simpleFileMetadata("", "file2", new Date(500), "title1");
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                oldMetadata
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                newMetadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(new Change<>(oldMetadata, newMetadata))),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(newMetadata)),
+                eq(emptyList())
+        );
+    }
+
     //test irrelevant change to remote
     //test change to local
     //test irrelevant change to local
@@ -331,15 +374,20 @@ public class MetadataSyncInteractorTest {
     //test delete file from local but without real file in local
     //test delete file from remote but without real file in remote
     //test sync with outdated local and remote removed items
+    //test specific changes without file upload\download
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, new Date(0));
     }
 
     private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded) {
+        return simpleFileMetadata(path, name, dateAdded, "title");
+    }
+
+    private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded, String title) {
         return new FileMetadata(new FileKey(name, path),
                 "artist",
-                "title",
+                title,
                 "album",
                 "album-artist",
                 new String[]{ "genre" },
