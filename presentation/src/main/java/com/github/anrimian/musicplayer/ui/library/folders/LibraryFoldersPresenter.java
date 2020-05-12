@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
@@ -39,7 +38,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  * Created on 23.10.2017.
  */
 
-@InjectViewState
+
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFoldersScreenInteractor interactor;

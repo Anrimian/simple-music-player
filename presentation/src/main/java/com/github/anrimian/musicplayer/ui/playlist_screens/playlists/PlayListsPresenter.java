@@ -9,10 +9,9 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class PlayListsPresenter extends MvpPresenter<PlayListsView> {
 
     private final PlayListsInteractor playListsInteractor;

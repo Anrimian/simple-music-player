@@ -22,7 +22,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
@@ -30,7 +29,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static java.util.Objects.requireNonNull;
 
-@InjectViewState
+
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
     private final MusicPlayerInteractor playerInteractor;

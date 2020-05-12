@@ -2,10 +2,9 @@ package com.github.anrimian.musicplayer.ui.settings.player;
 
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
 
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class PlayerSettingsPresenter extends MvpPresenter<PlayerSettingsView> {
 
     private final PlayerSettingsInteractor interactor;

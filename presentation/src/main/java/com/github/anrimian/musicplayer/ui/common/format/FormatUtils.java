@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
+import android.text.format.Formatter;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
@@ -189,5 +190,9 @@ public class FormatUtils {
                 R.dimen.swipe_panel_text_top_padding,
                 R.dimen.swipe_panel_icon_size,
                 R.dimen.swipe_panel_text_size);
+    }
+
+    public static String formatSize(Context context, long bytes) {
+        return Formatter.formatShortFileSize(context, bytes);
     }
 }

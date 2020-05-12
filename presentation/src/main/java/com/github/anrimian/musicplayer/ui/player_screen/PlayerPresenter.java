@@ -18,7 +18,6 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
@@ -28,7 +27,6 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
  * Created on 02.11.2017.
  */
 
-@InjectViewState
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private final MusicPlayerInteractor playerInteractor;

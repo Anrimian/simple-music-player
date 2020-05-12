@@ -15,11 +15,10 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
-@InjectViewState
+
 public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<ArtistItemsView> {
 
     private final long artistId;

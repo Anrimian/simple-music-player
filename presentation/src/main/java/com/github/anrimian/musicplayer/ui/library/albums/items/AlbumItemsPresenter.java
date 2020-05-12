@@ -15,9 +15,8 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import moxy.InjectViewState;
 
-@InjectViewState
+
 public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumItemsView> {
 
     private final long albumId;

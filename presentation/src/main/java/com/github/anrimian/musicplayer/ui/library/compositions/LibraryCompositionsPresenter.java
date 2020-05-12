@@ -13,9 +13,8 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import moxy.InjectViewState;
 
-@InjectViewState
+
 public class LibraryCompositionsPresenter
         extends BaseLibraryCompositionsPresenter<LibraryCompositionsView> {
 
