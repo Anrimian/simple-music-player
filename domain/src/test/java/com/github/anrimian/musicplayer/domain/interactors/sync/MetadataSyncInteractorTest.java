@@ -364,9 +364,135 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test irrelevant change to remote
-    //test change to local
-    //test irrelevant change to local
+    @Test
+    public void testIrrelevantChangeFromLocalToRemote() {
+        FileMetadata newMetadata = simpleFileMetadata("", "file2", new Date(1000), "title2");
+        FileMetadata oldMetadata = simpleFileMetadata("", "file2", new Date(1500), "title1");
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                oldMetadata
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                newMetadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(new Change<>(newMetadata, oldMetadata))),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(newMetadata))
+        );
+    }
+
+    @Test
+    public void testChangeFromRemoteToLocal() {
+        FileMetadata oldMetadata = simpleFileMetadata("", "file2", new Date(1000), "title2");
+        FileMetadata newMetadata = simpleFileMetadata("", "file2", new Date(1500), "title1");
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                newMetadata
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                oldMetadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(new Change<>(oldMetadata, newMetadata))),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(newMetadata))
+        );
+    }
+
+    @Test
+    public void testIrrelevantChangeFromRemoteToLocal() {
+        FileMetadata oldMetadata = simpleFileMetadata("", "file2", new Date(1000), "title2");
+        FileMetadata newMetadata = simpleFileMetadata("", "file2", new Date(500), "title1");
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                newMetadata
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                oldMetadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(new Change<>(newMetadata, oldMetadata))),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(oldMetadata)),
+                eq(emptyList())
+        );
+    }
+
     //test sync without changes
     //test sync error state
     //test create file from remote
@@ -375,6 +501,7 @@ public class MetadataSyncInteractorTest {
     //test delete file from remote but without real file in remote
     //test sync with outdated local and remote removed items
     //test specific changes without file upload\download
+    //test filepath change?
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, new Date(0));
