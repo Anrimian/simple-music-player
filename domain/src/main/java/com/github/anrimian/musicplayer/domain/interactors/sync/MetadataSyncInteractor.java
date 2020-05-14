@@ -174,35 +174,53 @@ public class MetadataSyncInteractor {
 
         //merge playlists
 
-        //skip saving if no changes was found
-        syncStateSubject.onNext(new RunningSyncState.SaveRemoteFileTable(repositoryType));
-
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
-        remoteRepository.updateMetadata(remoteMetadata,
-                remoteItemsToAdd,
-                remoteItemsToDelete,
-                remoteChangedItems,
-                remoteRemovedItemsToAdd,
-                remoteRemovedItemToDelete);
+        if (!remoteItemsToAdd.isEmpty()
+                || !remoteItemsToDelete.isEmpty()
+                || !remoteChangedItems.isEmpty()
+                || !remoteRemovedItemsToAdd.isEmpty()
+                || !remoteRemovedItemToDelete.isEmpty()) {
+            syncStateSubject.onNext(new RunningSyncState.SaveRemoteFileTable(repositoryType));
 
-        syncStateSubject.onNext(new RunningSyncState.SaveLocalFileTable());
+            remoteRepository.updateMetadata(remoteMetadata,
+                    remoteItemsToAdd,
+                    remoteItemsToDelete,
+                    remoteChangedItems,
+                    remoteRemovedItemsToAdd,
+                    remoteRemovedItemToDelete);
+        }
 
         //save local metadata
-        libraryRepository.updateLocalFilesMetadata(localFilesMetadata,
-                localItemsToAdd,
-                localItemsToDelete,
-                localChangedItems,
-                localRemovedItemsToAdd,
-                localRemovedItemToDelete);
+        if (!localItemsToAdd.isEmpty()
+                || !localItemsToDelete.isEmpty()
+                || !localChangedItems.isEmpty()
+                || !localRemovedItemsToAdd.isEmpty()
+                || !localRemovedItemToDelete.isEmpty()) {
 
-        syncStateSubject.onNext(new RunningSyncState.ScheduleFileTasks());
+            syncStateSubject.onNext(new RunningSyncState.SaveLocalFileTable());
+
+            libraryRepository.updateLocalFilesMetadata(localFilesMetadata,
+                    localItemsToAdd,
+                    localItemsToDelete,
+                    localChangedItems,
+                    localRemovedItemsToAdd,
+                    localRemovedItemToDelete);
+        }
 
         //schedule file tasks(+move change(+ move command list))
-        fileSyncInteractor.scheduleFileTasks(repositoryType,
-                localFilesToDelete,
-                remoteFilesToDelete,
-                localFilesToUpload,
-                remoteFilesToDownload);
+        if (!localFilesToDelete.isEmpty()
+                || !remoteFilesToDelete.isEmpty()
+                || !localFilesToUpload.isEmpty()
+                || !remoteFilesToDownload.isEmpty()) {
+
+            syncStateSubject.onNext(new RunningSyncState.ScheduleFileTasks());
+
+            fileSyncInteractor.scheduleFileTasks(repositoryType,
+                    localFilesToDelete,
+                    remoteFilesToDelete,
+                    localFilesToUpload,
+                    remoteFilesToDownload);
+        }
     }
 
     //async creation?

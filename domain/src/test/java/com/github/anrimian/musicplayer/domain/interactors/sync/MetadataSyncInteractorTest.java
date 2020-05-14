@@ -175,7 +175,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyMap())
         );
 
-        verify(libraryRepository).updateLocalFilesMetadata(
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -209,7 +209,7 @@ public class MetadataSyncInteractorTest {
 
         syncInteractor.runSync();
 
-        verify(remoteRepository).updateMetadata(
+        verify(remoteRepository, never()).updateMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -252,7 +252,7 @@ public class MetadataSyncInteractorTest {
 
         syncInteractor.runSync();
 
-        verify(remoteRepository).updateMetadata(
+        verify(remoteRepository, never()).updateMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -304,7 +304,7 @@ public class MetadataSyncInteractorTest {
                 eq(removedMetadataMap(removedFileMetadata))
         );
 
-        verify(libraryRepository).updateLocalFilesMetadata(
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -347,7 +347,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyMap())
         );
 
-        verify(libraryRepository).updateLocalFilesMetadata(
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -381,7 +381,7 @@ public class MetadataSyncInteractorTest {
 
         syncInteractor.runSync();
 
-        verify(remoteRepository).updateMetadata(
+        verify(remoteRepository, never()).updateMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -424,7 +424,7 @@ public class MetadataSyncInteractorTest {
 
         syncInteractor.runSync();
 
-        verify(remoteRepository).updateMetadata(
+        verify(remoteRepository, never()).updateMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -476,7 +476,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyMap())
         );
 
-        verify(libraryRepository).updateLocalFilesMetadata(
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
                 eq(emptyList()),
                 eq(emptyList()),
@@ -493,7 +493,46 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test sync without changes
+    @Test
+    public void testSyncWithoutChanges() {
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                simpleFileMetadata("", "file1"),
+                simpleFileMetadata("", "file2")
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                simpleFileMetadata("", "file2")
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository, never()).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList())
+        );
+    }
+
     //test sync error state
     //test create file from remote
     //test sync with files but without remote metadata
@@ -502,6 +541,7 @@ public class MetadataSyncInteractorTest {
     //test sync with outdated local and remote removed items
     //test specific changes without file upload\download
     //test filepath change?
+    //test sync with regular error, like timeout
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, new Date(0));
