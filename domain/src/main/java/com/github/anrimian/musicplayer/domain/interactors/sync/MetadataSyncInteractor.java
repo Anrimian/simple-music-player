@@ -63,8 +63,8 @@ public class MetadataSyncInteractor {
         Observable.fromIterable(syncSettingsRepository.getEnabledRemoteRepositories())
                 .flatMapCompletable(this::runSyncFor)
                 .doOnError(this::onSyncError)
+                .doOnComplete(() -> syncStateSubject.onNext(new RunningSyncState.Idle()))
                 .onErrorComplete()
-                .doFinally(() -> syncStateSubject.onNext(new RunningSyncState.Idle()))
                 .subscribeOn(scheduler)
                 .subscribe();
     }

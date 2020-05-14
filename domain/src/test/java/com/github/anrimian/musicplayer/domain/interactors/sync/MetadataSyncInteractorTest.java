@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFiles
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.RunningSyncState;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.RemoteStoragesRepository;
 import com.github.anrimian.musicplayer.domain.interactors.sync.repositories.SyncSettingsRepository;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.Scheduler;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryState.DISABLED_VERSION_TOO_HIGH;
@@ -533,8 +535,50 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test sync error state
-    //test create file from remote
+    @Test
+    public void testSyncError() {
+        when(remoteRepository.getMetadata()).thenThrow(new RuntimeException("test error"));
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                simpleFileMetadata("", "file1"),
+                simpleFileMetadata("", "file2")
+        ));
+
+        TestObserver<RunningSyncState> observer = syncInteractor.getRunningSyncStateObservable()
+                .test();
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository, never()).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList())
+        );
+
+        observer.assertValueAt(0, value -> value instanceof RunningSyncState.GetRemoteMetadata);
+        observer.assertValueAt(1, value -> value instanceof RunningSyncState.Error);
+    }
+
+    //test create file from remote - just write file name and set flag to scan after upload
     //test sync with files but without remote metadata
     //test delete file from local but without real file in local
     //test delete file from remote but without real file in remote
@@ -542,6 +586,7 @@ public class MetadataSyncInteractorTest {
     //test specific changes without file upload\download
     //test filepath change?
     //test sync with regular error, like timeout
+    //test sync launch rules, often calls?
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, new Date(0));
