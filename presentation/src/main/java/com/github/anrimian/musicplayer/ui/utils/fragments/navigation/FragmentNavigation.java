@@ -349,8 +349,11 @@ public class FragmentNavigation {
 
     @Nullable
     public Fragment getFragmentOnTop() {
-        return fragmentManagerProvider.getFragmentManager()
-                .findFragmentById(jugglerView.getTopViewId());
+        FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+        if (fm == null) {
+            return null;
+        }
+        return fm.findFragmentById(jugglerView.getTopViewId());
     }
 
     @Nullable

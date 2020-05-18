@@ -63,6 +63,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
@@ -141,17 +142,6 @@ public class MusicService extends Service {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-
-        serviceDisposable.add(playInfoDisposable);
-
-        notificationsDisplayer.startForegroundNotification(this,
-                true,
-                currentItem,
-                mediaSession,
-                notificationSetting);
-
-        subscribeOnNotificationSettings();
-        subscribeOnPlayerChanges();
     }
 
     @Override
@@ -164,6 +154,7 @@ public class MusicService extends Service {
                     currentItem,
                     mediaSession,
                     notificationSetting);
+            subscribeOnPlayerEvents();
         }
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
@@ -216,10 +207,18 @@ public class MusicService extends Service {
         }
     }
 
-    private void subscribeOnPlayerChanges() {
-        serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateReceived));
+    private void subscribeOnPlayerEvents() {
+        if (serviceDisposable.size() == 0) {
+            serviceDisposable.add(Observable.combineLatest(
+                    musicServiceInteractor.getNotificationSettingObservable(),
+                    themeController.getAppThemeObservable(),
+                    (setting, theme) -> setting)
+                    .observeOn(uiScheduler)
+                    .subscribe(this::onNotificationSettingReceived));
+            serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
+                    .observeOn(uiScheduler)
+                    .subscribe(this::onPlayerStateReceived));
+        }
     }
 
     private void onPlayerStateReceived(PlayerState playerState) {
@@ -234,8 +233,8 @@ public class MusicService extends Service {
                 break;
             }
             case PAUSE: {
-                updateForegroundNotification();
                 stopForeground(false);
+                updateForegroundNotification();
                 break;
             }
             case STOP: {
@@ -249,6 +248,7 @@ public class MusicService extends Service {
 
     private void subscribeOnPlayInfo() {
         if (playInfoDisposable.size() == 0) {
+            serviceDisposable.add(playInfoDisposable);
             playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
                     .observeOn(uiScheduler)
                     .subscribe(this::onCurrentCompositionReceived));
@@ -278,14 +278,6 @@ public class MusicService extends Service {
         updateMediaSessionState(playerState, trackPosition);
     }
 
-    private void subscribeOnNotificationSettings() {
-        serviceDisposable.add(Observable.combineLatest(
-                musicServiceInteractor.getNotificationSettingObservable(),
-                themeController.getAppThemeObservable(),
-                (setting, theme) -> setting)
-                .subscribe(this::onNotificationSettingReceived));
-    }
-
     private void onNotificationSettingReceived(MusicNotificationSetting setting) {
         boolean updateNotification = notificationSetting != null;
         notificationSetting = setting;
@@ -307,7 +299,7 @@ public class MusicService extends Service {
 
     private void updateMediaSessionMetadata(Composition composition, MusicNotificationSetting setting) {
         MediaMetadataCompat.Builder builder = metadataBuilder
-                .putString(METADATA_KEY_TITLE, composition.getTitle())
+                .putString(METADATA_KEY_TITLE, formatCompositionName(composition))
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
