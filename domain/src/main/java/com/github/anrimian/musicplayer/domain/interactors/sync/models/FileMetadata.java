@@ -11,6 +11,8 @@ public class FileMetadata {
 
     @Nullable
     private final String artist;
+    @Nonnull
+    private final String fileName;
     @Nullable
     private final String title;
     @Nullable
@@ -30,6 +32,7 @@ public class FileMetadata {
 
     public FileMetadata(FileKey fileKey,
                         @Nullable String artist,
+                        @Nonnull String fileName,
                         @Nullable String title,
                         @Nullable String album,
                         @Nullable String albumArtist,
@@ -40,6 +43,7 @@ public class FileMetadata {
                         @Nonnull Date dateModified) {
         this.fileKey = fileKey;
         this.artist = artist;
+        this.fileName = fileName;
         this.title = title;
         this.album = album;
         this.albumArtist = albumArtist;
@@ -62,6 +66,11 @@ public class FileMetadata {
     @Nullable
     public String getTitle() {
         return title;
+    }
+
+    @Nonnull
+    public String getFileName() {
+        return fileName;
     }
 
     @Nullable

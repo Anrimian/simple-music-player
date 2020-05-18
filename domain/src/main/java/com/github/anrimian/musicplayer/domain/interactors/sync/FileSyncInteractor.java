@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.sync;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.DownloadFileTask;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryType;
 
@@ -11,7 +12,7 @@ public class FileSyncInteractor {
                                   List<FileMetadata> localFilesToDelete,
                                   List<FileMetadata> remoteFilesToDelete,
                                   List<FileMetadata> localFilesToUpload,
-                                  List<FileMetadata> remoteFilesToDownload) {
+                                  List<DownloadFileTask> remoteFilesToDownload) {
 
     }
 }

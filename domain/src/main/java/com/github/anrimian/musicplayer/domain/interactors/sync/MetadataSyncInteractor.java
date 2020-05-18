@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.sync;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.DownloadFileTask;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
@@ -121,7 +122,7 @@ public class MetadataSyncInteractor {
         List<FileMetadata> localFilesToDelete = new LinkedList<>();
         List<FileMetadata> remoteFilesToDelete = new LinkedList<>();
         List<FileMetadata> localFilesToUpload = new LinkedList<>();
-        List<FileMetadata> remoteFilesToDownload = new LinkedList<>();
+        List<DownloadFileTask> remoteFilesToDownload = new LinkedList<>();
 
         //elements result lists
         List<FileMetadata> localItemsToAdd = new LinkedList<>();
@@ -148,7 +149,7 @@ public class MetadataSyncInteractor {
                 localFilesToDelete::add,
                 remoteFilesToDelete::add,
                 localFilesToUpload::add,
-                remoteFilesToDownload::add,
+                (item, rescanAfterDownload) -> remoteFilesToDownload.add(new DownloadFileTask(item, rescanAfterDownload)),
                 (key, item) -> localItemsToAdd.add(item),
                 (key, item) -> localItemsToDelete.add(item),
                 (key, oldLocalItem, newRemoteItem) -> localChangedItems.add(new Change<>(oldLocalItem, newRemoteItem)),
@@ -223,9 +224,21 @@ public class MetadataSyncInteractor {
         }
     }
 
-    //async creation?
     private FileMetadata createMetadataForFile(FileKey key) {
-        return null;
+        Date currentTime = new Date();
+        return new FileMetadata(
+                key,
+                null,
+                key.getName(),
+                null,
+                null,
+                null,
+                new String[0],
+                0,
+                0,//can we get size?
+                currentTime,
+                currentTime
+        );
     }
 
     private boolean isRemovedItemActual(FileMetadata metadata, RemovedFileMetadata removedFile) {

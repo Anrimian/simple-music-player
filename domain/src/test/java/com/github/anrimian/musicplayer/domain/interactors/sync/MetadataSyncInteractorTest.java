@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.sync;
 
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.DownloadFileTask;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
@@ -115,7 +116,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(metadataToAdd))
+                eq(asList(new DownloadFileTask(metadataToAdd)))
         );
     }
 
@@ -233,7 +234,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(metadataToDelete))
+                eq(asList(new DownloadFileTask(metadataToDelete)))
         );
     }
 
@@ -405,7 +406,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(newMetadata))
+                eq(asList(new DownloadFileTask(newMetadata)))
         );
     }
 
@@ -448,7 +449,7 @@ public class MetadataSyncInteractorTest {
                 eq(emptyList()),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(newMetadata))
+                eq(asList(new DownloadFileTask(newMetadata)))
         );
     }
 
@@ -578,7 +579,52 @@ public class MetadataSyncInteractorTest {
         observer.assertValueAt(1, value -> value instanceof RunningSyncState.Error);
     }
 
-    //test create file from remote - just write file name and set flag to scan after upload
+    @Test
+    public void testCreateFileFromRemote() {
+        FileMetadata existsMetadata = simpleFileMetadata("", "file1");
+        FileMetadata addedFileMetadata = simpleFileMetadata("", "file2");
+
+        when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(
+                emptyMap(),
+                existsMetadata
+        ));
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(
+                existsMetadata,
+                addedFileMetadata
+        ));
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                existsMetadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(asList(addedFileMetadata)),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(asList(addedFileMetadata)),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(asList(new DownloadFileTask(addedFileMetadata, true)))
+        );
+    }
+
     //test sync with files but without remote metadata
     //test delete file from local but without real file in local
     //test delete file from remote but without real file in remote
@@ -587,6 +633,7 @@ public class MetadataSyncInteractorTest {
     //test filepath change?
     //test sync with regular error, like timeout
     //test sync launch rules, often calls?
+    //test wait_for_wifi, wait_for_charging state
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, new Date(0));
@@ -599,6 +646,7 @@ public class MetadataSyncInteractorTest {
     private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded, String title) {
         return new FileMetadata(new FileKey(name, path),
                 "artist",
+                "filename + " + title,
                 title,
                 "album",
                 "album-artist",
@@ -608,7 +656,6 @@ public class MetadataSyncInteractorTest {
                 dateAdded,
                 new Date(0));
     }
-
 
     private void makeRemoteRepositoryReturnFiles(RemoteRepository repository,
                                                  FileMetadata... metadataList) {

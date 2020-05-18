@@ -28,7 +28,7 @@ public class StructMerger {
             Callback<T> outLocalFileToDelete,
             Callback<T> outRemoteFileToDelete,
             Callback<T> outLocalFileToUpload,
-            Callback<T> outRemoteFileToDownload,
+            BiCallback<T, Boolean> outRemoteFileToDownload,
             BiCallback<K, T> onLocalItemAdded,
             BiCallback<K, T> onLocalItemRemoved,
             TripleCallback<K, T, T> onLocalItemChanged,
@@ -69,12 +69,12 @@ public class StructMerger {
                         && changeInspector.call(localItem, remoteItem)) {
                     //change local file
                     onLocalItemChanged.call(localKey, localItem, remoteItem);
-                    outRemoteFileToDownload.call(remoteItem);
+                    outRemoteFileToDownload.call(remoteItem, false);
                 }
 
                 //local file not exists, download
                 if (!localExistingFiles.contains(localKey)) {
-                    outRemoteFileToDownload.call(localItem);
+                    outRemoteFileToDownload.call(localItem, false);
                 }
             }
         }
@@ -99,7 +99,7 @@ public class StructMerger {
             if (localItem == null) {
                 //process changes?
                 onLocalItemAdded.call(remoteKey, remoteItem);
-                outRemoteFileToDownload.call(remoteItem);
+                outRemoteFileToDownload.call(remoteItem, false);
             } else {
                 //local exists
 
@@ -127,7 +127,7 @@ public class StructMerger {
                 T item = itemDataCreator.map(remoteExistingFileKey);
                 onLocalItemAdded.call(remoteExistingFileKey, item);
                 onRemoteItemAdded.call(remoteExistingFileKey, item);
-                outRemoteFileToDownload.call(item);
+                outRemoteFileToDownload.call(item, true);
             }
         }
     }
