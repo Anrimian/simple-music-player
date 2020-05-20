@@ -180,11 +180,11 @@ public class MetadataSyncInteractorTest {
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
@@ -214,11 +214,11 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository).updateLocalFilesMetadata(
@@ -257,11 +257,11 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository).updateLocalFilesMetadata(
@@ -309,11 +309,11 @@ public class MetadataSyncInteractorTest {
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
@@ -352,11 +352,11 @@ public class MetadataSyncInteractorTest {
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
@@ -386,11 +386,11 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository).updateLocalFilesMetadata(
@@ -429,11 +429,11 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository).updateLocalFilesMetadata(
@@ -481,11 +481,11 @@ public class MetadataSyncInteractorTest {
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor).scheduleFileTasks(eq(remoteRepositoryType1),
@@ -512,27 +512,27 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList())
+                any(),
+                any(),
+                any(),
+                any()
         );
     }
 
@@ -552,27 +552,27 @@ public class MetadataSyncInteractorTest {
 
         verify(remoteRepository, never()).updateMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(libraryRepository, never()).updateLocalFilesMetadata(
                 any(),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyMap())
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(emptyList())
+                any(),
+                any(),
+                any(),
+                any()
         );
 
         observer.assertValueAt(0, value -> value instanceof RunningSyncState.GetRemoteMetadata);
@@ -625,9 +625,142 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test sync with files but without remote metadata
-    //test delete file from local but without real file in local
-    //test delete file from remote but without real file in remote
+    @Test
+    public void testSyncWithDeletedRemoteMetadata() {
+        FileMetadata file1 = simpleFileMetadata("", "file1");
+        FileMetadata file2 = simpleFileMetadata("", "file2");
+
+        when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(
+                emptyMap()
+        ));
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(
+                file1,
+                file2
+        ));
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                file1,
+                file2
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(asList(file2, file1)),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+    }
+
+    @Test
+    public void testDeleteFromLocalWithoutRealFileOnLocal() {
+        FileMetadata file1 = simpleFileMetadata("", "file1");
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                removedMetadataMap(removedFileMetadata),
+                file1
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(new LocalFilesMetadata(
+                metadataMap(file1, metadataToDelete),
+                metadataKeySet(file1),
+                Collections.emptyMap())
+        );
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository, never()).updateMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                eq(emptyList()),
+                eq(asList(metadataToDelete)),
+                eq(emptyList()),
+                eq(asList(removedFileMetadata)),
+                eq(emptyMap())
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+    }
+
+    @Test
+    public void testDeleteFromRemoteWithoutRealFileOnRemote() {
+        FileMetadata file1 = simpleFileMetadata("", "file1");
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+
+        when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(
+                emptyMap(),
+                file1,
+                metadataToDelete));
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(file1));
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                removedMetadataMap(removedFileMetadata),
+                file1
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(asList(metadataToDelete)),
+                eq(emptyList()),
+                eq(asList(removedFileMetadata)),
+                eq(emptyMap())
+        );
+
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+    }
+
     //test sync with outdated local and remote removed items
     //test specific changes without file upload\download
     //test filepath change?

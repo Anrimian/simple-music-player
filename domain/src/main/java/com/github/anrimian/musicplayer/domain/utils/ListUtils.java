@@ -22,6 +22,11 @@ public class ListUtils {
         return new ArrayList<>(Arrays.asList(objects));
     }
 
+    @SafeVarargs
+    public static <T> Set<T> asSet(T... objects) {
+        return new HashSet<>(Arrays.asList(objects));
+    }
+
     public static <T, E> List<E> mapList(List<T> from, List<E> to, MapperFunction<T, E> mapper) {
         for (T t: from) {
             to.add(mapper.map(t));

@@ -48,7 +48,9 @@ public class StructMerger {
             if (remoteRemovedItem != null) {
                 if (removedItemPriorityFunction.call(localItem, remoteRemovedItem)) {
                     onLocalItemRemoved.call(localKey, localItem);
-                    outLocalFileToDelete.call(localItem);//check if exists
+                    if (localExistingFiles.contains(localKey)) {
+                        outLocalFileToDelete.call(localItem);
+                    }
                     continue;
                 } else {
                     onRemoteRemovedItemNotActual.call(localKey, remoteRemovedItem);
@@ -60,7 +62,9 @@ public class StructMerger {
 
                 //upload to remote
                 onRemoteItemAdded.call(localKey, localItem);
-                outLocalFileToUpload.call(localItem);
+                if (!remoteExistingFiles.contains(localKey)) {
+                    outLocalFileToUpload.call(localItem);
+                }
             } else {
                 //remote exists
 
@@ -89,7 +93,9 @@ public class StructMerger {
             if (localRemovedItem != null) {
                 if (removedItemPriorityFunction.call(remoteItem, localRemovedItem)) {
                     omRemoteItemRemoved.call(remoteKey, remoteItem);
-                    outRemoteFileToDelete.call(remoteItem);
+                    if (remoteExistingFiles.contains(remoteKey)) {
+                        outRemoteFileToDelete.call(remoteItem);
+                    }
                     continue;
                 } else {
                     onLocalRemovedItemNotActual.call(remoteKey, localRemovedItem);

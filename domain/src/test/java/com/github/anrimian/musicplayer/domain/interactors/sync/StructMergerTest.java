@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.domain.interactors.sync;
 
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class StructMergerTest {
@@ -71,7 +74,56 @@ public class StructMergerTest {
     }
 
     @Test
-    public void testDeleteFromLocal() {
+    public void testDeleteFromRemote() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "1");
+        localItems.put(2, "2");
+        localItems.put(3, "3");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+        remoteItems.put(2, "2");
+        remoteItems.put(3, "3");
+        remoteItems.put(4, "4");
+
+        Map<Integer, Object> localRemovedItems = new HashMap<>();
+        localRemovedItems.put(4, new Object());
+
+        List<String> outRemoteFilesToDelete = new ArrayList<>();
+
+        StructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                localRemovedItems,
+                emptyMap(),
+                Collections.emptySet(),
+                ListUtils.asSet(1, 2, 3, 4),
+                (local, remote) -> false,
+                (local, remote) -> false,
+                (item, deletedItem) -> true,
+                String::valueOf,
+                item -> {},
+                outRemoteFilesToDelete::add,
+                item -> {},
+                (item, rescan) -> {},
+                localItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> remoteItems.remove(key),
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
+
+        assertEquals(3, remoteItems.size());
+        assertEquals("1", remoteItems.get(1));
+        assertEquals("2", remoteItems.get(2));
+        assertEquals("3", remoteItems.get(3));
+
+        assertTrue(outRemoteFilesToDelete.contains("4"));
+    }
+
+    @Test
+    public void testDeleteFromRemoteWithoutRealFileOnRemote() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
         localItems.put(2, "2");
@@ -116,11 +168,11 @@ public class StructMergerTest {
         assertEquals("2", remoteItems.get(2));
         assertEquals("3", remoteItems.get(3));
 
-        assertTrue(outRemoteFilesToDelete.contains("4"));
+        assertFalse(outRemoteFilesToDelete.contains("4"));
     }
 
     @Test
-    public void testIrrelevantDeleteFromLocal() {
+    public void testIrrelevantDeleteFromRemote() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
         localItems.put(2, "2");
@@ -175,7 +227,56 @@ public class StructMergerTest {
     }
 
     @Test
-    public void testDeleteFromRemote() {
+    public void testDeleteFromLocal() {
+        Map<Integer, String> localItems = new HashMap<>();
+        localItems.put(1, "1");
+        localItems.put(2, "2");
+        localItems.put(3, "3");
+        localItems.put(4, "4");
+
+        Map<Integer, String> remoteItems = new HashMap<>();
+        remoteItems.put(1, "1");
+        remoteItems.put(2, "2");
+        remoteItems.put(3, "3");
+
+        Map<Integer, Object> remoteRemovedItems = new HashMap<>();
+        remoteRemovedItems.put(4, new Object());
+
+        List<String> outLocalFilesToDelete = new ArrayList<>();
+
+        StructMerger.mergeFilesMap(localItems,
+                remoteItems,
+                emptyMap(),
+                remoteRemovedItems,
+                ListUtils.asSet(1, 2, 3, 4),
+                Collections.emptySet(),
+                (local, remote) -> false,
+                (local, remote) -> false,
+                (item, deletedItem) -> true,
+                String::valueOf,
+                outLocalFilesToDelete::add,
+                item -> {},
+                item -> {},
+                (item, rescan) -> {},
+                localItems::put,
+                (key, item) -> localItems.remove(key),
+                (key, oldItem, item) -> {},
+                remoteItems::put,
+                (key, item) -> {},
+                (key, oldItem, item) -> {},
+                (key, item) -> {},
+                (key, item) -> {});
+
+        assertEquals(3, localItems.size());
+        assertEquals("1", localItems.get(1));
+        assertEquals("2", localItems.get(2));
+        assertEquals("3", localItems.get(3));
+
+        assertTrue(outLocalFilesToDelete.contains("4"));
+    }
+
+    @Test
+    public void testDeleteFromLocalWithoutRealFilesOnLocal() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
         localItems.put(2, "2");
@@ -220,11 +321,11 @@ public class StructMergerTest {
         assertEquals("2", localItems.get(2));
         assertEquals("3", localItems.get(3));
 
-        assertTrue(outLocalFilesToDelete.contains("4"));
+        assertFalse(outLocalFilesToDelete.contains("4"));
     }
 
     @Test
-    public void testIrrelevantDeleteFromRemote() {
+    public void testIrrelevantDeleteFromLocal() {
         Map<Integer, String> localItems = new HashMap<>();
         localItems.put(1, "1");
         localItems.put(2, "2");
