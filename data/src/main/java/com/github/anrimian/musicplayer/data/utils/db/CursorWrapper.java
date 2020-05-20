@@ -14,16 +14,30 @@ public class CursorWrapper {
 
     @Nullable
     public String getString(String columnName) {
-        return cursor.getString(cursor.getColumnIndex(columnName));
+        int columnIndex = cursor.getColumnIndex(columnName);
+        if (columnIndex < 0 || cursor.isNull(columnIndex)) {
+            return null;
+        } else {
+            return cursor.getString(columnIndex);
+        }
     }
 
     public long getLong(String columnName) {
-        return cursor.getLong(cursor.getColumnIndex(columnName));
+        int columnIndex = cursor.getColumnIndex(columnName);
+        if (columnIndex < 0 || cursor.isNull(columnIndex)) {
+            return 0;
+        } else {
+            return cursor.getLong(columnIndex);
+        }
     }
 
-
     public int getInt(String columnName) {
-        return cursor.getInt(cursor.getColumnIndex(columnName));
+        int columnIndex = cursor.getColumnIndex(columnName);
+        if (columnIndex < 0 || cursor.isNull(columnIndex)) {
+            return 0;
+        } else {
+            return cursor.getInt(columnIndex);
+        }
     }
 
     public boolean getBoolean(String columnName) {
