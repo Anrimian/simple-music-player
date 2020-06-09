@@ -135,7 +135,7 @@ public class CompositionsDaoWrapper {
         });
     }
 
-    public void updateAlbum(long compositionId, String albumName) {
+    public void updateAlbum(long compositionId, @Nullable String albumName) {
         appDatabase.runInTransaction(() -> {
 
             Long artistId = null;
@@ -153,7 +153,9 @@ public class CompositionsDaoWrapper {
             // if album not exists - create album
             if (albumId == null && albumName != null) {
                 //single crash here
-                //unexisting artist id?
+                //irrelevant artist id?
+                //already existing album? - no
+                //non unique albumName and artist id?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 

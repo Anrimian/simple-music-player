@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Music Player.iml" filepath="$PROJECT_DIR$/Music Player.iml" group="Music Player" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Music_Player.iml" filepath="$PROJECT_DIR$/.idea/modules/Music_Player.iml" group="Music_Player" />
       <module fileurl="file://$PROJECT_DIR$/data/data.iml" filepath="$PROJECT_DIR$/data/data.iml" group="Music Player/data" />
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" group="Music Player/domain" />
       <module fileurl="file://$PROJECT_DIR$/music-player.iml" filepath="$PROJECT_DIR$/music-player.iml" group="music-player" />

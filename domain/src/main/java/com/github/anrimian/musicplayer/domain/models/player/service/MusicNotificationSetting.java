@@ -24,4 +24,24 @@ public class MusicNotificationSetting {
     public boolean isCoversOnLockScreen() {
         return coversOnLockScreen;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MusicNotificationSetting that = (MusicNotificationSetting) o;
+
+        if (showCovers != that.showCovers) return false;
+        if (coloredNotification != that.coloredNotification) return false;
+        return coversOnLockScreen == that.coversOnLockScreen;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (showCovers ? 1 : 0);
+        result = 31 * result + (coloredNotification ? 1 : 0);
+        result = 31 * result + (coversOnLockScreen ? 1 : 0);
+        return result;
+    }
 }

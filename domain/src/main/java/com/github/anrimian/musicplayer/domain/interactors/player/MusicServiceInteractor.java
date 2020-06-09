@@ -17,7 +17,19 @@ public class MusicServiceInteractor {
         return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
                 getColoredNotificationEnabledObservable(),
                 getCoversOnLockScreenEnabledObservable(),
-                this::mapToSettingModel);
+                MusicNotificationSetting::new);
+    }
+
+    public MusicNotificationSetting getNotificationSettings() {
+        boolean coversEnabled = settingsRepository.isCoversEnabled();
+        boolean coversInNotification = coversEnabled && settingsRepository.isCoversInNotificationEnabled();
+        boolean coloredNotification = settingsRepository.isColoredNotificationEnabled();
+        boolean coversOnLockScreen = settingsRepository.isCoversOnLockScreenEnabled();
+        return new MusicNotificationSetting(
+                coversInNotification,
+                coversInNotification && coloredNotification,
+                coversInNotification && coversOnLockScreen
+        );
     }
 
     private Observable<Boolean> getCoversInNotificationEnabledObservable() {
@@ -33,16 +45,8 @@ public class MusicServiceInteractor {
     }
 
     private Observable<Boolean> getCoversOnLockScreenEnabledObservable() {
-        return Observable.combineLatest(settingsRepository.getCoversInNotificationEnabledObservable(),
+        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
                 settingsRepository.getCoversOnLockScreenEnabledObservable(),
                 (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
-    }
-
-    private MusicNotificationSetting mapToSettingModel(boolean notificationCovers,
-                                                       boolean coloredNotification,
-                                                       boolean coversOnLockScreen) {
-        return new MusicNotificationSetting(notificationCovers,
-                coloredNotification,
-                coversOnLockScreen);
     }
 }

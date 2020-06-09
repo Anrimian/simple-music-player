@@ -1,0 +1,237 @@
+<resources>
+
+    <string name="open_drawer">Abrir gaveta</string>
+    <string name="close_drawer">Fechar gaveta</string>
+    <string name="try_again">Tente novamente</string>
+    <string name="can_not_work_without_file_permission">O aplicativo não pode funcionar sem permissão de arquivo</string>
+    <string name="close">Fechar</string>
+    <string name="library">Biblioteca</string>
+    <string name="settings">Configurações</string>
+    <string name="internal_app_error">Erro interno do aplicativo</string>
+    <string name="unexpected_error">Erro: %s</string>
+    <string name="file_not_found">Arquivo não encontrado</string>
+    <string name="compositions_on_device_not_found">Nenhuma música encontrada no dispositivo</string>
+    <string name="compositions_and_folders_for_search_not_found">Composições e pastas correspondentes aos resultados da pesquisa não encontrados</string>
+    <string name="compositions_for_search_not_found">Não foram encontrados resultados de pesquisa correspondentes</string>
+    <string name="foreground_channel_description">Notificação de reprodução em primeiro plano</string>
+    <string name="previous_track">Música anterior</string>
+    <string name="next_track">Próxima música</string>
+    <string name="folder">Pasta</string>
+    <string name="content_description_menu">Abrir menu de composição atual</string>
+    <string name="content_description_menu_template">Abrir menu de composição: %s</string>
+    <string name="share">Enviar</string>
+    <string name="content_description_repeat_mode">Menu do modo de repetição</string>
+    <string name="content_description_shuffle">Modo aleatório</string>
+    <string name="unknown_author">Autor desconhecido</string>
+    <string name="delete">Excluir</string>
+    <string name="delete_folder">Excluir pasta</string>
+    <string name="alphabetical_order">Alfabeticamente</string>
+    <string name="add_date_order">Por data de adição</string>
+    <string name="order">Ordenação</string>
+    <string name="folders">Pastas</string>
+    <string name="compositions">Músicas</string>
+    <string name="play_lists">Listas de reprodução</string>
+    <string name="play_lists_on_device_not_found">Nenhuma lista de reprodução encontrada no dispositivo</string>
+    <string name="name">Nome</string>
+    <string name="create">Criar</string>
+    <string name="create_playlist">Criar lista de reprodução</string>
+    <string name="create_playlist_error_template">Não é possível criar lista de reprodução: %1$s</string>
+    <string name="change_playlist_name_error_template">Não é possível alterar o nome da lista de reprodução: %1$s</string>
+    <string name="name_can_not_be_empty">Nome não pode estar vazio</string>
+    <string name="create_progress">Criando…</string>
+    <string name="play_list_with_this_name_already_exists">Lista de reprodução com este nome já existe</string>
+    <string name="add_to_playlist">Adicionar à lista de reprodução</string>
+    <string name="select_play_list">Selecionar lista de reprodução</string>
+    <string name="add_to_playlist_error_template">Não é possível adicionar música à lista de reprodução: %1$s</string>
+    <string name="delete_composition_error_template">Não é possível excluir a música: %1$s</string>
+    <string name="add_to_playlist_success_template">Música \"%1$s\" adicionado à lista de reprodução \"%2$s\"</string>
+    <string name="play_list_is_empty">A lista de reprodução está vazia</string>
+    <string name="save_as_play_list">Salvar como lista de reprodução</string>
+    <string name="cancel">Cancelar</string>
+    <string name="deleting">Excluindo</string>
+    <string name="delete_composition_template">Excluir música \"%1$s\"? Essa ação não pode ser desfeita.</string>
+    <string name="delete_empty_folder">Excluir pasta \"%s\"? Essa ação não pode ser desfeita.</string>
+    <string name="delete_folder_template">Excluir %2$s da pasta \"%1$s\"?
+        Se não houver mais arquivos na pasta, ele também será excluído.
+        Essa ação não pode ser desfeita.
+    </string>
+    <string name="delete_template">Excluir \"%1$s\"? Essa ação não pode ser desfeita.</string>
+    <string name="delete_composition_success">Música \"%1$s\" excluído</string>
+    <string name="search">Pesquisar</string>
+    <string name="play_queue">Fila de reprodução</string>
+    <string name="pause">Pausar</string>
+    <string name="play">Reproduzir</string>
+    <string name="play_all">Reproduzir tudo</string>
+    <string name="repeat_playlist">Fila de reprodução repetida</string>
+    <string name="repeat_composition">Repetir música</string>
+    <string name="do_not_repeat">Não repetir</string>
+    <string name="delete_from_queue">Excluir da fila de reprodução</string>
+    <string name="delete_from_play_list">Excluir da lista de reprodução</string>
+    <string name="add_item_to_playlist_error_template">Não é possível adicionar música à lista de reprodução: %1$s</string>
+    <string name="delete_from_playlist_success_template">Música \"%1$s\" excluído da lista de reprodução \"%2$s\"</string>
+    <string name="delete_playlist_template">Excluir lista de reprodução \"%1$s\"?</string>
+    <string name="play_list_delete_error">Não é possível excluir a lista de reprodução: %1$s </string>
+    <string name="play_not_exists">A lista de reprodução não existe</string>
+    <string name="play_list_deleted">Lista de reprodução \"%1$s\" foi excluída</string>
+    <string name="can_not_receive_file_for_send">Não é possível receber arquivos para envio: %1$s</string>
+    <string name="position_template">Hora de reprodução atual: %1$s</string>
+    <string name="now_playing_template">Reproduzindo agora: %1$s. Abrir a fila de reprodução.</string>
+    <string name="play_all_in_folder">Reproduzir tudo na pasta</string>
+    <string name="delete_playlist">Excluir lista de reprodução</string>
+    <string name="storage_timeout_error_message">
+        O Armazenamento de mídia do dispositivo não está respondendo.
+        Esta é uma questão realmente estranha e rara.
+        Tente reiniciar o dispositivo, talvez ele resolva esse problema.
+    </string>
+    <string name="select_all">Selecionar tudo</string>
+    <string name="file_uri_extract_error">
+        Não é possível obter o caminho do Sistema para composição \"%s\" enviar.
+        Possível está na pasta privada do Sistema.
+    </string>
+    <string name="loading_progress">Carregando…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Mais tarde primeiro</string>
+    <string name="play_action">Reproduzir</string>
+    <string name="play_next">Reproduzir próxima</string>
+    <string name="add_to_play_queue">Adicionar à fila</string>
+    <string name="edit_name">Renomear</string>
+    <string name="change">Alterar</string>
+    <string name="no_current_composition">Nenhuma composição atual</string>
+    <string name="show_covers">Mostrar capas</string>
+    <string name="show_covers_in_notification">Mostrar capas na notificação</string>
+    <string name="colored_notification">Cores das notificações nas cores da capa</string>
+    <string name="show_covers_on_lock_screen">Mostrar capas na tela de bloqueio</string>
+    <string name="display">Exibição</string>
+    <string name="decrease_volume_on_notification">Diminuir o volume quando a notificação for recebida</string>
+    <string name="playing">Reprodutor</string>
+    <string name="error_channel_description">Notificações de erro de reprodução</string>
+    <string name="playing_error">Erro de reprodução</string>
+    <string name="no_file_permission">Sem permissão de arquivo</string>
+    <string name="about_app">Sobre</string>
+    <string name="version_template">Versão %1$s(Construção %2$d)</string>
+    <string name="theme">Tema</string>
+    <string name="white_purple_theme">Branco (Roxo)</string>
+    <string name="white_indigo_theme">Branco (Índigo)</string>
+    <string name="white_teal_theme">Branco (Cerceta)</string>
+    <string name="dark_theme">Escuro</string>
+    <string name="edit">Editar</string>
+    <string name="edit_tags">Editar etiquetas</string>
+    <string name="change_author_name">Alterar artista</string>
+    <string name="change_title">Alterar título</string>
+    <string name="title">Título</string>
+    <string name="filename">Nome do arquivo</string>
+    <string name="artist">Artistas</string>
+    <string name="change_file_name">Alterar nome do arquivo</string>
+    <string name="copied_message">Texto copiado</string>
+    <string name="folder_name">Nome da pasta</string>
+    <string name="rename_folder">Renomear pasta</string>
+    <string name="cut">Cortar</string>
+    <string name="copy">Copiar</string>
+    <string name="paste">Colar</string>
+    <string name="paste_in_new_folder">Cole na nova pasta</string>
+    <string name="move_in_the_same_folder_error">Correspondências de pasta de destino e de origem</string>
+    <string name="file_already_exists">O arquivo com este nome já existe</string>
+    <string name="new_folder">Nova pasta</string>
+    <string name="play_on_connect_bluetooth_device">Comece a reproduzir quando o dispositivo Bluetooth estiver conectado</string>
+    <string name="headset">Fone de ouvido</string>
+    <string name="scan_storage">Verificar novamente o Armazenamento de mídia</string>
+    <string name="auto_night_mode">Modo noturno automático</string>
+    <string name="unsupported_format_hint">Formato não suportado</string>
+    <string name="artists">Artistas</string>
+    <string name="no_artists_in_library">Nenhum artista na Biblioteca</string>
+    <string name="albums">Álbuns</string>
+    <string name="no_albums_in_library">Não há álbuns na Biblioteca</string>
+    <string name="genres">Gêneros</string>
+    <string name="no_genres_in_library">Nenhum gênero na Biblioteca</string>
+    <string name="no_items_in_genre">Nenhuma composição no gênero selecionado</string>
+    <string name="no_compositions">Sem composições</string>
+    <string name="change_album_name">Alterar álbum</string>
+    <string name="album">Álbum</string>
+    <string name="genre">Gênero</string>
+    <string name="change_composition_genre">Alterar gênero de composição</string>
+    <string name="change_name">Alterar o nome</string>
+    <string name="rename_progress">Renomeando…</string>
+    <string name="album_artist">Álbum do artista</string>
+    <string name="change_album_artist">Alterar artista do álbum</string>
+    <string name="edit_album_tags">Editar etiquetas do álbum</string>
+    <string name="by_composition_count">Por contagem de composição</string>
+    <string name="by_duration">Por duração</string>
+    <string name="longest_first">Mais longo primeiro</string>
+    <string name="more_first">Mais primeiro</string>
+    <string name="artist_already_exists">O artista com este nome já existe</string>
+    <string name="album_already_exists">O álbum com este nome já existe</string>
+    <string name="genre_already_exists">O gênero com esse nome já existe</string>
+    <string name="remove_genre">Remover gênero</string>
+    <string name="add_composition_genre">Adicionar gênero</string>
+    <string name="add">Adicionar</string>
+    <string name="edit_genre">Editar gênero</string>
+    <string name="genre_removed_message">Gênero \"%s\" foi removido</string>
+    <string name="exclude_from_scanning">Ocultar</string>
+    <string name="ignored_folder_added">Pasta \'%s\' adicionado à lista de pastas excluídas</string>
+    <string name="excluded_folders">Pastas excluídas</string>
+    <string name="remove_excluded_folder">Remover pasta excluída</string>
+    <string name="no_excluded_folders">Nenhuma pasta excluída</string>
+    <string name="ignored_folder_removed">Pasta excluída removida</string>
+    <string name="moving_and_destination_folders_matches">Correspondências de movimentação e destino</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">A pasta com esse nome já existe na pasta de destino</string>
+    <string name="move_progress">Movendo…</string>
+    <string name="delete_progress">Excluindo…</string>
+    <string name="play_next_message_single">Composição \"%s\" será reproduzido a seguir</string>
+    <string name="added_to_queue_message_single">Composição \"%s\" adicionado ao fim da fila de reprodução</string>
+    <string name="queue_item_removed">Ítem da fila removido</string>
+    <string name="by_size">Por tamanho</string>
+    <string name="largest_first">Maior primeiro</string>
+    <string name="log_info_text">Ocorreram alguns erros não fatais e as informações sobre eles foram registradas no arquivo de relatório. O aplicativo não envia relatório automaticamente, mas você pode enviá-los manualmente. Isso ajudará a melhorar a qualidade do aplicativo. Tamanho atual do arquivo de relatório: %d KB</string>
+    <string name="view_file">Visualizar arquivo</string>
+    <string name="send_file">Enviar arquivo</string>
+    <string name="delete_file">Excluir arquivo</string>
+    <string name="log_file_deleted">Arquivo de relatório excluído</string>
+    <string name="pick_email_app_to_send">Escolha um aplicativo de e-mail para enviar</string>
+    <string name="clear_play_queue">Limpar fila de reprodução</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s música</item>
+        <item quantity="other">%1$s músicas</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s música</item>
+        <item quantity="other">%1$s músicas</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s arquivo</item>
+        <item quantity="other">%1$s arquivos</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s álbum</item>
+        <item quantity="other">%1$s álbuns</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s música será reproduzida a seguir</item>
+        <item quantity="other">%s músicas serão reproduzidas a seguir</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s música adicionada ao final da fila de reprodução</item>
+        <item quantity="other">%s músicas adicionadas ao final da fila de reprodução</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d música adicionada à lista de reprodução \"%2$s\"</item>
+        <item quantity="other">%1$d músicas adicionadas à lista de reprodução \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d música excluída da lista de reprodução \"%2$s\"</item>
+        <item quantity="other">%1$d músicas excluídas da lista de reprodução \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d música excluída</item>
+        <item quantity="other">%1$d músicas excluídas</item>
+    </plurals>
+
+</resources>

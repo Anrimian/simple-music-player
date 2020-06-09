@@ -306,6 +306,11 @@ public class MusicPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    @Nullable
+    public PlayQueueItem getCurrentItem() {
+        return currentItem;
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();

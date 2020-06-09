@@ -3,63 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/fl_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="?android:attr/colorBackground">
 
-        <TextView
-            android:id="@+id/tv_display"
-            style="@style/TextStyleButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/display"/>
+            android:orientation="vertical">
 
-        <View
-            style="@style/Divider.Horizontal"
-            android:layout_marginStart="@dimen/toolbar_content_start"/>
+            <TextView
+                android:id="@+id/tv_display"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/display"/>
 
-        <TextView
-            android:id="@+id/tv_library"
-            style="@style/TextStyleButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/library"/>
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
 
-        <View
-            style="@style/Divider.Horizontal"
-            android:layout_marginStart="@dimen/toolbar_content_start"/>
+            <TextView
+                android:id="@+id/tv_library"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/library"/>
 
-        <TextView
-            android:id="@+id/tv_player"
-            style="@style/TextStyleButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/playing"/>
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
 
-        <View
-            style="@style/Divider.Horizontal"
-            android:layout_marginStart="@dimen/toolbar_content_start"/>
+            <TextView
+                android:id="@+id/tv_player"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/playing"/>
 
-        <TextView
-            android:id="@+id/tv_headset"
-            style="@style/TextStyleButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/headset"/>
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
 
-        <View
-            style="@style/Divider.Horizontal"
-            android:layout_marginStart="@dimen/toolbar_content_start"/>
+            <TextView
+                android:id="@+id/tv_headset"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/headset"/>
 
-        <TextView
-            android:id="@+id/tv_theme_name"
-            style="@style/TextStyleButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/theme"/>
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_theme_name"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/theme"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 </FrameLayout>

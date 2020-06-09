@@ -539,7 +539,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             if (showCover) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .displayImage(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
+                        .displayImageInReusableTarget(ivMusicIcon, composition, R.drawable.ic_music_placeholder);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
             }

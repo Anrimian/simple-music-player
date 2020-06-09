@@ -117,7 +117,7 @@ public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
         tvProgress.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         tvError.setVisibility(View.VISIBLE);
-        tvError.setText(getString(R.string.chage_playlist_name_error_template, errorCommand.getMessage()));
+        tvError.setText(getString(R.string.change_playlist_name_error_template, errorCommand.getMessage()));
     }
 
     @Override

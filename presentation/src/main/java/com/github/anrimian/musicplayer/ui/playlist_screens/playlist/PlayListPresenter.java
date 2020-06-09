@@ -213,7 +213,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void addCompositionsToEnd(List<Composition> compositions) {
         playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
     }
 
     private void onDefaultError(Throwable throwable) {

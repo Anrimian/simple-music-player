@@ -80,14 +80,23 @@ public class NotificationsDisplayer {
     }
 
     public void showErrorNotification(@StringRes int errorMessageId) {
+        notificationManager.notify(ERROR_NOTIFICATION_ID, getErrorNotification(errorMessageId));
+    }
+
+    public void startForegroundErrorNotification(Service service,
+                                                 @StringRes int errorMessageId) {
+        Notification notification = getErrorNotification(errorMessageId);
+        service.startForeground(ERROR_NOTIFICATION_ID, notification);
+    }
+
+    public Notification getErrorNotification(@StringRes int errorMessageId) {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-        Notification notification = new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
+        return new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.playing_error))
                 .setContentText(context.getString(errorMessageId))
                 .setColor(getColor(context, R.color.default_notification_color))
@@ -98,9 +107,6 @@ public class NotificationsDisplayer {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .build();
-
-        notificationManager.notify(ERROR_NOTIFICATION_ID, notification);
-
     }
 
     public void removeErrorNotification() {
@@ -111,7 +117,8 @@ public class NotificationsDisplayer {
                                             boolean play,
                                             @Nullable PlayQueueItem queueItem,
                                             MediaSessionCompat mediaSession,
-                                            @Nullable MusicNotificationSetting notificationSetting) {
+                                            @Nullable MusicNotificationSetting notificationSetting,
+                                            boolean reloadCover) {
         Notification notification = getDefaultMusicNotification(play,
                 queueItem,
                 mediaSession,
@@ -119,13 +126,16 @@ public class NotificationsDisplayer {
                 .build();
         service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
 
-        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+        if (reloadCover) {
+            showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+        }
     }
 
     public void updateForegroundNotification(boolean play,
                                              @Nullable PlayQueueItem queueItem,
                                              MediaSessionCompat mediaSession,
-                                             MusicNotificationSetting notificationSetting) {
+                                             MusicNotificationSetting notificationSetting,
+                                             boolean reloadCover) {
         if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
             return;
         }
@@ -137,16 +147,22 @@ public class NotificationsDisplayer {
                 .build();
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
 
-        showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+        if (reloadCover) {
+            showMusicNotificationWithCover(play, queueItem, mediaSession, notificationSetting);
+        }
+    }
+
+    public void cancelCoverLoadingForForegroundNotification() {
+        if (cancellationRunnable != null) {
+            cancellationRunnable.run();
+        }
     }
 
     private void showMusicNotificationWithCover(boolean play,
                                                 @Nullable PlayQueueItem queueItem,
                                                 MediaSessionCompat mediaSession,
                                                 MusicNotificationSetting notificationSetting) {
-        if (cancellationRunnable != null) {
-            cancellationRunnable.run();
-        }
+        cancelCoverLoadingForForegroundNotification();
 
         if (queueItem == null) {
             return;
@@ -171,7 +187,7 @@ public class NotificationsDisplayer {
             builder.setLargeIcon(bitmap);
             currentNotificationBitmap = bitmap;
             notificationManager.notify(FOREGROUND_NOTIFICATION_ID, builder.build());
-        });
+        }, () -> currentNotificationBitmap);
     }
 
     private NotificationCompat.Builder getDefaultMusicNotification(boolean play,
@@ -184,21 +200,21 @@ public class NotificationsDisplayer {
         PendingIntent pIntentPlayPause = PendingIntent.getService(context,
                 requestCode,
                 intentPlayPause,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent intentSkipToPrevious = new Intent(context, MusicService.class);
         intentSkipToPrevious.putExtra(REQUEST_CODE, SKIP_TO_PREVIOUS);
         PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context,
                 SKIP_TO_PREVIOUS,
                 intentSkipToPrevious,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent intentSkipToNext = new Intent(context, MusicService.class);
         intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
         PendingIntent pIntentSkipToNext = PendingIntent.getService(context,
                 SKIP_TO_NEXT,
                 intentSkipToNext,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(OPEN_PLAY_QUEUE_ARG, true);

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="useless_image">Ничего не значащая картинка</string>
+
     <string name="open_drawer">Открыть боковое меню</string>
     <string name="close_drawer">Закрыть блоковое меню</string>
-    <string name="useless_image">Ничего не значащая картинка</string>
     <string name="try_again">Попробовать снова</string>
     <string name="can_not_work_without_file_permission">Приложение не может работать без разрешения на доступ к файлам</string>
     <string name="close">Закрыть</string>
@@ -37,7 +38,7 @@
     <string name="create">Создать</string>
     <string name="create_playlist">Создание плейлиста</string>
     <string name="create_playlist_error_template">Не удалось создать плейлист: %1$s</string>
-    <string name="chage_playlist_name_error_template">Не удалось изменить имя плейлиста: %1$s</string>
+    <string name="change_playlist_name_error_template">Не удалось изменить имя плейлиста: %1$s</string>
     <string name="name_can_not_be_empty">имя не может быть пустым</string>
     <string name="create_progress">Создание…</string>
     <string name="play_list_with_this_name_already_exists">плейлист с таким именем уже существует</string>
@@ -123,7 +124,6 @@
     </string>
     <string name="about_app_text_write">напишите</string>
     <string name="about_app_text_here">напишите</string>
-    <string name="send_email">Отправить email</string>
     <string name="theme">Тема оформления</string>
     <string name="white_purple_theme">Светлая(Фиолетовая)</string>
     <string name="white_indigo_theme">Светлая(Синяя)</string>

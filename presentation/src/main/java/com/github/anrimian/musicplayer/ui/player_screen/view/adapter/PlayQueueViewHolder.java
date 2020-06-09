@@ -62,6 +62,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
     }
 
     void update(PlayQueueItem item, List<Object> payloads) {
+        this.playQueueItem = item;
         compositionItemWrapper.update(item.getComposition(), payloads);
     }
 

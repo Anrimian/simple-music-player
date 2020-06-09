@@ -1,15 +1,7 @@
 <resources>
 
-    <string name="file_provider_authorities" translatable="false">
-        com.github.anrimian.simplemusicplayer.share_file_provider
-    </string>
-    <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
-    <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
-
-    <string name="app_name" translatable="false">Music Player</string>
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
-    <string name="useless_image">Useless image</string>
     <string name="try_again">Try again</string>
     <string name="can_not_work_without_file_permission">Application can not work without file permission</string>
     <string name="close">Close</string>
@@ -26,7 +18,7 @@
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
     <string name="content_description_menu">Open current composition menu</string>
-    <string name="content_description_menu_template">Open composition menu %s</string>
+    <string name="content_description_menu_template">Open composition menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
     <string name="content_description_shuffle">Shuffle mode</string>
@@ -44,7 +36,7 @@
     <string name="create">Create</string>
     <string name="create_playlist">Create playlist</string>
     <string name="create_playlist_error_template">Can not create playlist: %1$s</string>
-    <string name="chage_playlist_name_error_template">Can not change playlist name: %1$s</string>
+    <string name="change_playlist_name_error_template">Can not change playlist name: %1$s</string>
     <string name="name_can_not_be_empty">name can not be empty</string>
     <string name="create_progress">Creating…</string>
     <string name="play_list_with_this_name_already_exists">playlist with this name already exists</string>
@@ -88,13 +80,13 @@
     <string name="delete_playlist">Delete playlist</string>
     <string name="storage_timeout_error_message">
         Device media storage is not responding.
-        This is a really strange and rare mistake.
+        This is a really strange and rare issue.
         Try to reboot the device, perhaps it will solve this problem.
     </string>
     <string name="select_all">Select all</string>
     <string name="file_uri_extract_error">
         Can\'t get system path for composition \"%s\" to send.
-        Possible he is in private system folder or so.
+        Possible it is in private system folder.
     </string>
     <string name="loading_progress">Loading…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
@@ -117,23 +109,6 @@
     <string name="no_file_permission">No file permission</string>
     <string name="about_app">About</string>
     <string name="version_template">Version %1$s(Build %2$d)</string>
-    <string name="about_app_text"><![CDATA[<big><b>What is this app?</b></big>
-        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.
-        <br/>If you find an error, %1$s about it.
-        <br/>If you feel that some features are missing, %1$s about it, but I can\'t promise that I necessarily implement it. Usually I do after a while.
-        <br/>
-        <br/><big><b>Is this app completely free?</b></big>
-        <br/>Yes, no ads, no in-app purchases. Perhaps if this app becomes highly popular I could implement some paid non-essential features, but I definitely won\'t add ads or lock existing functionality.
-        <br/>
-        <br/><big><b>Has this app any analytics or data collection?</b></big>
-        <br/>No analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
-        <br/>
-        <br/><big><b>Translations</b></big>
-        <br/>If you find an error in app texts or want to offer translation to your language, %2$s about it.]]>
-    </string>
-    <string name="about_app_text_write">email me</string>
-    <string name="about_app_text_here">email me</string>
-    <string name="send_email">Send email</string>
     <string name="theme">Theme</string>
     <string name="white_purple_theme">White(Purple)</string>
     <string name="white_indigo_theme">White(Indigo)</string>
@@ -206,7 +181,7 @@
     <string name="queue_item_removed">Queue item removed</string>
     <string name="by_size">By size</string>
     <string name="largest_first">Largest first</string>
-    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help to improve app quality. Current log file size: %d KB</string>
+    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help improve app quality. Current log file size: %d KB</string>
     <string name="view_file">View file</string>
     <string name="send_file">Send file</string>
     <string name="delete_file">Delete file</string>
@@ -216,64 +191,46 @@
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
-        <item quantity="few">%1$s songs</item>
-        <item quantity="many">%1$s songs</item>
         <item quantity="other">%1$s songs</item>
     </plurals>
 
     <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s song</item>
-        <item quantity="few">%1$s songs</item>
-        <item quantity="many">%1$s songs</item>
         <item quantity="other">%1$s songs</item>
     </plurals>
 
     <plurals name="files_count">
         <item quantity="one">%1$s file</item>
-        <item quantity="few">%1$s files</item>
-        <item quantity="many">%1$s files</item>
         <item quantity="other">%1$s files</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
-        <item quantity="few">%1$s albums</item>
-        <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
 
     <plurals name="play_next_message">
         <item quantity="one">%s song will be played next</item>
-        <item quantity="few">%s songs will be played next</item>
-        <item quantity="many">%s songs will be played next</item>
         <item quantity="other">%s songs will be played next</item>
     </plurals>
 
     <plurals name="added_to_queue_message">
         <item quantity="one">%s song added to end of play queue</item>
-        <item quantity="few">%s songs added to end of play queue</item>
-        <item quantity="many">%s songs added to end of play queue</item>
         <item quantity="other">%s songs added to end of play queue</item>
     </plurals>
 
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d song added to playlist \"%2$s\"</item>
-        <item quantity="few">%1$d songs added to playlist \"%2$s\"</item>
-        <item quantity="many">%1$d songs added to playlist \"%2$s\"</item>
         <item quantity="other">%1$d songs added to playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d song deleted from playlist \"%2$s\"</item>
-        <item quantity="few">%1$d songs deleted from playlist \"%2$s\"</item>
-        <item quantity="many">%1$d songs deleted from playlist \"%2$s\"</item>
         <item quantity="other">%1$d songs deleted from playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d song deleted</item>
-        <item quantity="few">%1$d songs deleted</item>
-        <item quantity="many">%1$d songs deleted</item>
         <item quantity="other">%1$d songs deleted</item>
     </plurals>
 

@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -92,8 +93,8 @@ public class MusicService extends Service {
     @Inject
     Scheduler uiScheduler;
 
-    public MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
-    public Builder stateBuilder = new Builder()
+    private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+    private final Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
                     | ACTION_STOP
                     | ACTION_PAUSE
@@ -101,22 +102,20 @@ public class MusicService extends Service {
                     | ACTION_SKIP_TO_NEXT
                     | ACTION_SKIP_TO_PREVIOUS
                     | ACTION_SEEK_TO);
+    //optimization
+    private final ServiceState serviceState = new ServiceState();
 
     private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
-    private final CompositeDisposable playInfoDisposable = new CompositeDisposable();
 
     private MediaSessionCompat mediaSession;
 
-    @Nullable
-    private PlayerState playerState;
-
+    private PlayerState playerState = PlayerState.PLAY;
     @Nullable
     private PlayQueueItem currentItem;
-
-    private MusicNotificationSetting notificationSetting;
-
     private long trackPosition;
+    private MusicNotificationSetting notificationSetting;
+    private AppTheme currentAppTheme;
 
     @Override
     public void onCreate() {
@@ -127,7 +126,8 @@ public class MusicService extends Service {
         notificationsDisplayer = appComponent.notificationDisplayer();
 
         if (!Permissions.hasFilePermission(this)) {
-            notificationsDisplayer.showErrorNotification(R.string.no_file_permission);//test it
+            notificationsDisplayer.startForegroundErrorNotification(this, R.string.no_file_permission);
+            stopForeground(true);
             stopSelf();
             return;
         }
@@ -142,6 +142,26 @@ public class MusicService extends Service {
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
         PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+
+        //reduce chance to show first notification without info
+        currentItem = musicPlayerInteractor.getCurrentItem();
+        notificationSetting = musicServiceInteractor.getNotificationSettings();
+
+        //we must start foreground in onCreate, strange ANR otherwise
+        notificationsDisplayer.startForegroundNotification(this,
+                playerState == PlayerState.PLAY,
+                currentItem,
+                mediaSession,
+                notificationSetting,
+                true);
+        //update state that depends on current item and settings to keep it actual
+        if (currentItem != null) {
+            updateMediaSessionState();
+            updateMediaSessionMetadata();
+            updateMediaSessionAlbumArt();
+        }
+
+        subscribeOnServiceState();
     }
 
     @Override
@@ -150,11 +170,11 @@ public class MusicService extends Service {
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
             notificationsDisplayer.startForegroundNotification(this,
-                    true,
+                    playerState == PlayerState.PLAY,
                     currentItem,
                     mediaSession,
-                    notificationSetting);
-            subscribeOnPlayerEvents();
+                    notificationSetting,
+                    false);
         }
         if (requestCode != -1) {
             handleNotificationAction(requestCode);
@@ -207,116 +227,163 @@ public class MusicService extends Service {
         }
     }
 
-    private void subscribeOnPlayerEvents() {
-        if (serviceDisposable.size() == 0) {
-            serviceDisposable.add(Observable.combineLatest(
-                    musicServiceInteractor.getNotificationSettingObservable(),
-                    themeController.getAppThemeObservable(),
-                    (setting, theme) -> setting)
-                    .observeOn(uiScheduler)
-                    .subscribe(this::onNotificationSettingReceived));
-            serviceDisposable.add(musicPlayerInteractor.getPlayerStateObservable()
-                    .observeOn(uiScheduler)
-                    .subscribe(this::onPlayerStateReceived));
-        }
+    private void subscribeOnServiceState() {
+        serviceDisposable.add(Observable.combineLatest(musicPlayerInteractor.getPlayerStateObservable(),
+                musicPlayerInteractor.getCurrentQueueItemObservable(),
+                musicPlayerInteractor.getTrackPositionObservable(),
+                musicServiceInteractor.getNotificationSettingObservable(),
+                themeController.getAppThemeObservable(),
+                serviceState::set)
+                .observeOn(uiScheduler)
+                .subscribe(this::onServiceStateReceived));
     }
 
-    private void onPlayerStateReceived(PlayerState playerState) {
-        updateMediaSessionState(playerState, trackPosition);
+    private void onServiceStateReceived(ServiceState serviceState) {
+        PlayQueueEvent playQueueEvent = serviceState.playQueueEvent;
+        PlayQueueItem newQueueItem = playQueueEvent.getPlayQueueItem();
+        PlayerState newPlayerState = serviceState.playerState;
+        long newTrackPosition = serviceState.trackPosition;
 
-        this.playerState = playerState;
-        switch (playerState) {
-            case PLAY: {
-                mediaSession.setActive(true);
-                updateForegroundNotification();
-                subscribeOnPlayInfo();
-                break;
-            }
-            case PAUSE: {
-                stopForeground(false);
-                updateForegroundNotification();
-                break;
-            }
-            case STOP: {
-                mediaSession.setActive(false);
-                stopForeground(true);
-                stopSelf();
-                break;
-            }
-        }
-    }
-
-    private void subscribeOnPlayInfo() {
-        if (playInfoDisposable.size() == 0) {
-            serviceDisposable.add(playInfoDisposable);
-            playInfoDisposable.add(musicPlayerInteractor.getCurrentQueueItemObservable()
-                    .observeOn(uiScheduler)
-                    .subscribe(this::onCurrentCompositionReceived));
-            playInfoDisposable.add(musicPlayerInteractor.getTrackPositionObservable()
-                    .observeOn(uiScheduler)
-                    .subscribe(this::onTrackPositionReceived));
-        }
-    }
-
-    private void onCurrentCompositionReceived(PlayQueueEvent playQueueEvent) {
-        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
-        if (queueItem == null) {
+        if (newQueueItem == null || newPlayerState == PlayerState.STOP) {
+            currentItem = null;
+            trackPosition = 0;
+            notificationsDisplayer.cancelCoverLoadingForForegroundNotification();
             mediaSession.setActive(false);
+            stopForeground(true);
             stopSelf();
             return;
         }
-        if (!queueItem.equals(currentItem) || !areSourcesTheSame(currentItem, queueItem)) {
-            currentItem = queueItem;
-            updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
-            updateMediaSessionState(playerState, 0);
-            updateForegroundNotification();
+        if (!mediaSession.isActive()) {
+            mediaSession.setActive(true);
         }
-    }
 
-    private void onTrackPositionReceived(long position) {
-        this.trackPosition = position;
-        updateMediaSessionState(playerState, trackPosition);
-    }
+        boolean updateNotification = false;
+        boolean updateMediaSessionState = false;
+        boolean updateMediaSessionMetadata = false;
+        boolean updateMediaSessionAlbumArt = false;
 
-    private void onNotificationSettingReceived(MusicNotificationSetting setting) {
-        boolean updateNotification = notificationSetting != null;
-        notificationSetting = setting;
-        if (updateNotification) {
-            updateForegroundNotification();
-            if (currentItem != null) {
-                updateMediaSessionMetadata(currentItem.getComposition(), notificationSetting);
+        if (this.playerState != serviceState.playerState) {
+            this.playerState = serviceState.playerState;
+            updateNotification = true;
+            updateMediaSessionState = true;
+
+            onPlayerStateChanged(playerState);
+        }
+
+        if (!newQueueItem.equals(currentItem) || !areSourcesTheSame(currentItem, newQueueItem)) {
+            if (!newQueueItem.equals(currentItem)) {
+                newTrackPosition = playQueueEvent.getTrackPosition();
+                updateMediaSessionAlbumArt = true;
             }
+            this.currentItem = newQueueItem;
+            updateNotification = true;
+            updateMediaSessionMetadata = true;
+        }
+
+        if (this.trackPosition != newTrackPosition) {
+            this.trackPosition = newTrackPosition;
+            updateMediaSessionState = true;
+        }
+
+        MusicNotificationSetting newSettings = serviceState.settings;
+        if (!newSettings.equals(this.notificationSetting)) {
+            if (notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
+                updateMediaSessionAlbumArt = true;
+            }
+            if (notificationSetting.isShowCovers() != newSettings.isShowCovers()
+                    || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()) {
+                updateNotification = true;
+            }
+            this.notificationSetting = newSettings;
+        }
+        if (serviceState.appTheme != currentAppTheme) {
+            currentAppTheme = serviceState.appTheme;
+            updateNotification = true;
+        }
+
+        //seekbar values on cover settings change
+        if (updateNotification) {
+            updateForegroundNotification(updateMediaSessionAlbumArt);
+        }
+        if (updateMediaSessionState) {
+            updateMediaSessionState();
+        }
+        if (updateMediaSessionMetadata) {
+            updateMediaSessionMetadata();
+        }
+        if (updateMediaSessionAlbumArt) {
+            updateMediaSessionAlbumArt();
         }
     }
 
-    private void updateForegroundNotification() {
-        notificationsDisplayer.updateForegroundNotification(
-                playerState == PlayerState.PLAY,
-                currentItem,
-                mediaSession,
-                notificationSetting);
+    private void updateMediaSessionAlbumArt() {
+        assert currentItem != null;
+        Composition composition = currentItem.getComposition();
+
+        if (notificationSetting.isCoversOnLockScreen()) {
+            Components.getAppComponent().imageLoader().loadImage(composition, bitmap -> {
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                mediaSession.setMetadata(metadataBuilder.build());
+            });
+        } else {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null);
+            mediaSession.setMetadata(metadataBuilder.build());
+        }
     }
 
-    private void updateMediaSessionMetadata(Composition composition, MusicNotificationSetting setting) {
+    private void updateMediaSessionMetadata() {
+        assert currentItem != null;
+        Composition composition = currentItem.getComposition();
         MediaMetadataCompat.Builder builder = metadataBuilder
                 .putString(METADATA_KEY_TITLE, formatCompositionName(composition))
                 .putString(METADATA_KEY_ALBUM, composition.getAlbum())
                 .putString(METADATA_KEY_ARTIST, formatCompositionAuthor(composition, this).toString())
                 .putLong(METADATA_KEY_DURATION, composition.getDuration());
-        if (setting.isCoversOnLockScreen()) {
-            Components.getAppComponent().imageLoader().loadImage(composition, bitmap -> {
-                builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
-                mediaSession.setMetadata(builder.build());
-            });
-        }
         mediaSession.setMetadata(builder.build());
     }
 
-    private void updateMediaSessionState(PlayerState playerState, long trackPosition) {
-        stateBuilder.setState(toMediaState(playerState),
-                trackPosition,
-                1);
+    private void updateMediaSessionState() {
+        stateBuilder.setState(toMediaState(playerState), trackPosition, 1);
         mediaSession.setPlaybackState(stateBuilder.build());
+    }
+
+    private void onPlayerStateChanged(PlayerState playerState) {
+        switch (playerState) {
+            case PAUSE: {
+                stopForeground(false);
+                break;
+            }
+        }
+    }
+
+    private void updateForegroundNotification(boolean reloadCover) {
+        notificationsDisplayer.updateForegroundNotification(
+                playerState == PlayerState.PLAY,
+                currentItem,
+                mediaSession,
+                notificationSetting,
+                reloadCover);
+    }
+
+    private static class ServiceState {
+        PlayerState playerState;
+        PlayQueueEvent playQueueEvent;
+        long trackPosition;
+        MusicNotificationSetting settings;
+        AppTheme appTheme;
+
+        private ServiceState set(PlayerState playerState,
+                                 PlayQueueEvent playQueueEvent,
+                                 long trackPosition,
+                                 MusicNotificationSetting settings,
+                                 AppTheme appTheme) {
+            this.playerState = playerState;
+            this.playQueueEvent = playQueueEvent;
+            this.trackPosition = trackPosition;
+            this.settings = settings;
+            this.appTheme = appTheme;
+            return this;
+        }
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {

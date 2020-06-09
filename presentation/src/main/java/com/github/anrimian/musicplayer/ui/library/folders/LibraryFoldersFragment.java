@@ -402,7 +402,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
     }

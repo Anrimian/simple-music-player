@@ -96,7 +96,6 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
         this.play = play;
         for (PlayQueueViewHolder holder: viewHolders) {
             boolean isCurrentItem = holder.getPlayQueueItem().equals(currentItem);
-            holder.showAsCurrentItem(isCurrentItem);
             holder.showAsPlaying(isCurrentItem && play, true);
         }
     }
