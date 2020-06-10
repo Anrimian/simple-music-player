@@ -36,6 +36,7 @@ import static com.github.anrimian.musicplayer.domain.interactors.sync.models.Rem
 public class MetadataSyncInteractor {
 
     private final int metadataVersion;
+    private final long removedItemKeepMaxTime;
     private final SyncSettingsRepository syncSettingsRepository;
     private final RemoteStoragesRepository remoteStoragesRepository;
     private final LibraryRepository libraryRepository;
@@ -46,12 +47,13 @@ public class MetadataSyncInteractor {
     private final BehaviorSubject<RemoteRepositoryType> currentSyncingRepositorySubject = BehaviorSubject.create();
 
     public MetadataSyncInteractor(int metadataVersion,
-                                  SyncSettingsRepository syncSettingsRepository,
+                                  long removedItemKeepMaxTime, SyncSettingsRepository syncSettingsRepository,
                                   RemoteStoragesRepository remoteStoragesRepository,
                                   LibraryRepository libraryRepository,
                                   FileSyncInteractor fileSyncInteractor,
                                   Scheduler scheduler) {
         this.metadataVersion = metadataVersion;
+        this.removedItemKeepMaxTime = removedItemKeepMaxTime;
         this.syncSettingsRepository = syncSettingsRepository;
         this.remoteStoragesRepository = remoteStoragesRepository;
         this.libraryRepository = libraryRepository;
@@ -171,7 +173,7 @@ public class MetadataSyncInteractor {
                 (key, item) -> localRemovedItemsToAdd.add(item),
                 localRemovedItemToDelete::put,
                 (key, item) -> remoteRemovedItemsToAdd.add(item),
-                localRemovedItemToDelete::put);
+                remoteRemovedItemToDelete::put);
 
         //merge playlists
 
@@ -248,7 +250,7 @@ public class MetadataSyncInteractor {
     }
 
     private boolean isRemovedItemIsNotTooOld(RemovedFileMetadata removedFile) {
-        return true;//return time compare result
+        return removedFile.getAddDate().getTime() + removedItemKeepMaxTime > System.currentTimeMillis();
     }
 
     private boolean isLocalItemNewerThanRemote(FileMetadata local, FileMetadata remote) {

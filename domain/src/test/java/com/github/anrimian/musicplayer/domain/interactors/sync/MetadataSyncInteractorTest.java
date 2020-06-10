@@ -49,6 +49,7 @@ public class MetadataSyncInteractorTest {
 
     private MetadataSyncInteractor syncInteractor = new MetadataSyncInteractor(
             1,
+            0,
             syncSettingsRepository,
             remoteStoragesRepository,
             libraryRepository,
@@ -155,7 +156,7 @@ public class MetadataSyncInteractorTest {
     @Test
     public void testDeleteFromRemote() {
         FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 1000);
 
         makeRemoteRepositoryReturnFiles(remoteRepository,
                 simpleFileMetadata("", "file1"),
@@ -197,8 +198,8 @@ public class MetadataSyncInteractorTest {
 
     @Test
     public void testIrrelevantDeleteFromRemote() {
-        FileMetadata metadataToDelete = simpleFileMetadata("", "file2", new Date(1000));
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1));
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2", 10000);
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 5000);
 
         makeRemoteRepositoryReturnFiles(remoteRepository,
                 simpleFileMetadata("", "file1"),
@@ -241,7 +242,7 @@ public class MetadataSyncInteractorTest {
     @Test
     public void testDeleteFromLocal() {
         FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 1000);
 
         makeRemoteRepositoryReturnFiles(remoteRepository,
                 removedMetadataMap(removedFileMetadata),
@@ -283,8 +284,8 @@ public class MetadataSyncInteractorTest {
 
     @Test
     public void testIrrelevantDeleteFromLocal() {
-        FileMetadata metadataToDelete = simpleFileMetadata("", "file2", new Date(1000));
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1));
+        FileMetadata metadataToDelete = simpleFileMetadata("", "file2", 1000);
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 1);
 
         makeRemoteRepositoryReturnFiles(remoteRepository,
                 removedMetadataMap(removedFileMetadata),
@@ -675,7 +676,7 @@ public class MetadataSyncInteractorTest {
     public void testDeleteFromLocalWithoutRealFileOnLocal() {
         FileMetadata file1 = simpleFileMetadata("", "file1");
         FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 1000);
 
         makeRemoteRepositoryReturnFiles(remoteRepository,
                 removedMetadataMap(removedFileMetadata),
@@ -720,7 +721,7 @@ public class MetadataSyncInteractorTest {
     public void testDeleteFromRemoteWithoutRealFileOnRemote() {
         FileMetadata file1 = simpleFileMetadata("", "file1");
         FileMetadata metadataToDelete = simpleFileMetadata("", "file2");
-        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", new Date(1000));
+        RemovedFileMetadata removedFileMetadata = removedFileMetadata("", "file2", 1000);
 
         when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(
                 emptyMap(),
@@ -761,7 +762,59 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test sync with outdated local and remote removed items
+    @Test
+    public void testRemoveOutdatedRemovedFiles() {
+        syncInteractor = new MetadataSyncInteractor(
+                1,
+                5000,
+                syncSettingsRepository,
+                remoteStoragesRepository,
+                libraryRepository,
+                fileSyncInteractor,
+                scheduler);
+
+        FileMetadata metadata = simpleFileMetadata("", "file1");
+        RemovedFileMetadata removedLocalFileMetadata = removedFileMetadata("", "file2", -10000);
+        RemovedFileMetadata removedRemoteFileMetadata = removedFileMetadata("", "file3", -10000);
+
+        makeRemoteRepositoryReturnFiles(remoteRepository,
+                removedMetadataMap(removedRemoteFileMetadata),
+                metadata
+        );
+
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
+                removedMetadataMap(removedLocalFileMetadata),
+                metadata
+        ));
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository).updateMetadata(
+                any(),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(emptyList()),
+                eq(removedMetadataMap(removedRemoteFileMetadata))
+        );
+
+        verify(libraryRepository).updateLocalFilesMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(removedMetadataMap(removedLocalFileMetadata))
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+    }
+
     //test specific changes without file upload\download
     //test filepath change?
     //test sync with regular error, like timeout
@@ -769,11 +822,12 @@ public class MetadataSyncInteractorTest {
     //test wait_for_wifi, wait_for_charging state
 
     private FileMetadata simpleFileMetadata(String path, String name) {
-        return simpleFileMetadata(path, name, new Date(0));
+        return simpleFileMetadata(path, name, 0);
     }
 
-    private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded) {
-        return simpleFileMetadata(path, name, dateAdded, "title");
+    private FileMetadata simpleFileMetadata(String path, String name, long dateAdded) {
+        long now = System.currentTimeMillis();
+        return simpleFileMetadata(path, name, new Date(now + dateAdded), "title");
     }
 
     private FileMetadata simpleFileMetadata(String path, String name, Date dateAdded, String title) {
@@ -816,8 +870,9 @@ public class MetadataSyncInteractorTest {
         return new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), Collections.emptyMap());
     }
 
-    private RemovedFileMetadata removedFileMetadata(String path, String name, Date date) {
-        return new RemovedFileMetadata(new FileKey(name, path), date);
+    private RemovedFileMetadata removedFileMetadata(String path, String name, long date) {
+        long now = System.currentTimeMillis();
+        return new RemovedFileMetadata(new FileKey(name, path), new Date(now + date));
     }
 
     private Map<FileKey, RemovedFileMetadata> removedMetadataMap(RemovedFileMetadata... metadataList) {
