@@ -6,13 +6,15 @@ import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepo
 
 import java.util.List;
 
+import io.reactivex.Completable;
+
 public class FileSyncInteractor {
 
-    public void scheduleFileTasks(RemoteRepositoryType repositoryType,
-                                  List<FileMetadata> localFilesToDelete,
-                                  List<FileMetadata> remoteFilesToDelete,
-                                  List<FileMetadata> localFilesToUpload,
-                                  List<DownloadFileTask> remoteFilesToDownload) {
-
+    public Completable scheduleFileTasks(RemoteRepositoryType repositoryType,
+                                         List<FileMetadata> localFilesToDelete,
+                                         List<FileMetadata> remoteFilesToDelete,
+                                         List<FileMetadata> localFilesToUpload,
+                                         List<DownloadFileTask> remoteFilesToDownload) {
+        return Completable.complete();
     }
 }

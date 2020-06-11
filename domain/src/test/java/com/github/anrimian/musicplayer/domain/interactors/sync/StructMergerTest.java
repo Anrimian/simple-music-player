@@ -20,8 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 public class StructMergerTest {
 
-    //delete metadata case
-
     @Test
     public void testMergeAddFromBothSide() {
         Map<Integer, String> localItems = new HashMap<>();

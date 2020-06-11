@@ -38,9 +38,9 @@ public abstract class RunningSyncState {
     public static class CalculateChanges extends RunningSyncState {
     }
 
-    public static class SaveRemoteFileTable extends Running {
+    public static class SaveRemoteFileMetadata extends Running {
 
-        public SaveRemoteFileTable(RemoteRepositoryType repositoryType) {
+        public SaveRemoteFileMetadata(RemoteRepositoryType repositoryType) {
             super(repositoryType);
         }
     }

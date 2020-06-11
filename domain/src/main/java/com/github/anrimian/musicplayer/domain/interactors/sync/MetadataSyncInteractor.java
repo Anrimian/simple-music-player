@@ -29,6 +29,7 @@ import java.util.Set;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.domain.interactors.sync.models.RemoteRepositoryState.DISABLED_VERSION_TOO_HIGH;
@@ -85,39 +86,58 @@ public class MetadataSyncInteractor {
     }
 
     private Completable runSyncFor(RemoteRepositoryType repositoryType) {
-        return Completable.fromAction(() -> {
-            RemoteRepository remoteRepository = remoteStoragesRepository.getRemoteRepository(repositoryType);
-            runSyncForRepository(remoteRepository, repositoryType);
-        });
+        return Single.just(new SyncData(repositoryType, remoteStoragesRepository.getRemoteRepository(repositoryType)))
+                .doOnSuccess(syncData -> syncStateSubject.onNext(new RunningSyncState.GetRemoteMetadata(syncData.repositoryType)))
+                .flatMap(this::getRemoteFilesMetadata)
+                .doOnSuccess(syncData -> syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType)))
+                .flatMap(this::getRemoteRealFilesList)
+                .doOnSuccess(syncData -> syncStateSubject.onNext(new RunningSyncState.CollectLocalFileInfo()))
+                .flatMap(this::getLocalFilesMetadata)
+                .doOnSuccess(syncData -> syncStateSubject.onNext(new RunningSyncState.CalculateChanges()))
+                .flatMapCompletable(syncData -> Single.fromCallable(() -> calculateChanges(syncData))
+                        .flatMapCompletable(dataMergeResult ->
+                                saveRemoteMetadata(syncData, dataMergeResult)
+                                .andThen(saveLocalMetadata(syncData, dataMergeResult))
+                                .andThen(scheduleFileTasks(syncData, dataMergeResult))
+                        )
+                );
     }
 
-    //on error stop sync
-    private void runSyncForRepository(RemoteRepository remoteRepository, RemoteRepositoryType repositoryType) {
-        //get metadata from remote
-        syncStateSubject.onNext(new RunningSyncState.GetRemoteMetadata(repositoryType));
-        RemoteFilesMetadata remoteMetadata = remoteRepository.getMetadata();
+    private Single<SyncData> getRemoteFilesMetadata(SyncData syncData) {
+        return syncData.remoteRepository.getMetadata()
+                .map(syncData::setRemoteMetadata)
+                .doOnSuccess(this::checkRemoteMetadataVersion);
+    }
 
+    private void checkRemoteMetadataVersion(SyncData syncData) {
         //check metadata version
-        if (remoteMetadata.getVersion() > metadataVersion) {
-            remoteStoragesRepository.setEnabledState(repositoryType, DISABLED_VERSION_TOO_HIGH);
+        if (syncData.remoteMetadata.getVersion() > metadataVersion) {
+            remoteStoragesRepository.setEnabledState(syncData.repositoryType, DISABLED_VERSION_TOO_HIGH);
             throw new TooHighRemoteRepositoryVersion();
         }
+    }
+
+    private Single<SyncData> getRemoteRealFilesList(SyncData syncData) {
+        return syncData.remoteRepository.getRealFileList()
+                .map(syncData::setRemoteRealFiles);
+    }
+
+    private Single<SyncData> getLocalFilesMetadata(SyncData syncData) {
+        return libraryRepository.getLocalFilesMetadata()
+                .map(syncData::setLocalFilesMetadata);
+    }
+
+    private DataMergeResult calculateChanges(SyncData syncData) {
+        RemoteFilesMetadata remoteMetadata = syncData.remoteMetadata;
+        LocalFilesMetadata localFilesMetadata = syncData.localFilesMetadata;
 
         Map<FileKey, FileMetadata> remoteFiles = remoteMetadata.getFiles();
+        Set<FileKey> remoteRealFiles = syncData.remoteRealFiles;
         Map<FileKey, RemovedFileMetadata> remoteRemovedFiles = remoteMetadata.getRemovedFiles();
 
-        //get remote real file list
-        syncStateSubject.onNext(new RunningSyncState.GetRemoteFileTable(repositoryType));
-        Set<FileKey> remoteRealFiles = remoteRepository.getRealFileList();
-
-        //get metadata from local
-        syncStateSubject.onNext(new RunningSyncState.CollectLocalFileInfo());
-        LocalFilesMetadata localFilesMetadata = libraryRepository.getLocalFilesMetadata();
         Map<FileKey, FileMetadata> localFiles = localFilesMetadata.getLocalFiles();
         Set<FileKey> localRealFiles = localFilesMetadata.getRealFilesList();
         Map<FileKey, RemovedFileMetadata> localRemovedFiles = localFilesMetadata.getRemovedFiles();
-
-        syncStateSubject.onNext(new RunningSyncState.CalculateChanges());
 
         //calculate changes
         //file task lists
@@ -175,55 +195,78 @@ public class MetadataSyncInteractor {
                 (key, item) -> remoteRemovedItemsToAdd.add(item),
                 remoteRemovedItemToDelete::put);
 
-        //merge playlists
+        return new DataMergeResult(
+                localFilesToDelete,
+                remoteFilesToDelete,
+                localFilesToUpload,
+                remoteFilesToDownload,
+                localItemsToAdd,
+                localItemsToDelete,
+                localChangedItems,
+                remoteItemsToAdd,
+                remoteItemsToDelete,
+                remoteChangedItems,
+                localRemovedItemToDelete,
+                remoteRemovedItemToDelete,
+                localRemovedItemsToAdd,
+                remoteRemovedItemsToAdd
+        );
+    }
 
+    private Completable saveRemoteMetadata(SyncData syncData, DataMergeResult dataMergeResult) {
         //save remote metadata(if we can't save cause 'not enough place' or smth - error and disable repository
-        if (!remoteItemsToAdd.isEmpty()
-                || !remoteItemsToDelete.isEmpty()
-                || !remoteChangedItems.isEmpty()
-                || !remoteRemovedItemsToAdd.isEmpty()
-                || !remoteRemovedItemToDelete.isEmpty()) {
-            syncStateSubject.onNext(new RunningSyncState.SaveRemoteFileTable(repositoryType));
+        if (!dataMergeResult.remoteItemsToAdd.isEmpty()
+                || !dataMergeResult.remoteItemsToDelete.isEmpty()
+                || !dataMergeResult.remoteChangedItems.isEmpty()
+                || !dataMergeResult.remoteRemovedItemsToAdd.isEmpty()
+                || !dataMergeResult.remoteRemovedItemToDelete.isEmpty()) {
+            syncStateSubject.onNext(new RunningSyncState.SaveRemoteFileMetadata(syncData.repositoryType));
 
-            remoteRepository.updateMetadata(remoteMetadata,
-                    remoteItemsToAdd,
-                    remoteItemsToDelete,
-                    remoteChangedItems,
-                    remoteRemovedItemsToAdd,
-                    remoteRemovedItemToDelete);
+            return syncData.remoteRepository.updateMetadata(syncData.remoteMetadata,
+                    dataMergeResult.remoteItemsToAdd,
+                    dataMergeResult.remoteItemsToDelete,
+                    dataMergeResult.remoteChangedItems,
+                    dataMergeResult.remoteRemovedItemsToAdd,
+                    dataMergeResult.remoteRemovedItemToDelete);
         }
+        return Completable.complete();
+    }
 
-        //save local metadata
-        if (!localItemsToAdd.isEmpty()
-                || !localItemsToDelete.isEmpty()
-                || !localChangedItems.isEmpty()
-                || !localRemovedItemsToAdd.isEmpty()
-                || !localRemovedItemToDelete.isEmpty()) {
+    private Completable saveLocalMetadata(SyncData syncData, DataMergeResult dataMergeResult) {
+        if (!dataMergeResult.localItemsToAdd.isEmpty()
+                || !dataMergeResult.localItemsToDelete.isEmpty()
+                || !dataMergeResult.localChangedItems.isEmpty()
+                || !dataMergeResult.localRemovedItemsToAdd.isEmpty()
+                || !dataMergeResult.localRemovedItemToDelete.isEmpty()) {
 
             syncStateSubject.onNext(new RunningSyncState.SaveLocalFileTable());
 
-            libraryRepository.updateLocalFilesMetadata(localFilesMetadata,
-                    localItemsToAdd,
-                    localItemsToDelete,
-                    localChangedItems,
-                    localRemovedItemsToAdd,
-                    localRemovedItemToDelete);
+            return libraryRepository.updateLocalFilesMetadata(syncData.localFilesMetadata,
+                    dataMergeResult.localItemsToAdd,
+                    dataMergeResult.localItemsToDelete,
+                    dataMergeResult.localChangedItems,
+                    dataMergeResult.localRemovedItemsToAdd,
+                    dataMergeResult.localRemovedItemToDelete);
         }
+        return Completable.complete();
+    }
 
+    private Completable scheduleFileTasks(SyncData syncData, DataMergeResult dataMergeResult) {
         //schedule file tasks(+move change(+ move command list))
-        if (!localFilesToDelete.isEmpty()
-                || !remoteFilesToDelete.isEmpty()
-                || !localFilesToUpload.isEmpty()
-                || !remoteFilesToDownload.isEmpty()) {
+        if (!dataMergeResult.localFilesToDelete.isEmpty()
+                || !dataMergeResult.remoteFilesToDelete.isEmpty()
+                || !dataMergeResult.localFilesToUpload.isEmpty()
+                || !dataMergeResult.remoteFilesToDownload.isEmpty()) {
 
             syncStateSubject.onNext(new RunningSyncState.ScheduleFileTasks());
 
-            fileSyncInteractor.scheduleFileTasks(repositoryType,
-                    localFilesToDelete,
-                    remoteFilesToDelete,
-                    localFilesToUpload,
-                    remoteFilesToDownload);
+            return fileSyncInteractor.scheduleFileTasks(syncData.repositoryType,
+                    dataMergeResult.localFilesToDelete,
+                    dataMergeResult.remoteFilesToDelete,
+                    dataMergeResult.localFilesToUpload,
+                    dataMergeResult.remoteFilesToDownload);
         }
+        return Completable.complete();
     }
 
     private FileMetadata createMetadataForFile(FileKey key) {
@@ -268,4 +311,82 @@ public class MetadataSyncInteractor {
                 || first.getSize() != second.getSize();
     }
 
+    private static class SyncData {
+        final RemoteRepositoryType repositoryType;
+        final RemoteRepository remoteRepository;
+        RemoteFilesMetadata remoteMetadata;
+        Set<FileKey> remoteRealFiles;
+        LocalFilesMetadata localFilesMetadata;
+
+        private SyncData(RemoteRepositoryType repositoryType, RemoteRepository remoteRepository) {
+            this.repositoryType = repositoryType;
+            this.remoteRepository = remoteRepository;
+        }
+
+        private SyncData setRemoteMetadata(RemoteFilesMetadata remoteMetadata) {
+            this.remoteMetadata = remoteMetadata;
+            return this;
+        }
+
+        private SyncData setRemoteRealFiles(Set<FileKey> remoteRealFiles) {
+            this.remoteRealFiles = remoteRealFiles;
+            return this;
+        }
+
+        private SyncData setLocalFilesMetadata(LocalFilesMetadata localFilesMetadata) {
+            this.localFilesMetadata = localFilesMetadata;
+            return this;
+        }
+    }
+
+    private static class DataMergeResult {
+
+        final List<FileMetadata> localFilesToDelete;
+        final List<FileMetadata> remoteFilesToDelete;
+        final List<FileMetadata> localFilesToUpload;
+        final List<DownloadFileTask> remoteFilesToDownload;
+
+        final List<FileMetadata> localItemsToAdd;
+        final List<FileMetadata> localItemsToDelete;
+        final List<Change<FileMetadata>> localChangedItems;
+
+        final List<FileMetadata> remoteItemsToAdd;
+        final List<FileMetadata> remoteItemsToDelete;
+        final List<Change<FileMetadata>> remoteChangedItems;
+
+        final Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete;
+        final Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete;
+        final List<RemovedFileMetadata> localRemovedItemsToAdd;
+        final List<RemovedFileMetadata> remoteRemovedItemsToAdd;
+
+        private DataMergeResult(List<FileMetadata> localFilesToDelete,
+                                List<FileMetadata> remoteFilesToDelete,
+                                List<FileMetadata> localFilesToUpload,
+                                List<DownloadFileTask> remoteFilesToDownload,
+                                List<FileMetadata> localItemsToAdd,
+                                List<FileMetadata> localItemsToDelete,
+                                List<Change<FileMetadata>> localChangedItems,
+                                List<FileMetadata> remoteItemsToAdd,
+                                List<FileMetadata> remoteItemsToDelete,
+                                List<Change<FileMetadata>> remoteChangedItems,
+                                Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete,
+                                Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete,
+                                List<RemovedFileMetadata> localRemovedItemsToAdd,
+                                List<RemovedFileMetadata> remoteRemovedItemsToAdd) {
+            this.localFilesToDelete = localFilesToDelete;
+            this.remoteFilesToDelete = remoteFilesToDelete;
+            this.localFilesToUpload = localFilesToUpload;
+            this.remoteFilesToDownload = remoteFilesToDownload;
+            this.localItemsToAdd = localItemsToAdd;
+            this.localItemsToDelete = localItemsToDelete;
+            this.localChangedItems = localChangedItems;
+            this.remoteItemsToAdd = remoteItemsToAdd;
+            this.remoteItemsToDelete = remoteItemsToDelete;
+            this.remoteChangedItems = remoteChangedItems;
+            this.localRemovedItemToDelete = localRemovedItemToDelete;
+            this.remoteRemovedItemToDelete = remoteRemovedItemToDelete;
+            this.localRemovedItemsToAdd = localRemovedItemsToAdd;
+            this.remoteRemovedItemsToAdd = remoteRemovedItemsToAdd;
+        }
+    }
 }

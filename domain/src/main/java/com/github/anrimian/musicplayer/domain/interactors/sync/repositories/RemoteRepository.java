@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
+
 public interface RemoteRepository {
 
-    RemoteFilesMetadata getMetadata();
+    Single<RemoteFilesMetadata> getMetadata();
 
-    Set<FileKey> getRealFileList();
+    Single<Set<FileKey>> getRealFileList();
 
-    void updateMetadata(RemoteFilesMetadata remoteMetadata,
-                        List<FileMetadata> remoteItemsToAdd,
-                        List<FileMetadata> remoteItemsToDelete,
-                        List<Change<FileMetadata>> remoteChangedItems,
-                        List<RemovedFileMetadata> remoteRemovedItemsToAdd,
-                        Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete);
+    Completable updateMetadata(RemoteFilesMetadata remoteMetadata,
+                               List<FileMetadata> remoteItemsToAdd,
+                               List<FileMetadata> remoteItemsToDelete,
+                               List<Change<FileMetadata>> remoteChangedItems,
+                               List<RemovedFileMetadata> remoteRemovedItemsToAdd,
+                               Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete);
 }

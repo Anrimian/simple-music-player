@@ -24,7 +24,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -65,6 +67,13 @@ public class MetadataSyncInteractorTest {
         when(syncSettingsRepository.getEnabledRemoteRepositories()).thenReturn(asList(remoteRepositoryType1));
 
         when(remoteStoragesRepository.getRemoteRepository(remoteRepositoryType1)).thenReturn(remoteRepository);
+
+        when(remoteRepository.updateMetadata(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete());
+
+        when(libraryRepository.updateLocalFilesMetadata(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete());
+
+
+        when(fileSyncInteractor.scheduleFileTasks(any(), any(), any(), any(), any())).thenReturn(Completable.complete());
     }
 
     @Test
@@ -589,7 +598,7 @@ public class MetadataSyncInteractorTest {
                 emptyMap(),
                 existsMetadata
         ));
-        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySetSingle(
                 existsMetadata,
                 addedFileMetadata
         ));
@@ -634,7 +643,7 @@ public class MetadataSyncInteractorTest {
         when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(
                 emptyMap()
         ));
-        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySetSingle(
                 file1,
                 file2
         ));
@@ -683,11 +692,11 @@ public class MetadataSyncInteractorTest {
                 file1
         );
 
-        when(libraryRepository.getLocalFilesMetadata()).thenReturn(new LocalFilesMetadata(
+        when(libraryRepository.getLocalFilesMetadata()).thenReturn(Single.just(new LocalFilesMetadata(
                 metadataMap(file1, metadataToDelete),
                 metadataKeySet(file1),
                 Collections.emptyMap())
-        );
+        ));
 
         syncInteractor.runSync();
 
@@ -727,7 +736,7 @@ public class MetadataSyncInteractorTest {
                 emptyMap(),
                 file1,
                 metadataToDelete));
-        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySet(file1));
+        when(remoteRepository.getRealFileList()).thenReturn(metadataKeySetSingle(file1));
 
         when(libraryRepository.getLocalFilesMetadata()).thenReturn(localFilesMetadata(
                 removedMetadataMap(removedFileMetadata),
@@ -815,8 +824,8 @@ public class MetadataSyncInteractorTest {
         );
     }
 
-    //test specific changes without file upload\download
-    //test filepath change?
+    //test specific changes without file upload\download - wait
+    //test filepath change? - wait
     //test sync with regular error, like timeout
     //test sync launch rules, often calls?
     //test wait_for_wifi, wait_for_charging state
@@ -853,21 +862,21 @@ public class MetadataSyncInteractorTest {
                                                  Map<FileKey, RemovedFileMetadata> removedItems,
                                                  FileMetadata... metadataList) {
         when(repository.getMetadata()).thenReturn(remoteFilesMetadata(removedItems, metadataList));
-        when(repository.getRealFileList()).thenReturn(metadataKeySet(metadataList));
+        when(repository.getRealFileList()).thenReturn(Single.just(metadataKeySet(metadataList)));
     }
 
-    private RemoteFilesMetadata remoteFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
+    private Single<RemoteFilesMetadata> remoteFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
                                                     FileMetadata... metadataList) {
-        return new RemoteFilesMetadata(1, new Date(0), metadataMap(metadataList), removedItems);
+        return Single.just(new RemoteFilesMetadata(1, new Date(0), metadataMap(metadataList), removedItems));
     }
 
-    private LocalFilesMetadata localFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
+    private Single<LocalFilesMetadata> localFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
                                                   FileMetadata... metadataList) {
-        return new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), removedItems);
+        return Single.just(new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), removedItems));
     }
 
-    private LocalFilesMetadata localFilesMetadata(FileMetadata... metadataList) {
-        return new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), Collections.emptyMap());
+    private Single<LocalFilesMetadata> localFilesMetadata(FileMetadata... metadataList) {
+        return Single.just(new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), Collections.emptyMap()));
     }
 
     private RemovedFileMetadata removedFileMetadata(String path, String name, long date) {
@@ -891,6 +900,10 @@ public class MetadataSyncInteractorTest {
         return map;
     }
 
+    private Single<Set<FileKey>> metadataKeySetSingle(FileMetadata... metadataList) {
+        return Single.just(metadataKeySet(metadataList));
+    }
+
     private Set<FileKey> metadataKeySet(FileMetadata... metadataList) {
         Set<FileKey> set = new HashSet<>();
         for (FileMetadata metadata : metadataList) {
@@ -899,7 +912,7 @@ public class MetadataSyncInteractorTest {
         return set;
     }
 
-    private RemoteFilesMetadata versionMetadata(int version) {
-        return new RemoteFilesMetadata(version, new Date(0), Collections.emptyMap(), Collections.emptyMap());
+    private Single<RemoteFilesMetadata> versionMetadata(int version) {
+        return Single.just(new RemoteFilesMetadata(version, new Date(0), Collections.emptyMap(), Collections.emptyMap()));
     }
 }

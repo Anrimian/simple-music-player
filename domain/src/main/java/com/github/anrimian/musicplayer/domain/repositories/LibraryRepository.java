@@ -92,12 +92,12 @@ public interface LibraryRepository {
 
     Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
 
-    LocalFilesMetadata getLocalFilesMetadata();
+    Single<LocalFilesMetadata> getLocalFilesMetadata();
 
-    void updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
-                                  List<FileMetadata> localItemsToAdd,
-                                  List<FileMetadata> localItemsToDelete,
-                                  List<Change<FileMetadata>> localChangedItems,
-                                  List<RemovedFileMetadata> localRemovedItemsToAdd,
-                                  Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete);
+    Completable updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
+                                         List<FileMetadata> localItemsToAdd,
+                                         List<FileMetadata> localItemsToDelete,
+                                         List<Change<FileMetadata>> localChangedItems,
+                                         List<RemovedFileMetadata> localRemovedItemsToAdd,
+                                         Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete);
 }
