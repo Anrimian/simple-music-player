@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -824,9 +825,48 @@ public class MetadataSyncInteractorTest {
         );
     }
 
+    @Test
+    public void testSyncErrorInMiddle() {
+        when(remoteRepository.getMetadata()).thenReturn(remoteFilesMetadata(emptyMap()));
+        when(remoteRepository.getRealFileList()).thenReturn(Single.error(new TimeoutException("just timeout")));
+
+        TestObserver<RunningSyncState> observer = syncInteractor.getRunningSyncStateObservable()
+                .test();
+
+        syncInteractor.runSync();
+
+        verify(remoteRepository, never()).updateMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        verify(libraryRepository, never()).updateLocalFilesMetadata(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        verify(fileSyncInteractor, never()).scheduleFileTasks(eq(remoteRepositoryType1),
+                any(),
+                any(),
+                any(),
+                any()
+        );
+
+        observer.assertValueAt(0, value -> value instanceof RunningSyncState.GetRemoteMetadata);
+        observer.assertValueAt(1, value -> value instanceof RunningSyncState.GetRemoteFileTable);
+        observer.assertValueAt(2, value -> value instanceof RunningSyncState.Error);
+    }
+
     //test specific changes without file upload\download - wait
     //test filepath change? - wait
-    //test sync with regular error, like timeout
     //test sync launch rules, often calls?
     //test wait_for_wifi, wait_for_charging state
 
