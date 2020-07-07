@@ -170,7 +170,6 @@
     <string name="ignored_folder_added">Pasta \'%s\' adicionado à lista de pastas excluídas</string>
     <string name="excluded_folders">Pastas excluídas</string>
     <string name="remove_excluded_folder">Remover pasta excluída</string>
-    <string name="no_excluded_folders">Nenhuma pasta excluída</string>
     <string name="ignored_folder_removed">Pasta excluída removida</string>
     <string name="moving_and_destination_folders_matches">Correspondências de movimentação e destino</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">A pasta com esse nome já existe na pasta de destino</string>
@@ -188,6 +187,24 @@
     <string name="log_file_deleted">Arquivo de relatório excluído</string>
     <string name="pick_email_app_to_send">Escolha um aplicativo de e-mail para enviar</string>
     <string name="clear_play_queue">Limpar fila de reprodução</string>
+    <string name="no_excluded_folders">As pastas excluídas no escaneamento serão exibidas aqui</string>
+    <string name="keep_playing_after_window_close">Continue reproduzindo após o fechamento da janela</string>
+    <string name="unknown_play_error">Erro de reprodução desconhecido</string>
+    <string name="equalizer">Equalizador</string>
+    <string name="system_equalizer">Equalizador do sistema</string>
+    <string name="no_equalizer">Nenhum</string>
+    <string name="external_equalizer_description">O trabalho do equalizador do sistema depende do aplicativo do equalizador externo e pode não funcionar com alguns aplicativos</string>
+    <string name="external_equalizer_not_found">Aplicativo equalizador externo não encontrado</string>
+    <string name="open">Abrir</string>
+    <string name="cover">Capa</string>
+    <string name="change_cover">Change cover</string>
+    <string name="pick_from_gallery">Escolha da galeria</string>
+    <string name="remove_cover">Retirar capa</string>
+    <string name="changing_cover_progress">Trocando a capa…</string>
+    <string name="editor_timeout_error">O tempo limite do editor de TAGs expirou. Talvez o formato do arquivo não seja suportado</string>
+    <string name="change_lyrics">Alterar letras</string>
+    <string name="lyrics">Letras</string>
+    <string name="check_tags_error">Falha ao verificar as TAGS de composição: %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>

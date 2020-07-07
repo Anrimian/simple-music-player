@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.Observable;
@@ -9,7 +9,7 @@ public interface AppMediaPlayer {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    void prepareToPlay(Composition composition, long startPosition);
+    void prepareToPlay(CompositionSource composition, long startPosition);
 
     void stop();
 

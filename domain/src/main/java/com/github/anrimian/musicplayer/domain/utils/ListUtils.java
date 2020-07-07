@@ -94,6 +94,10 @@ public class ListUtils {
         Collections.swap(list, i, j);
     }
 
+    public static boolean isIndexInRange(List<?> list, int index) {
+        return index >= 0 && index < list.size();
+    }
+
     public static <K, V> void removeMap(Map<K, V> map, Map<K, V> mapToRemove) {
         for (K key: mapToRemove.keySet()) {
             map.remove(key);

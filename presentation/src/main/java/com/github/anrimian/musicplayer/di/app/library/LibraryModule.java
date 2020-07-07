@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.di.app.library;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
@@ -34,7 +34,7 @@ public class LibraryModule {
 
     @Provides
     @Nonnull
-    PlayerPresenter playerPresenter(MusicPlayerInteractor musicPlayerInteractor,
+    PlayerPresenter playerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                                     PlayListsInteractor playListsInteractor,
                                     PlayerScreenInteractor playerScreenInteractor,
                                     ErrorParser errorParser,
@@ -48,7 +48,7 @@ public class LibraryModule {
 
     @Provides
     @NonNull
-    PlayerScreenInteractor playerScreenInteractor(MusicPlayerInteractor musicPlayerInteractor,
+    PlayerScreenInteractor playerScreenInteractor(LibraryPlayerInteractor musicPlayerInteractor,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository) {
         return new PlayerScreenInteractor(musicPlayerInteractor, uiStateRepository, settingsRepository);
@@ -64,7 +64,7 @@ public class LibraryModule {
     @Nonnull
     LibraryFoldersInteractor libraryFilesInteractor(LibraryRepository musicProviderRepository,
                                                     EditorRepository editorRepository,
-                                                    MusicPlayerInteractor musicPlayerInteractor,
+                                                    LibraryPlayerInteractor musicPlayerInteractor,
                                                     PlayListsRepository playListsRepository,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository,

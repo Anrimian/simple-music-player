@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.domain.interactors.player;
+package com.github.anrimian.musicplayer.data.controllers.music.error;
 
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 

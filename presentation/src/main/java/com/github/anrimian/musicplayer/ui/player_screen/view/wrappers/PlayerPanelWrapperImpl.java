@@ -3,21 +3,22 @@ package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
+import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
+import com.github.anrimian.musicplayer.databinding.PartialQueueToolbarBinding;
+import com.github.anrimian.musicplayer.databinding.PartialToolbarBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
@@ -32,85 +33,28 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.view.View.INVISIBLE;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
 import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
 public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
+    private final PartialDetailedMusicBinding panelBinding;
+    private final FragmentDrawerBinding viewBinding;
+    private final PartialQueueToolbarBinding queueToolbarBinding;
+    private final PartialToolbarBinding toolbarBinding;
+    private final MotionLayout mlBottomSheet;
     @Nullable
-    @BindView(R.id.coordinator_bottom_sheet)
-    CoordinatorLayout bottomSheetCoordinator;
-
+    private final CoordinatorLayout bottomSheetCoordinator;
     @Nullable
-    @BindView(R.id.bottom_sheet_left_shadow)
-    View bottomSheetLeftShadow;
-
+    private final View bottomSheetLeftShadow;
     @Nullable
-    @BindView(R.id.bottom_sheet_top_left_shadow)
-    View bottomSheetTopLeftShadow;
-
-    @BindView(R.id.iv_play_pause)
-    ImageView ivPlayPause;
-
-    @BindView(R.id.iv_skip_to_previous)
-    ImageView ivSkipToPrevious;
-
-    @BindView(R.id.iv_skip_to_next)
-    ImageView ivSkipToNext;
-
-    @BindView(R.id.drawer_fragment_container)
-    JugglerView fragmentContainer;
-
-    @BindView(R.id.tv_current_composition)
-    TextView tvCurrentComposition;
-
-    @BindView(R.id.btn_infinite_play)
-    ImageView btnRepeatMode;
-
-    @BindView(R.id.btn_random_play)
-    ImageView btnRandomPlay;
-
-    @BindView(R.id.tv_played_time)
-    TextView tvPlayedTime;
-
-    @BindView(R.id.tv_total_time)
-    TextView tvTotalTime;
-
-    @BindView(R.id.sb_track_state)
-    AppCompatSeekBar sbTrackState;
-
-    @BindView(R.id.iv_music_icon)
-    ImageView ivMusicIcon;
-
-    @BindView(R.id.btn_actions_menu)
-    ImageView btnActionsMenu;
-
-    @BindView(R.id.tv_current_composition_author)
-    TextView tvCurrentCompositionAuthor;
-
-    @BindView(R.id.cl_play_queue_container)
-    CoordinatorLayout clPlayQueueContainer;
-
-    @BindView(R.id.ml_bottom_sheet)
-    MotionLayout mlBottomSheet;
-
-    @BindView(R.id.toolbar)
-    AdvancedToolbar toolbar;
-
-    @BindView(R.id.toolbar_content_container)
-    View titleContainer;
-
-    @BindView(R.id.toolbar_play_queue)
-    View playQueueTitleContainer;
-
-    @BindView(R.id.title_container)
-    View toolbarTitleContainer;
+    private final View bottomSheetTopLeftShadow;
+    private final TextView tvCurrentComposition;
+    private final CoordinatorLayout clPlayQueueContainer;
+    private final AdvancedToolbar toolbar;
+    private final View titleContainer;
 
     private final Activity activity;
     private final Runnable onBottomSheetDragCollapsed;
@@ -121,17 +65,31 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private SlideDelegate bottomSheetDelegate;
 
     public PlayerPanelWrapperImpl(View view,
+                                  FragmentDrawerBinding viewBinding,
+                                  PartialDetailedMusicBinding panelBinding,
+                                  MotionLayout mlBottomSheet,
                                   Activity activity,
                                   Bundle savedInstanceState,
                                   Runnable onBottomSheetDragCollapsed,
                                   Runnable onBottomSheetDragExpanded,
                                   Callback<Boolean> bottomSheetStateListener) {
+        this.viewBinding = viewBinding;
+        this.panelBinding = panelBinding;
+        this.mlBottomSheet = mlBottomSheet;
         this.activity = activity;
         this.onBottomSheetDragCollapsed = onBottomSheetDragCollapsed;
         this.onBottomSheetDragExpanded = onBottomSheetDragExpanded;
         this.bottomSheetStateListener = bottomSheetStateListener;
 
-        ButterKnife.bind(this, view);
+        titleContainer = viewBinding.toolbar.titleContainer;
+        queueToolbarBinding = viewBinding.toolbarPlayQueue;
+        toolbarBinding = viewBinding.toolbar;
+        clPlayQueueContainer = viewBinding.clPlayQueueContainer;
+        bottomSheetCoordinator = view.findViewById(R.id.coordinator_bottom_sheet);
+        tvCurrentComposition = panelBinding.tvCurrentComposition;
+        toolbar = toolbarBinding.getRoot();
+        bottomSheetLeftShadow = view.findViewById(R.id.bottom_sheet_left_shadow);
+        bottomSheetTopLeftShadow = view.findViewById(R.id.bottom_sheet_top_left_shadow);
 
         setViewStartState();
         if (savedInstanceState == null) {
@@ -198,18 +156,10 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         }
     }
 
-    private void setContentBottomHeight(int heightInPixels) {
-        bottomSheetBehavior.setPeekHeight(heightInPixels);
-
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fragmentContainer.getLayoutParams();
-        layoutParams.bottomMargin = heightInPixels;
-        fragmentContainer.setLayoutParams(layoutParams);
-    }
-
     private void setButtonsSelectableBackground(@DrawableRes int resId) {
-        ivPlayPause.setBackgroundResource(resId);
-        ivSkipToNext.setBackgroundResource(resId);
-        ivSkipToPrevious.setBackgroundResource(resId);
+        panelBinding.ivPlayPause.setBackgroundResource(resId);
+        panelBinding.ivSkipToNext.setBackgroundResource(resId);
+        panelBinding.ivSkipToPrevious.setBackgroundResource(resId);
     }
 
     private void onBottomSheetStateChanged(Integer newState) {
@@ -227,27 +177,28 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private SlideDelegate createBottomSheetDelegate() {
         DelegateManager boundDelegateManager = new DelegateManager();
         boundDelegateManager
-                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(playQueueTitleContainer)))
+                .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(queueToolbarBinding.getRoot())))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(titleContainer))))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.toolbarContentContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
-                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(fragmentContainer))))
-                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, ivMusicIcon)))
-                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(tvCurrentCompositionAuthor)))
-                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(btnActionsMenu)))
-                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(sbTrackState)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRepeatMode)))
-                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(btnRandomPlay)))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvPlayedTime)))
+                .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
+                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, panelBinding.ivMusicIcon)))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(panelBinding.tvCurrentCompositionAuthor)))
+                .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(panelBinding.btnActionsMenu)))
+                .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(panelBinding.sbTrackState)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.btnInfinitePlay)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.btnRandomPlay)))
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvPlayedTime)))
                 .addDelegate(new ToolbarDelegate(toolbar, activity.getWindow()))
-                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(tvTotalTime)));
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvTotalTime)));
 
         DelegateManager delegateManager = new DelegateManager();
         if (isInLandscapeOrientation()) {//landscape
             boundDelegateManager.addDelegate(new MoveXDelegate(
                     0.5f,
                     bottomSheetCoordinator));
+
             boundDelegateManager.addDelegate(new LeftBottomShadowDelegate(
                     bottomSheetLeftShadow,
                     bottomSheetTopLeftShadow,
@@ -263,23 +214,14 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
             delegateManager.addDelegate(new MoveYDelegate(clPlayQueueContainer, 0.3f));
         }
         delegateManager.addDelegate(new BoundValuesDelegate(0.008f, 0.95f, boundDelegateManager));
-        //ellipsize TextView workaround. Find better later
-        delegateManager.addDelegate(slideOffset -> {
-            if (slideOffset == 1f) {
-                run(tvCurrentComposition, () -> {
-                    tvCurrentComposition.requestLayout();
-                    tvCurrentComposition.invalidate();
-                });
-            }
-        });
         return delegateManager;
     }
 
     private void setViewStartState() {
         clPlayQueueContainer.setVisibility(INVISIBLE);
-        playQueueTitleContainer.setVisibility(INVISIBLE);
-        titleContainer.setVisibility(INVISIBLE);
-        toolbarTitleContainer.setVisibility(INVISIBLE);
+        queueToolbarBinding.getRoot().setVisibility(INVISIBLE);
+        toolbarBinding.toolbarContentContainer.setVisibility(INVISIBLE);
+        toolbarBinding.titleContainer.setVisibility(INVISIBLE);
     }
 
     private boolean isInLandscapeOrientation() {

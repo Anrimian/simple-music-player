@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
@@ -45,8 +46,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -65,14 +64,9 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     @InjectPresenter
     GenreItemsPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
-
-    @BindView(R.id.fab)
-    View fab;
+    private RecyclerView recyclerView;
+    private CoordinatorLayout clListContainer;
+    private View fab;
 
     private AdvancedToolbar toolbar;
     private CompositionsAdapter adapter;
@@ -97,7 +91,7 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     }
 
     @Override
-    protected BaseLibraryCompositionsPresenter getBasePresenter() {
+    protected BaseLibraryCompositionsPresenter<GenreItemsView> getBasePresenter() {
         return presenter;
     }
 
@@ -106,13 +100,16 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_base_fab_list, container, false);
+        FragmentBaseFabListBinding viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
+        recyclerView = viewBinding.recyclerView;
+        clListContainer = viewBinding.listContainer;
+        fab = viewBinding.fab;
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 

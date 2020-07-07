@@ -1,21 +1,18 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
-import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
-import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
-import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
@@ -31,58 +28,39 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
 import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
-import static io.reactivex.subjects.BehaviorSubject.createDefault;
 
-/**
- * Created on 02.11.2017.
- */
+public class LibraryPlayerInteractor {
 
-public class MusicPlayerInteractor {
-
-    private final MusicPlayerController musicPlayerController;
-    private final SystemMusicController systemMusicController;
-    private final SystemServiceController systemServiceController;
+    private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
     private final SettingsRepository settingsRepository;
     private final PlayQueueRepository playQueueRepository;
     private final LibraryRepository musicProviderRepository;
     private final UiStateRepository uiStateRepository;
     private final Analytics analytics;
 
-    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
-    private final BehaviorSubject<PlayerState> playerStateSubject = createDefault(IDLE);
-
-    private final CompositeDisposable systemEventsDisposable = new CompositeDisposable();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
+
+    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+
+    private final Observable<CurrentComposition> currentCompositionObservable;
 
     @Nullable
     private PlayQueueItem currentItem;
 
-    private final Observable<CurrentComposition> currentCompositionObservable;
-
-    public MusicPlayerInteractor(MusicPlayerController musicPlayerController,
-                                 SettingsRepository settingsRepository,
-                                 SystemMusicController systemMusicController,
-                                 SystemServiceController systemServiceController,
-                                 PlayQueueRepository playQueueRepository,
-                                 LibraryRepository musicProviderRepository,
-                                 UiStateRepository uiStateRepository,
-                                 Analytics analytics) {
-        this.musicPlayerController = musicPlayerController;
-        this.systemMusicController = systemMusicController;
+    public LibraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
+                                   SettingsRepository settingsRepository,
+                                   PlayQueueRepository playQueueRepository,
+                                   LibraryRepository musicProviderRepository,
+                                   UiStateRepository uiStateRepository,
+                                   Analytics analytics) {
+        this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.settingsRepository = settingsRepository;
-        this.systemServiceController = systemServiceController;
         this.playQueueRepository = playQueueRepository;
         this.musicProviderRepository = musicProviderRepository;
         this.uiStateRepository = uiStateRepository;
@@ -100,10 +78,9 @@ public class MusicPlayerInteractor {
 
         playerDisposable.add(playQueueRepository.getCurrentQueueItemObservable()
                 .subscribe(this::onQueueItemChanged));
-        playerDisposable.add(musicPlayerController.getEventsObservable()
+
+        playerDisposable.add(playerCoordinatorInteractor.getPlayerEventsObservable(LIBRARY)
                 .subscribe(this::onMusicPlayerEventReceived));
-        playerDisposable.add(systemMusicController.getVolumeObservable()
-                .subscribe(this::onVolumeChanged));
     }
 
     public void startPlaying(List<Composition> compositions) {
@@ -112,63 +89,33 @@ public class MusicPlayerInteractor {
 
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
-                .doOnSubscribe(d -> playerStateSubject.onNext(LOADING))
-                .doOnError(t -> playerStateSubject.onNext(STOP))
-                .doOnComplete(this::play)
+                .doOnComplete(() -> playerCoordinatorInteractor.play(LIBRARY))
+                //fixes music gap and state blinking(prepare new queue from stop state)
+                .doOnSubscribe(o -> playerCoordinatorInteractor.setInLoadingState(LIBRARY))
                 .doOnError(analytics::processNonFatalError)
                 .onErrorComplete()
                 .subscribe();
     }
 
     public void play() {
-        if (playerStateSubject.getValue() == PLAY) {
-            return;
-        }
-        if (playerStateSubject.getValue() == PAUSED_PREPARE_ERROR && currentItem != null) {
-            musicPlayerController.prepareToPlay(
-                    currentItem.getComposition(),
-                    uiStateRepository.getTrackPosition()
-            );
-        }
-
-        systemEventsDisposable.clear();
-        Observable<AudioFocusEvent> audioFocusObservable = systemMusicController.requestAudioFocus();
-        if (audioFocusObservable != null) {
-            if (playerStateSubject.getValue() != LOADING) {
-                musicPlayerController.resume();
-                playerStateSubject.onNext(PLAY);
-            }
-            systemServiceController.startMusicService();
-
-            systemEventsDisposable.add(audioFocusObservable.subscribe(this::onAudioFocusChanged));
-            systemEventsDisposable.add(systemMusicController.getAudioBecomingNoisyObservable()
-                    .subscribe(this::onAudioBecomingNoisy));
-        }
+        playerCoordinatorInteractor.play(LIBRARY);
     }
 
     public void playOrPause() {
-        if (playerStateSubject.getValue() == PLAY) {
-            pause();
-        } else {
-            play();
-        }
+        playerCoordinatorInteractor.playOrPause(LIBRARY);
     }
 
     public void stop() {
-        musicPlayerController.stop();
-        playerStateSubject.onNext(STOP);
-        systemEventsDisposable.clear();
+        playerCoordinatorInteractor.stop(LIBRARY);
     }
 
     public void pause() {
-        musicPlayerController.pause();
-        playerStateSubject.onNext(PAUSE);
-        systemEventsDisposable.clear();
+        playerCoordinatorInteractor.pause(LIBRARY);
     }
 
     public void skipToPrevious() {
-        if (musicPlayerController.getTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-            musicPlayerController.seekTo(0);
+        if (getActualTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
+            onSeekFinished(0);
             return;
         }
         playQueueRepository.skipToPrevious();
@@ -203,9 +150,7 @@ public class MusicPlayerInteractor {
     }
 
     public void onSeekStarted() {
-        if (playerStateSubject.getValue() == PLAY) {
-            musicPlayerController.pause();
-        }
+        playerCoordinatorInteractor.onSeekStarted(LIBRARY);
     }
 
     public void seekTo(long position) {
@@ -213,10 +158,11 @@ public class MusicPlayerInteractor {
     }
 
     public void onSeekFinished(long position) {
-        if (playerStateSubject.getValue() == PLAY) {
-            musicPlayerController.resume();
+        boolean processed = playerCoordinatorInteractor.onSeekFinished(position, LIBRARY);
+        if (!processed) {
+            uiStateRepository.setTrackPosition(position);
+            trackPositionSubject.onNext(position);
         }
-        musicPlayerController.seekTo(position);
     }
 
     public void setRepeatMode(int mode) {
@@ -241,18 +187,16 @@ public class MusicPlayerInteractor {
     }
 
     public Observable<Long> getTrackPositionObservable() {
-        return musicPlayerController.getTrackPositionObservable()
+        return playerCoordinatorInteractor.getTrackPositionObservable(LIBRARY)
                 .mergeWith(trackPositionSubject);
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
-        return playerStateSubject.map(PlayerState::toBaseState)
-                .filter(state -> state != LOADING)
-                .distinctUntilChanged();
+        return playerCoordinatorInteractor.getPlayerStateObservable(LIBRARY);
     }
 
     public PlayerState getPlayerState() {
-        return playerStateSubject.getValue();
+        return playerCoordinatorInteractor.getPlayerState(LIBRARY);
     }
 
     public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
@@ -306,11 +250,6 @@ public class MusicPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
-    @Nullable
-    public PlayQueueItem getCurrentItem() {
-        return currentItem;
-    }
-
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
@@ -323,28 +262,48 @@ public class MusicPlayerInteractor {
 
             //if items are equal and content changed -> restart play
             if (previousItem != null && previousItem.equals(currentItem)) {
+                trackPosition = getActualTrackPosition();
+
                 if (!hasSourceChanges(previousItem, currentItem)) {
+
+                    //if other fields was changed - update source
+                    if (!areSourcesTheSame(previousItem, currentItem)) {
+                        playerCoordinatorInteractor.updateSource(
+                                new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
+                                LIBRARY);
+                    }
                     return;
                 }
-                trackPosition = musicPlayerController.getTrackPosition();
             }
 
-            musicPlayerController.prepareToPlay(currentItem.getComposition(), trackPosition);
+            playerCoordinatorInteractor.prepareToPlay(
+                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
+                    LIBRARY
+            );
         }
     }
 
+    private long getActualTrackPosition() {
+        long position = playerCoordinatorInteractor.getActualTrackPosition(LIBRARY);
+        if (position == -1) {
+            return uiStateRepository.getTrackPosition();
+        }
+        return position;
+    }
+
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
-        if (playerEvent instanceof PreparedEvent) {
-            onCompositionPrepared();
-        } else if (playerEvent instanceof FinishedEvent) {
+        if (playerEvent instanceof FinishedEvent) {
             FinishedEvent finishedEvent = (FinishedEvent) playerEvent;
             onCompositionPlayFinished();
-            Composition composition = finishedEvent.getComposition();
-            if (composition.getCorruptionType() != null) {
-                musicProviderRepository.writeErrorAboutComposition(null, composition)
-                        .doOnError(analytics::processNonFatalError)
-                        .onErrorComplete()
-                        .subscribe();
+            CompositionSource compositionSource = finishedEvent.getComposition();
+            if (compositionSource instanceof LibraryCompositionSource) {
+                Composition composition = ((LibraryCompositionSource) compositionSource).getComposition();
+                if (composition.getCorruptionType() != null) {
+                    musicProviderRepository.writeErrorAboutComposition(null, composition)
+                            .doOnError(analytics::processNonFatalError)
+                            .onErrorComplete()
+                            .subscribe();
+                }
             }
         } else if (playerEvent instanceof ErrorEvent) {
             ErrorEvent errorEvent = (ErrorEvent) playerEvent;
@@ -352,29 +311,11 @@ public class MusicPlayerInteractor {
         }
     }
 
-    private void onVolumeChanged(int volume) {
-        if (playerStateSubject.getValue() == PLAY && volume == 0) {
-            pause();
-        }
-    }
-
-    private void onCompositionPrepared() {
-        PlayerState state = playerStateSubject.getValue();
-        if (state == LOADING) {
-            playerStateSubject.onNext(PLAY);
-        }
-        if (state == PLAY || state == LOADING) {
-            musicPlayerController.resume();
-        }
-    }
-
-    private void handleErrorWithComposition(ErrorType errorType, Composition composition) {
-        if (errorType == ErrorType.IGNORED) {
-            musicPlayerController.pause();
-            playerStateSubject.onNext(PAUSED_PREPARE_ERROR);
-            systemEventsDisposable.clear();
+    private void handleErrorWithComposition(ErrorType errorType, CompositionSource compositionSource) {
+        if (!(compositionSource instanceof LibraryCompositionSource) || errorType == ErrorType.IGNORED) {
             return;
         }
+        Composition composition = ((LibraryCompositionSource) compositionSource).getComposition();
         CorruptionType corruptionType = toCorruptionType(errorType);
         musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
                 .doOnError(analytics::processNonFatalError)
@@ -400,10 +341,11 @@ public class MusicPlayerInteractor {
     }
 
     private void onCompositionPlayFinished() {
+        onSeekFinished(0);
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
-            musicPlayerController.seekTo(0);
             return;
         }
+        //skipped twice from end of queue
         playQueueRepository.skipToNext()
                 .doOnSuccess(this::onAutoSkipNextFinished)
                 .subscribe();
@@ -413,39 +355,5 @@ public class MusicPlayerInteractor {
         if (currentPosition == 0 && !(settingsRepository.getRepeatMode() == RepeatMode.REPEAT_PLAY_LIST)) {
             stop();
         }
-    }
-
-    private void onAudioFocusChanged(AudioFocusEvent event) {
-        switch (event) {
-            case GAIN: {
-                musicPlayerController.setVolume(1f);
-                if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
-                    playerStateSubject.onNext(PLAY);
-                    musicPlayerController.resume();
-                    systemServiceController.startMusicService();
-                }
-                break;
-            }
-            case LOSS_SHORTLY: {
-                if (playerStateSubject.getValue() == PLAY
-                        && settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()) {
-                    musicPlayerController.setVolume(0.5f);
-                }
-                break;
-            }
-            case LOSS: {
-                if (playerStateSubject.getValue() == PLAY) {
-                    musicPlayerController.pause();
-                    playerStateSubject.onNext(PAUSED_EXTERNALLY);
-                    break;
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private void onAudioBecomingNoisy(Object o) {
-        musicPlayerController.pause();
-        playerStateSubject.onNext(PAUSE);
     }
 }

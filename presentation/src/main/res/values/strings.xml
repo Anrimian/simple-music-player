@@ -170,7 +170,6 @@
     <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
     <string name="excluded_folders">Excluded folders</string>
     <string name="remove_excluded_folder">Remove excluded folder</string>
-    <string name="no_excluded_folders">No excluded folders</string>
     <string name="ignored_folder_removed">Excluded folder removed</string>
     <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
@@ -188,6 +187,24 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
+    <string name="no_excluded_folders">Folders excluded from scanning will be appear here</string>
+    <string name="keep_playing_after_window_close">Keep playing after window closing</string>
+    <string name="unknown_play_error">Unknown play error</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="system_equalizer">System equalizer</string>
+    <string name="no_equalizer">None</string>
+    <string name="external_equalizer_description">System equalizer work depends on external equalizer application and may not work with some applications</string>
+    <string name="external_equalizer_not_found">External equalizer application not found</string>
+    <string name="open">Open</string>
+    <string name="cover">Cover</string>
+    <string name="change_cover">Change cover</string>
+    <string name="pick_from_gallery">Pick from gallery</string>
+    <string name="remove_cover">Remove cover</string>
+    <string name="changing_cover_progress">Changing cover…</string>
+    <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
+    <string name="change_lyrics">Change lyrics</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="check_tags_error">Failed to check composition tags: %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

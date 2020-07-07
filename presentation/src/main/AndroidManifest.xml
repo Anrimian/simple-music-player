@@ -43,6 +43,19 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.main.external_player.ExternalPlayerActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/DialogActivityTheme"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <!--<category android:name="android.intent.category.BROWSABLE"/>-->
+                <data android:scheme="content"/>
+                <data android:mimeType="audio/*"/>
+            </intent-filter>
+        </activity>
+
         <activity android:name=".ui.editor.composition.CompositionEditorActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SlidrActivityTheme"/>

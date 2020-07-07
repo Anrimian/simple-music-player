@@ -162,6 +162,22 @@ public class FormatUtils {
         }
     }
 
+    @StringRes
+    public static int getRepeatModeText(int repeatMode) {
+        switch (repeatMode) {
+            case RepeatMode.NONE: {
+                return R.string.do_not_repeat;
+            }
+            case RepeatMode.REPEAT_COMPOSITION: {
+                return R.string.repeat_composition;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                return R.string.repeat_playlist;
+            }
+            default: return R.string.do_not_repeat;
+        }
+    }
+
     public static void formatLinkedFabView(View view, View fab) {
         run(fab, () -> {
             int width = fab.getWidth();

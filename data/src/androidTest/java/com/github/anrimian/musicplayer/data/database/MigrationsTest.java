@@ -39,6 +39,15 @@ public class MigrationsTest {
                     new FrameworkSQLiteOpenHelperFactory());
 
     @Test
+    public void testMigrationFrom6To7() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 6);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                7,
+                false,
+                Migrations.MIGRATION_6_7);
+    }
+
+    @Test
     public void testMigrationFrom5To6() throws IOException {
         SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 5);
 

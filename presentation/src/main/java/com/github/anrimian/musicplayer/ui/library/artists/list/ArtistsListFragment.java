@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentLibraryArtistsBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
@@ -23,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.serialization.ArtistSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter;
@@ -40,8 +42,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -57,11 +57,8 @@ public class ArtistsListFragment extends LibraryFragment implements
     @InjectPresenter
     ArtistsListPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
+    private RecyclerView recyclerView;
+    private CoordinatorLayout clListContainer;
 
     private AdvancedToolbar toolbar;
     private ArtistsAdapter adapter;
@@ -82,13 +79,15 @@ public class ArtistsListFragment extends LibraryFragment implements
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_library_artists, container, false);
+        FragmentLibraryArtistsBinding binding = FragmentLibraryArtistsBinding.inflate(inflater, container, false);
+        recyclerView = binding.recyclerView;
+        clListContainer = binding.listContainer;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
@@ -244,6 +243,10 @@ public class ArtistsListFragment extends LibraryFragment implements
             }
             case R.id.menu_search: {
                 toolbar.setSearchModeEnabled(true);
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {

@@ -13,8 +13,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 
 public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 

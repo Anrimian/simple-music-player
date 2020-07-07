@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
@@ -17,14 +18,13 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.DialogFragment;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogCommonInputSimpleBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPLETE_ON_ENTER_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
@@ -38,8 +38,7 @@ import static com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTex
 
 public class InputTextDialogFragment extends DialogFragment {
 
-    @BindView(R.id.edit_text)
-    AutoCompleteTextView editText;
+    private AutoCompleteTextView editText;
 
     @Nullable
     private Callback<String> onCompleteListener;
@@ -91,9 +90,11 @@ public class InputTextDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = View.inflate(getActivity(), R.layout.dialog_common_input_simple, null);
-
-        ButterKnife.bind(this, view);
+        DialogCommonInputSimpleBinding binding = DialogCommonInputSimpleBinding.inflate(
+                LayoutInflater.from(requireActivity())
+        );
+        View view = binding.getRoot();
+        editText = binding.editText;
 
         Bundle args = getArguments();
         assert args != null;
@@ -107,16 +108,20 @@ public class InputTextDialogFragment extends DialogFragment {
         dialog.show();
 
         boolean canBeEmpty = args.getBoolean(CAN_BE_EMPTY_ARG);
+        boolean completeOnEnterButton = args.getBoolean(COMPLETE_ON_ENTER_ARG);
 
         editText.setHint(args.getInt(EDIT_TEXT_HINT));
-        editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editText.setImeOptions(completeOnEnterButton? EditorInfo.IME_ACTION_DONE: EditorInfo.IME_ACTION_UNSPECIFIED);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         editText.setOnEditorActionListener((v, actionId, event) -> {
             if (!canBeEmpty && !isEnterButtonEnabled(editText.getText().toString().trim())) {
                 return true;
             }
-            onCompleteButtonClicked();
-            return true;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onCompleteButtonClicked();
+                return true;
+            }
+            return false;
         });
         String startText = args.getString(EDIT_TEXT_VALUE);
         setEditableText(editText, startText);
@@ -153,12 +158,12 @@ public class InputTextDialogFragment extends DialogFragment {
 
     private void onCompleteButtonClicked() {
         String text = editText.getText().toString();
-        if (!TextUtils.equals(text, getArguments().getString(EDIT_TEXT_VALUE))) {
+        if (!TextUtils.equals(text, requireArguments().getString(EDIT_TEXT_VALUE))) {
             if (onCompleteListener != null) {
                 onCompleteListener.call(text);
             }
             if (complexCompleteListener != null) {
-                complexCompleteListener.call(text, getArguments().getBundle(EXTRA_DATA_ARG));
+                complexCompleteListener.call(text, requireArguments().getBundle(EXTRA_DATA_ARG));
             }
         }
         dismissAllowingStateLoss();
@@ -167,6 +172,7 @@ public class InputTextDialogFragment extends DialogFragment {
     private boolean isEnterButtonEnabled(String text) {
         return !isEmpty(text);
     }
+
     public static class Builder {
         @StringRes private final int title;
         @StringRes private final int positiveButtonText;
@@ -174,6 +180,7 @@ public class InputTextDialogFragment extends DialogFragment {
         @StringRes private final int editTextHint;
         private final String editTextValue;
         private boolean canBeEmpty = true;
+        private boolean completeOnEnterButton = true;
         private Bundle extra = null;
         private String[] hints;
 
@@ -187,6 +194,11 @@ public class InputTextDialogFragment extends DialogFragment {
             this.negativeButtonText = negativeButtonText;
             this.editTextHint = editTextHint;
             this.editTextValue = editTextValue;
+        }
+
+        public Builder completeOnEnterButton(boolean completeOnEnterButton) {
+            this.completeOnEnterButton = completeOnEnterButton;
+            return this;
         }
 
         public Builder canBeEmpty(boolean canBeEmpty) {
@@ -212,6 +224,7 @@ public class InputTextDialogFragment extends DialogFragment {
             args.putInt(EDIT_TEXT_HINT, editTextHint);
             args.putString(EDIT_TEXT_VALUE, editTextValue);
             args.putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty);
+            args.putBoolean(COMPLETE_ON_ENTER_ARG, completeOnEnterButton);
             args.putBundle(EXTRA_DATA_ARG, extra);
             args.putStringArray(HINTS_ARG, hints);
             InputTextDialogFragment fragment = new InputTextDialogFragment();

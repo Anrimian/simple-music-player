@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
+import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -76,8 +77,16 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
-    CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider) {
-        return new CompositionSourceEditor(musicProvider);
+    FileSourceProvider fileSourceProvider(Context context) {
+        return new FileSourceProvider(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider,
+                                                    FileSourceProvider fileSourceProvider) {
+        return new CompositionSourceEditor(musicProvider, fileSourceProvider);
     }
 
     @Provides

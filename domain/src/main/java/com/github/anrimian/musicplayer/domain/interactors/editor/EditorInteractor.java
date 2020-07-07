@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
@@ -56,6 +57,10 @@ public class EditorInteractor {
         return editorRepository.changeCompositionAlbumArtist(composition, nullIfEmpty(newArtist));
     }
 
+    public Completable editCompositionLyrics(FullComposition composition, String text) {
+        return editorRepository.changeCompositionLyrics(composition, nullIfEmpty(text));
+    }
+
     public Completable editCompositionTitle(FullComposition composition, String newTitle) {
         return editorRepository.changeCompositionTitle(composition, newTitle);
     }
@@ -82,7 +87,7 @@ public class EditorInteractor {
      */
     public Completable updateTagsFromSource(FullComposition fullComposition) {
         return editorRepository.getCompositionFileTags(fullComposition)
-                .flatMapCompletable(tags -> getDiffTasksFromSource(fullComposition, tags));
+                .flatMapCompletable(tags -> updateCompositionTags(fullComposition, tags));
     }
 
     public Completable updateAlbumName(String name, long albumId) {
@@ -105,8 +110,16 @@ public class EditorInteractor {
         return musicProviderRepository.getGenreNames();
     }
 
-    private Completable getDiffTasksFromSource(FullComposition fullComposition,
-                                               CompositionSourceTags tags) {
+    public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
+        return editorRepository.changeCompositionAlbumArt(composition, imageSource);
+    }
+
+    public Completable removeCompositionAlbumArt(FullComposition composition) {
+        return editorRepository.removeCompositionAlbumArt(composition);
+    }
+
+    private Completable updateCompositionTags(FullComposition fullComposition,
+                                              CompositionSourceTags tags) {
         LinkedList<Completable> tasksList = new LinkedList<>();
 
         String tagTitle = tags.getTitle();
@@ -127,6 +140,11 @@ public class EditorInteractor {
         String tagAlbumArtist = tags.getAlbumArtist();
         if (!isEmpty(tagAlbumArtist) && !Objects.equals(fullComposition.getAlbumArtist(), tagAlbumArtist)) {
             tasksList.add(editCompositionAlbumArtist(fullComposition, tagAlbumArtist));
+        }
+
+        String tagLyrics = tags.getLyrics();
+        if (!isEmpty(tagLyrics) && !Objects.equals(fullComposition.getLyrics(), tagLyrics)) {
+            tasksList.add(editCompositionLyrics(fullComposition, tagLyrics));
         }
 
         return Completable.concat(tasksList);

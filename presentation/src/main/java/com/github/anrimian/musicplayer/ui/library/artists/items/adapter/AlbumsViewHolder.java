@@ -2,13 +2,13 @@ package com.github.anrimian.musicplayer.ui.library.artists.items.adapter;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemAlbumsHorizontalBinding;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.albums.AlbumsAdapter;
@@ -16,16 +16,10 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHold
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class AlbumsViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.rv_albums)
-    RecyclerView rvAlbums;
-
-    @BindView(R.id.tv_songs_title)
-    TextView tvSongsTitle;
+    private ItemAlbumsHorizontalBinding viewBinding;
+    private RecyclerView rvAlbums;
 
     private AlbumsAdapter albumsAdapter;
 
@@ -33,7 +27,8 @@ public class AlbumsViewHolder extends BaseViewHolder {
                      Callback<Album> itemClickListener,
                      Callback<Boolean> albumsScrollStateCallback) {
         super(parent, R.layout.item_albums_horizontal);
-        ButterKnife.bind(this, itemView);
+        viewBinding = ItemAlbumsHorizontalBinding.bind(itemView);
+        rvAlbums = viewBinding.rvAlbums;
 
         rvAlbums.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         rvAlbums.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -65,6 +60,6 @@ public class AlbumsViewHolder extends BaseViewHolder {
     }
 
     void setCompositionsTitleVisible(boolean visible) {
-        tvSongsTitle.setVisibility(visible? View.VISIBLE : View.GONE);
+        viewBinding.tvSongsTitle.setVisibility(visible? View.VISIBLE : View.GONE);
     }
 }

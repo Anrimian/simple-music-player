@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
@@ -59,7 +59,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private Item<PlayListItem> deletedItem;
 
     public PlayListPresenter(long playListId,
-                             MusicPlayerInteractor playerInteractor,
+                             LibraryPlayerInteractor playerInteractor,
                              PlayListsInteractor playListsInteractor,
                              DisplaySettingsInteractor displaySettingsInteractor,
                              ErrorParser errorParser,

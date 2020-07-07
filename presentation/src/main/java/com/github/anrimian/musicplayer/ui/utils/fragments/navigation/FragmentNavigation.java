@@ -239,8 +239,11 @@ public class FragmentNavigation {
             screens.add(new FragmentMetaData(newRootFragment));
             int topViewId = jugglerView.getTopViewId();
             newRootFragment.setMenuVisibility(isVisible);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+            if (fm == null) {
+                return;
+            }
+            fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, exitAnimation)
                     .replace(topViewId, newRootFragment)
                     .runOnCommit(() -> {
@@ -413,7 +416,7 @@ public class FragmentNavigation {
             FragmentMetaData bottomFragment = screens.get(screens.size() - 2);
             FragmentManager fm = fragmentManagerProvider.getFragmentManager();
             if (fm == null) {
-                //can be null if in very fast create-close case
+                //can be null in very fast create-close case
                 return;
             }
             fm.beginTransaction()

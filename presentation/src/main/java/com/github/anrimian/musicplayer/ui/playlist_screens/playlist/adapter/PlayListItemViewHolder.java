@@ -17,7 +17,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 
 import javax.annotation.Nonnull;
 
-import butterknife.ButterKnife;
+
 
 /**
  * Created on 31.10.2017.
@@ -34,7 +34,6 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
                            BiCallback<PlayListItem, Integer> onCompositionClickListener,
                            OnItemClickListener<Integer> onIconClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
-        ButterKnife.bind(this, itemView);
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 o -> onIconClickListener.onItemClick(getAdapterPosition()),
                 composition -> onCompositionClickListener.call(item, getAdapterPosition())

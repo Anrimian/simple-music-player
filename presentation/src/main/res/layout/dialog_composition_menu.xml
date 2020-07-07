@@ -18,7 +18,7 @@
 
     <TextView
         style="@style/TextStyleContentSubtitle.Medium"
-        android:id="@+id/tv_composition_author"
+        android:id="@+id/tv_composition_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/content_spacing_margin"

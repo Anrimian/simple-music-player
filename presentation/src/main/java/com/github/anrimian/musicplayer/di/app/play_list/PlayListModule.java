@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.play_list;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -27,7 +27,7 @@ public class PlayListModule {
 
     @Provides
     @Nonnull
-    PlayListPresenter playListsPresenter(MusicPlayerInteractor musicPlayerInteractor,
+    PlayListPresenter playListsPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                                          PlayListsInteractor playListsInteractor,
                                          DisplaySettingsInteractor displaySettingsInteractor,
                                          @Named(UI_SCHEDULER) Scheduler uiSchedule,

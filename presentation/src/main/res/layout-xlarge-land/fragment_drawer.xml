@@ -45,7 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <FrameLayout
-                android:id="@+id/toolbar_play_queue"
+                android:id="@+id/static_toolbar_play_queue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
@@ -55,20 +55,20 @@
 
                 <include
                     layout="@layout/partial_queue_toolbar"
+                    android:id="@+id/toolbar_play_queue"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:layout_marginStart="@dimen/content_horizontal_margin" />
 
             </FrameLayout>
 
-
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:id="@+id/cl_play_queue_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/toolbar_play_queue"
+                app:layout_constraintTop_toBottomOf="@id/static_toolbar_play_queue"
                 app:layout_constraintStart_toStartOf="@id/guideline_center"
-                app:layout_constraintEnd_toEndOf="@id/toolbar_play_queue"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/cl_music_panel">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -93,11 +93,8 @@
                 android:id="@+id/cl_music_panel"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/bottom_sheet_expand_height"
-                app:behavior_hideable="false"
-                app:behavior_peekHeight="@dimen/bottom_sheet_height"
-                app:layout_behavior="@string/bottom_sheet_behavior"
-                app:layout_constraintStart_toStartOf="@id/toolbar_play_queue"
-                app:layout_constraintEnd_toEndOf="@id/toolbar_play_queue"
+                app:layout_constraintStart_toStartOf="@id/guideline_center"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <View

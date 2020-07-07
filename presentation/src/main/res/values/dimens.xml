@@ -43,8 +43,11 @@
    <!--content_vertical_margin*2(32) + fab size(56) -->
     <dimen name="list_bottom_padding_with_fab">88dp</dimen>
 
-    <!--dialog margins-->
+    <!--dialogs-->
     <dimen name="dialog_content_margin_start">20dp</dimen>
+    <item name="dialog_min_width_major" type="dimen">65%</item>
+    <item name="dialog_min_width_minor" type="dimen">95%</item>
+    <dimen name="floating_window_z">16dp</dimen>
 
     <dimen name="subtitle_height">48dp</dimen>
 
@@ -57,9 +60,10 @@
     <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
 
-    <!--controls-->
+    <!--radio button-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
     <dimen name="radio_button_text_vertical_padding">15dp</dimen>
+    <dimen name="radio_button_description_padding">48dp</dimen>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>

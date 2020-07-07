@@ -29,10 +29,9 @@ ext {
     rxPermissionsVersion = "0.10.2"
     rxJavaExtVersion = "0.20.10"
     moxyVersion = "2.1.2"
-    butterKnifeVersion = "10.2.1"
-    daggerVersion = "2.27"
+    daggerVersion = "2.28.1"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.11.4"
+    exoPlayerVersion = "2.11.6"
     roomVersion = "2.2.5"
     jTaggerVersion = '2.0.3'
     circleImageViewVersion = "3.1.0"
@@ -72,9 +71,6 @@ ext {
 
     room = "androidx.room:room-runtime:$roomVersion"
     roomCompiler = "androidx.room:room-compiler:$roomVersion"
-
-    butterKnife = "com.jakewharton:butterknife:$butterKnifeVersion"
-    butterKnifeCompiler = "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
 
     dagger = "com.google.dagger:dagger:$daggerVersion"
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"

@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -30,7 +30,7 @@ public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreI
     public GenreItemsPresenter(long genreId,
                                LibraryGenresInteractor interactor,
                                PlayListsInteractor playListsInteractor,
-                               MusicPlayerInteractor playerInteractor,
+                               LibraryPlayerInteractor playerInteractor,
                                DisplaySettingsInteractor displaySettingsInteractor,
                                ErrorParser errorParser,
                                Scheduler uiScheduler) {

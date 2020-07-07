@@ -5,12 +5,18 @@ public class CompositionSourceTags {
     private final String artist;
     private final String album;
     private final String albumArtist;
+    private final String lyrics;
 
-    public CompositionSourceTags(String title, String artist, String album, String albumArtist) {
+    public CompositionSourceTags(String title,
+                                 String artist,
+                                 String album,
+                                 String albumArtist,
+                                 String lyrics) {
         this.title = title;
         this.artist = artist;
         this.album = album;
         this.albumArtist = albumArtist;
+        this.lyrics = lyrics;
     }
 
     public String getTitle() {
@@ -27,5 +33,9 @@ public class CompositionSourceTags {
 
     public String getAlbumArtist() {
         return albumArtist;
+    }
+
+    public String getLyrics() {
+        return lyrics;
     }
 }

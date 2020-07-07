@@ -33,6 +33,59 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/tv_cover_hint"
+                    style="@style/TextStyle.Subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cover"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginEnd="@dimen/content_horizontal_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_cover"
+                    style="@style/ImageStyle"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="@dimen/content_internal_margin"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintStart_toStartOf="@+id/tv_cover_hint"
+                    app:layout_constraintTop_toBottomOf="@id/tv_cover_hint"
+                    tools:src="@drawable/ic_music_placeholder"/>
+
+                <ImageView
+                    android:id="@+id/iv_cover_edit"
+                    style="@style/ButtonStyle"
+                    android:contentDescription="@string/cover"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_cover_hint"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_cover_hint"
+                    app:srcCompat="@drawable/ic_circle_edit_outline"/>
+
+                <View
+                    android:id="@+id/divider_cover"
+                    style="@style/Divider.Horizontal.Constraint"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_cover"
+                    app:layout_constraintBottom_toTopOf="@id/tv_filename_hint"/>
+
+                <FrameLayout
+                    android:id="@+id/change_cover_clickable_area"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:foreground="?selectableItemBackground"
+                    android:contentDescription="@string/change_cover"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/divider_cover"/>
+
+                <TextView
                     android:id="@+id/tv_filename_hint"
                     style="@style/TextStyle.Subtitle"
                     android:layout_width="0dp"
@@ -41,7 +94,7 @@
                     android:layout_marginTop="@dimen/content_vertical_margin"
                     android:layout_marginEnd="@dimen/content_horizontal_margin"
                     android:layout_marginStart="@dimen/toolbar_content_start"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_cover"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -81,7 +134,7 @@
                     android:layout_height="0dp"
                     android:foreground="?selectableItemBackground"
                     android:contentDescription="@string/change_file_name"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/divider_cover"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/divider_filename"/>
@@ -293,6 +346,58 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_album_artist"/>
 
+
+                <TextView
+                    android:id="@+id/tv_lyrics_hint"
+                    style="@style/TextStyle.Subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lyrics"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                    app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                    app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+                <TextView
+                    android:id="@+id/tv_lyrics"
+                    style="@style/TextStyle.Medium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/content_internal_margin"
+                    app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                    app:layout_constraintTop_toBottomOf="@id/tv_lyrics_hint"
+                    app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                    tools:text="lyrics"/>
+
+                <ImageView
+                    android:id="@+id/iv_lyrics"
+                    style="@style/ButtonStyle"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_lyrics_hint"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_lyrics_hint"
+                    app:srcCompat="@drawable/ic_circle_edit_outline" />
+
+                <FrameLayout
+                    android:id="@+id/change_lyrics_clickable_area"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:foreground="?selectableItemBackground"
+                    android:contentDescription="@string/change_album_artist"
+                    app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/divider_lyrics"/>
+
+                <View
+                    android:id="@+id/divider_lyrics"
+                    style="@style/Divider.Horizontal.Constraint"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_lyrics"/>
+
                 <TextView
                     android:id="@+id/tv_genre_hint"
                     style="@style/TextStyle.Subtitle"
@@ -300,7 +405,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/genres"
                     android:layout_marginTop="@dimen/content_vertical_margin"
-                    app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                    app:layout_constraintTop_toBottomOf="@id/divider_lyrics"
                     app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
                     app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
 
@@ -319,7 +424,7 @@
                     android:layout_height="0dp"
                     android:background="?selectableItemBackground"
                     android:contentDescription="@string/add_composition_genre"
-                    app:layout_constraintTop_toBottomOf="@id/divider_album_artist"
+                    app:layout_constraintTop_toBottomOf="@id/divider_lyrics"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>

@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.widgets;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
@@ -18,6 +18,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
@@ -31,13 +32,13 @@ public class WidgetUpdater {
     public static final String ACTION_UPDATE_QUEUE = "action_update_queue";
 
     private final Context context;
-    private final MusicPlayerInteractor musicPlayerInteractor;
+    private final LibraryPlayerInteractor musicPlayerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
 
     private final CompositeDisposable updateDisposable = new CompositeDisposable();
 
     public WidgetUpdater(Context context,
-                         MusicPlayerInteractor musicPlayerInteractor,
+                         LibraryPlayerInteractor musicPlayerInteractor,
                          DisplaySettingsInteractor displaySettingsInteractor) {
         this.context = context;
         this.musicPlayerInteractor = musicPlayerInteractor;
@@ -87,27 +88,29 @@ public class WidgetUpdater {
         String compositionName = null;
         String compositionAuthor = null;
         long compositionId = 0;
+        long compositionUpdateTime = 0;
         PlayQueueItem item = playQueueEvent.getPlayQueueItem();
         if (item != null) {
             compositionName = formatCompositionName(item.getComposition());
             compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
             compositionId = item.getComposition().getId();
+            compositionUpdateTime = item.getComposition().getDateModified().getTime();
         }
-        updateComposition(compositionName, compositionAuthor, compositionId);
+        updateComposition(compositionName, compositionAuthor, compositionId, compositionUpdateTime);
     }
 
     private void updateComposition(String compositionName,
                                    String compositionAuthor,
-                                   long compositionId) {
-        WidgetDataHolder.setCompositionName(context, compositionName);
-        WidgetDataHolder.setCompositionAuthor(context, compositionAuthor);
-        WidgetDataHolder.setCompositionId(context, compositionId);
+                                   long compositionId,
+                                   long updateTime) {
+        WidgetDataHolder.setCompositionInfo(context, compositionName, compositionAuthor, compositionId, updateTime);
 
         updateWidgets(intent -> {
             intent.putExtra(WIDGET_ACTION, ACTION_UPDATE_COMPOSITION);
             intent.putExtra(COMPOSITION_NAME_ARG, compositionName);
             intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
             intent.putExtra(COMPOSITION_ID_ARG, compositionId);
+            intent.putExtra(COMPOSITION_UPDATE_TIME_ARG, updateTime);
         });
     }
 

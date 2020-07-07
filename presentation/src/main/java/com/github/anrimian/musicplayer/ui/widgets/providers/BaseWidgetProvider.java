@@ -13,7 +13,7 @@ import androidx.annotation.LayoutRes;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
@@ -29,6 +29,7 @@ import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
@@ -48,14 +49,17 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         String compositionName;
         String compositionAuthor;
         long compositionId;
+        long compositionUpdateTime;
         if (ACTION_UPDATE_COMPOSITION.equals(intent.getStringExtra(WIDGET_ACTION))) {
             compositionName = intent.getStringExtra(COMPOSITION_NAME_ARG);
             compositionAuthor = intent.getStringExtra(COMPOSITION_AUTHOR_ARG);
             compositionId = intent.getLongExtra(COMPOSITION_ID_ARG, 0);
+            compositionUpdateTime = intent.getLongExtra(COMPOSITION_UPDATE_TIME_ARG, 0);
         } else {
             compositionName = WidgetDataHolder.getCompositionName(context);
             compositionAuthor = WidgetDataHolder.getCompositionAuthor(context);
             compositionId = WidgetDataHolder.getCompositionId(context);
+            compositionUpdateTime = WidgetDataHolder.getCompositionUpdateTime(context);
         }
 
         int queueSize;
@@ -70,7 +74,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         boolean randomPlayModeEnabled = false;
         int repeatMode = RepeatMode.NONE;
         if (Permissions.hasFilePermission(context)) {
-            MusicPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
+            LibraryPlayerInteractor musicPlayerInteractor = appComponent.musicPlayerInteractor();
             play = musicPlayerInteractor.getPlayerState() == PlayerState.PLAY;
             randomPlayModeEnabled = musicPlayerInteractor.isRandomPlayingEnabled();
             repeatMode = musicPlayerInteractor.getRepeatMode();
@@ -94,6 +98,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     compositionName,
                     compositionAuthor,
                     compositionId,
+                    compositionUpdateTime,
                     queueSize,
                     enabled,
                     showCovers,
@@ -110,6 +115,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   String compositionName,
                                   String compositionAuthor,
                                   long compositionId,
+                                  long compositionUpdateTime,
                                   int queueSize,
                                   boolean enabled,
                                   boolean showCovers,
@@ -164,6 +170,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                               String compositionName,
                               String compositionAuthor,
                               long compositionId,
+                              long compositionUpdateTime,
                               int queueSize,
                               boolean enabled,
                               boolean showCovers,
@@ -179,6 +186,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 compositionName,
                 compositionAuthor,
                 compositionId,
+                compositionUpdateTime,
                 queueSize,
                 enabled,
                 showCovers,

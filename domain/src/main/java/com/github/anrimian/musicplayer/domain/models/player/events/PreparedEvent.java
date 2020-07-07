@@ -1,19 +1,19 @@
 package com.github.anrimian.musicplayer.domain.models.player.events;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 
 /**
  * Created on 24.06.2018.
  */
 public class PreparedEvent implements PlayerEvent {
 
-    private final Composition composition;
+    private final CompositionSource composition;
 
-    public PreparedEvent(Composition composition) {
+    public PreparedEvent(CompositionSource composition) {
         this.composition = composition;
     }
 
-    public Composition getComposition() {
+    public CompositionSource getComposition() {
         return composition;
     }
 

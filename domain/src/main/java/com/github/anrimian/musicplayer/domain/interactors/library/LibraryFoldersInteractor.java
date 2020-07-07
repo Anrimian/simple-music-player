@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.library;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -30,7 +30,7 @@ public class LibraryFoldersInteractor {
 
     private final LibraryRepository libraryRepository;
     private final EditorRepository editorRepository;
-    private final MusicPlayerInteractor musicPlayerInteractor;
+    private final LibraryPlayerInteractor musicPlayerInteractor;
     private final PlayListsRepository playListsRepository;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
@@ -38,7 +38,7 @@ public class LibraryFoldersInteractor {
 
     public LibraryFoldersInteractor(LibraryRepository libraryRepository,
                                     EditorRepository editorRepository,
-                                    MusicPlayerInteractor musicPlayerInteractor,
+                                    LibraryPlayerInteractor musicPlayerInteractor,
                                     PlayListsRepository playListsRepository,
                                     SettingsRepository settingsRepository,
                                     UiStateRepository uiStateRepository,

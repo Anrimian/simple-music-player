@@ -1,35 +1,23 @@
 package com.github.anrimian.musicplayer.ui.editor.composition.list;
 
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemGenreChipBinding;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class GenreViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.tv_genre)
-    TextView tvGenre;
-
-    @BindView(R.id.iv_remove)
-    ImageView ivRemove;
-
-    @BindView(R.id.chip_container)
-    View chipContainer;
+    private ItemGenreChipBinding viewBinding;
 
     private ShortGenre genre;
 
@@ -38,10 +26,11 @@ class GenreViewHolder extends BaseViewHolder {
                     Callback<ShortGenre> onLongClickListener,
                     Callback<ShortGenre> onRemoveClickListener) {
         super(parent, R.layout.item_genre_chip);
-        ButterKnife.bind(this, itemView);
-        chipContainer.setOnClickListener(v -> onClickListener.call(genre));
-        onLongClick(chipContainer, () -> onLongClickListener.call(genre));
-        ivRemove.setOnClickListener(v -> onRemoveClickListener.call(genre));
+        viewBinding = ItemGenreChipBinding.bind(itemView);
+
+        viewBinding.chipContainer.setOnClickListener(v -> onClickListener.call(genre));
+        onLongClick(viewBinding.chipContainer, () -> onLongClickListener.call(genre));
+        viewBinding.ivRemove.setOnClickListener(v -> onRemoveClickListener.call(genre));
     }
 
     void bind(ShortGenre genre) {
@@ -63,6 +52,6 @@ class GenreViewHolder extends BaseViewHolder {
     }
 
     private void showName() {
-        tvGenre.setText(genre.getName());
+        viewBinding.tvGenre.setText(genre.getName());
     }
 }

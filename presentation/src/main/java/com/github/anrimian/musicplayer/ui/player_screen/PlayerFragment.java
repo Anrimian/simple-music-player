@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
@@ -18,7 +19,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
@@ -29,6 +29,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
+import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -45,6 +47,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -76,8 +79,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
@@ -111,75 +112,32 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     @InjectPresenter
     PlayerPresenter presenter;
 
-    @BindView(R.id.drawer)
-    DrawerLayout drawer;
-
-    @BindView(R.id.navigation_view)
-    NavigationView navigationView;
-
-    @BindView(R.id.rv_playlist)
-    RecyclerView rvPlayList;
-
-    @BindView(R.id.iv_play_pause)
-    ImageView ivPlayPause;
-
-    @BindView(R.id.iv_skip_to_previous)
-    ImageView ivSkipToPrevious;
-
-    @BindView(R.id.iv_skip_to_next)
-    ImageView ivSkipToNext;
-
-    @BindView(R.id.drawer_fragment_container)
-    JugglerView fragmentContainer;
-
-    @BindView(R.id.tv_current_composition)
-    TextView tvCurrentComposition;
-
-    @BindView(R.id.btn_infinite_play)
-    ImageView btnRepeatMode;
-
-    @BindView(R.id.btn_random_play)
-    ImageView btnRandomPlay;
-
-    @BindView(R.id.tv_played_time)
-    TextView tvPlayedTime;
-
-    @BindView(R.id.tv_total_time)
-    TextView tvTotalTime;
-
-    @BindView(R.id.sb_track_state)
-    AppCompatSeekBar sbTrackState;
-
-    @BindView(R.id.bottom_sheet_top_shadow)
-    View bottomSheetTopShadow;
-
-    @BindView(R.id.top_panel)
-    View topBottomSheetPanel;
-
-    @BindView(R.id.iv_music_icon)
-    ImageView ivMusicIcon;
-
-    @BindView(R.id.btn_actions_menu)
-    ImageView btnActionsMenu;
-
-    @BindView(R.id.tv_current_composition_author)
-    TextView tvCurrentCompositionAuthor;
-
-    @BindView(R.id.cl_play_queue_container)
-    CoordinatorLayout clPlayQueueContainer;
-
-    @BindView(R.id.ml_bottom_sheet)
+    private FragmentDrawerBinding viewBinding;
+    private PartialDetailedMusicBinding panelBinding;
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private RecyclerView rvPlayList;
+    private ImageView ivPlayPause;
+    private ImageView ivSkipToPrevious;
+    private ImageView ivSkipToNext;
+    private JugglerView fragmentContainer;
+    private TextView tvCurrentComposition;
+    private ImageView btnRepeatMode;
+    private ImageView btnRandomPlay;
+    private TextView tvPlayedTime;
+    private TextView tvTotalTime;
+    private SeekBar sbTrackState;
+    private View bottomSheetTopShadow;
+    private View topBottomSheetPanel;
+    private ImageView ivMusicIcon;
+    private ImageView btnActionsMenu;
+    private TextView tvCurrentCompositionAuthor;
+    private CoordinatorLayout clPlayQueueContainer;
     @Nullable
-    MotionLayout mlBottomSheet;
-
-    @BindView(R.id.toolbar)
-    AdvancedToolbar toolbar;
-
-    @BindView(R.id.acv_play_queue)
-    ActionMenuView acvPlayQueueMenu;
-
-    @BindView(R.id.tv_queue_subtitle)
-    TextView tvQueueSubtitle;
+    private MotionLayout mlBottomSheet;
+    private AdvancedToolbar toolbar;
+    private ActionMenuView acvPlayQueueMenu;
+    private TextView tvQueueSubtitle;
 
     private PlayQueueAdapter playQueueAdapter;
 
@@ -227,13 +185,39 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_drawer, container, false);
+        viewBinding = FragmentDrawerBinding.inflate(inflater, container, false);
+        toolbar = viewBinding.toolbar.getRoot();
+        fragmentContainer = viewBinding.drawerFragmentContainer;
+        mlBottomSheet = viewBinding.getRoot().findViewById(R.id.ml_bottom_sheet);
+        navigationView = viewBinding.navigationView;
+        drawer = viewBinding.drawer;
+        acvPlayQueueMenu = viewBinding.toolbarPlayQueue.acvPlayQueue;
+
+        panelBinding = viewBinding.clMusicPanel;
+        assert panelBinding != null;
+        ivSkipToPrevious = panelBinding.ivSkipToPrevious;
+        ivSkipToNext = panelBinding.ivSkipToNext;
+        btnRepeatMode = panelBinding.btnInfinitePlay;
+        rvPlayList = viewBinding.rvPlaylist;
+        btnActionsMenu = panelBinding.btnActionsMenu;
+        topBottomSheetPanel = panelBinding.topPanel;
+        sbTrackState = panelBinding.sbTrackState;
+        ivPlayPause = panelBinding.ivPlayPause;
+        btnRandomPlay = panelBinding.btnRandomPlay;
+        bottomSheetTopShadow = viewBinding.bottomSheetTopShadow;
+        tvCurrentComposition = panelBinding.tvCurrentComposition;
+        tvPlayedTime = panelBinding.tvPlayedTime;
+        tvTotalTime = panelBinding.tvTotalTime;
+        ivMusicIcon = panelBinding.ivMusicIcon;
+        tvCurrentCompositionAuthor = panelBinding.tvCurrentCompositionAuthor;
+        clPlayQueueContainer = viewBinding.clPlayQueueContainer;
+        tvQueueSubtitle = viewBinding.toolbarPlayQueue.tvQueueSubtitle;
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
 
@@ -247,7 +231,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         navigation.setEnterAnimation(R.anim.anim_slide_in_right);
         navigation.setRootExitAnimation(R.anim.anim_alpha_disappear);
 
-        drawerLockStateProcessor = new DrawerLockStateProcessor(drawer);
+        drawerLockStateProcessor = new DrawerLockStateProcessor(viewBinding.drawer);
         drawerLockStateProcessor.setupWithNavigation(navigation);
         viewDisposable.add(toolbar.getSearchModeObservable()
                 .subscribe(drawerLockStateProcessor::onSearchModeChanged)
@@ -261,6 +245,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                     drawerLockStateProcessor::onBottomSheetOpened);
         } else {
             playerPanelWrapper = new PlayerPanelWrapperImpl(view,
+                    viewBinding,
+                    panelBinding,
+                    mlBottomSheet,
                     requireActivity(),
                     savedInstanceState,
                     presenter::onBottomPanelCollapsed,
@@ -705,6 +692,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_clear_play_queue: {

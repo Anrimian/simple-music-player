@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -31,7 +31,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryCompositionsView>
         extends MvpPresenter<T> {
 
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     protected final ErrorParser errorParser;
@@ -54,7 +54,7 @@ public abstract class BaseLibraryCompositionsPresenter<T extends BaseLibraryComp
     @Nullable
     private String searchText;
 
-    public BaseLibraryCompositionsPresenter(MusicPlayerInteractor playerInteractor,
+    public BaseLibraryCompositionsPresenter(LibraryPlayerInteractor playerInteractor,
                                             PlayListsInteractor playListsInteractor,
                                             DisplaySettingsInteractor displaySettingsInteractor,
                                             ErrorParser errorParser,

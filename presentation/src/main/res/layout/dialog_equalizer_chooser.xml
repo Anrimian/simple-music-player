@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
+        android:layout_marginBottom="@dimen/content_internal_margin">
+
+        <RadioButton
+            android:id="@+id/rbUseSystemEqualizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:paddingStart="@dimen/radio_button_text_margin_start"
+            android:paddingEnd="@dimen/radio_button_text_margin_start"
+            android:paddingTop="@dimen/radio_button_text_vertical_padding"
+            android:paddingBottom="@dimen/radio_button_text_vertical_padding"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_internal_margin"
+            android:text="@string/system_equalizer"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnOpenSystemEqualizer"/>
+
+        <Button
+            style="@style/ButtonOutlineStyle"
+            android:id="@+id/btnOpenSystemEqualizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="@id/tvSystemEqualizerDescription"/>
+
+        <TextView
+            android:id="@+id/tvSystemEqualizerDescription"
+            style="@style/TextStyle.Subtitle.Small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            android:layout_marginEnd="@dimen/content_internal_margin"
+            android:paddingStart="@dimen/radio_button_description_padding"
+            app:layout_constraintTop_toBottomOf="@id/rbUseSystemEqualizer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnOpenSystemEqualizer"
+            tools:text="descriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescriptiondescription"
+            tools:ignore="RtlSymmetry"/>
+
+        <RadioButton
+            android:id="@+id/rbDisableEqualizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_text_primary"
+            android:paddingStart="@dimen/radio_button_text_margin_start"
+            android:paddingEnd="@dimen/radio_button_text_margin_start"
+            android:paddingTop="@dimen/radio_button_text_vertical_padding"
+            android:paddingBottom="@dimen/radio_button_text_vertical_padding"
+            android:layout_marginLeft="@dimen/content_horizontal_margin"
+            android:layout_marginRight="@dimen/content_horizontal_margin"
+            android:text="@string/no_equalizer"
+            app:layout_constraintTop_toBottomOf="@id/tvSystemEqualizerDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

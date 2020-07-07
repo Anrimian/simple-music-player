@@ -35,6 +35,11 @@
     <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
     </style>
 
+    <style name="ButtonOutlineStyle" parent="@style/Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_outline_button</item>
+        <item name="android:textColor">@color/color_accent_state</item>
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
 
     </style>
@@ -103,7 +108,7 @@
     </style>
 
     <style name="TextStyle.Subtitle">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:textSize">14sp</item>
     </style>
 

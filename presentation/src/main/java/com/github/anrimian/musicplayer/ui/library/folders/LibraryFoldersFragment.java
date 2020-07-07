@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentLibraryFoldersBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
@@ -35,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
@@ -55,8 +57,6 @@ import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
@@ -88,32 +88,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @InjectPresenter
     LibraryFoldersPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.fab)
-    View fab;
-
-    @BindView(R.id.header_container)
-    View headerContainer;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
-
-    @BindView(R.id.content_container)
-    View contentContainer;
-
-    @BindView(R.id.vg_file_menu)
-    View vgFileMenu;
-
-    @BindView(R.id.iv_cut)
-    View ivCut;
-
-    @BindView(R.id.iv_copy)
-    View ivCopy;
-
-    @BindView(R.id.vg_move_file_menu)
-    View vgMoveFileMenu;
+    private FragmentLibraryFoldersBinding viewBinding;
+    private RecyclerView recyclerView;
+    private CoordinatorLayout clListContainer;
 
     private final CompositeDisposable fragmentDisposable = new CompositeDisposable();
 
@@ -147,13 +124,15 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_library_folders, container, false);
+        viewBinding = FragmentLibraryFoldersBinding.inflate(inflater, container, false);
+        recyclerView = viewBinding.recyclerView;
+        clListContainer = viewBinding.listContainer;
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         fragmentDisposable.add(toolbar.getSelectionModeObservable()
@@ -178,17 +157,17 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter::onCompositionIconClicked);
         recyclerView.setAdapter(adapter);
 
-        headerViewWrapper = new HeaderViewWrapper(headerContainer);
+        headerViewWrapper = new HeaderViewWrapper(viewBinding.headerContainer);
         headerViewWrapper.setOnClickListener(v -> presenter.onBackPathButtonClicked());
 
-        fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
-        vgFileMenu.setVisibility(INVISIBLE);
-        vgMoveFileMenu.setVisibility(INVISIBLE);
-        formatLinkedFabView(vgFileMenu, fab);
-        formatLinkedFabView(vgMoveFileMenu, fab);
+        viewBinding.fab.setOnClickListener(v -> presenter.onPlayAllButtonClicked());
+        viewBinding.vgFileMenu.setVisibility(INVISIBLE);
+        viewBinding.vgMoveFileMenu.setVisibility(INVISIBLE);
+        formatLinkedFabView(viewBinding.vgFileMenu, viewBinding.fab);
+        formatLinkedFabView(viewBinding.vgMoveFileMenu, viewBinding.fab);
 
-        ivCut.setOnClickListener(v -> presenter.onMoveSelectedFoldersButtonClicked());
-        ivCopy.setOnClickListener(v -> presenter.onCopySelectedFoldersButtonClicked());
+        viewBinding.ivCut.setOnClickListener(v -> presenter.onMoveSelectedFoldersButtonClicked());
+        viewBinding.ivCopy.setOnClickListener(v -> presenter.onCopySelectedFoldersButtonClicked());
 
         //maybe will be moved to root fragment later
         view.findViewById(R.id.iv_close).setOnClickListener(v -> presenter.onCloseMoveMenuClicked());
@@ -235,7 +214,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
         if (getFolderId() != null) {
             SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
-            SlidrPanel.replace(contentContainer,
+            SlidrPanel.replace(viewBinding.contentContainer,
                     () -> {
                         toolbar.showSelectionMode(0);
                         FragmentNavigation.from(requireFragmentManager()).goBack();
@@ -291,19 +270,19 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showEmptyList() {
-        fab.setVisibility(View.GONE);
+        viewBinding.fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_on_device_not_found, false);
     }
 
     @Override
     public void showEmptySearchResult() {
-        fab.setVisibility(View.GONE);
+        viewBinding.fab.setVisibility(View.GONE);
         progressViewWrapper.showMessage(R.string.compositions_and_folders_for_search_not_found, false);
     }
 
     @Override
     public void showList() {
-        fab.setVisibility(VISIBLE);
+        viewBinding.fab.setVisibility(VISIBLE);
         progressViewWrapper.hideAll();
     }
 
@@ -505,7 +484,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
 
     @Override
     public void showMoveFileMenu(boolean show) {
-        animateVisibility(vgMoveFileMenu, show? VISIBLE: INVISIBLE);
+        animateVisibility(viewBinding.vgMoveFileMenu, show? VISIBLE: INVISIBLE);
     }
 
     @Override
@@ -558,7 +537,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     }
 
     private void onSelectionModeChanged(boolean enabled) {
-        animateVisibility(vgFileMenu, enabled? VISIBLE: INVISIBLE);
+        animateVisibility(viewBinding.vgFileMenu, enabled? VISIBLE: INVISIBLE);
     }
 
     private void onCompositionActionSelected(Composition composition, @MenuRes int menuItemId) {
@@ -685,6 +664,10 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 //noinspection ConstantConditions
                 FragmentNavigation.from(getParentFragment().requireFragmentManager())
                         .addNewFragment(new ExcludedFoldersFragment());
+                break;
+            }
+            case R.id.menu_equalizer: {
+                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_search: {

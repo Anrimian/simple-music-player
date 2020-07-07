@@ -59,7 +59,7 @@
                 android:layout_marginStart="@dimen/toolbar_content_start"/>
 
             <TextView
-                android:id="@+id/tv_theme_name"
+                android:id="@+id/tv_theme"
                 style="@style/TextStyleButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

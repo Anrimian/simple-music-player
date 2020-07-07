@@ -14,10 +14,14 @@ import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresen
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
+
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 21.04.2018.
@@ -66,7 +70,8 @@ public class SettingsModule {
 
     @Provides
     @Nonnull
-    PlayerSettingsPresenter playerSettingsPresenter(PlayerSettingsInteractor playerSettingsInteractor) {
-        return new PlayerSettingsPresenter(playerSettingsInteractor);
+    PlayerSettingsPresenter playerSettingsPresenter(PlayerSettingsInteractor playerSettingsInteractor,
+                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler);
     }
 }

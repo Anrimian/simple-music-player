@@ -5,10 +5,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.MenuRes;
@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogCompositionMenuBinding;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.domain.utils.functions.TripleCallback;
@@ -31,9 +32,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ARG;
@@ -53,20 +51,7 @@ import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.Recyc
 
 public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.title_shadow)
-    View titleShadow;
-
-    @BindView(R.id.tv_composition_name)
-    TextView tvCompositionName;
-
-    @BindView(R.id.tv_composition_author)
-    TextView tvCompositionInfo;
-
-    @BindView(R.id.list_container)
-    View listContainer;
+    private DialogCompositionMenuBinding viewBinding;
 
     private Composition composition;
 
@@ -110,14 +95,13 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void setupDialog(@NonNull Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View view = View.inflate(getContext(), R.layout.dialog_composition_menu, null);
+        viewBinding = DialogCompositionMenuBinding.inflate(LayoutInflater.from(getContext()));
+        View view = viewBinding.getRoot();
         dialog.setContentView(view);
 
-        ButterKnife.bind(this, view);
-
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        attachDynamicShadow(recyclerView, titleShadow);
+        viewBinding.recyclerView.setLayoutManager(layoutManager);
+        attachDynamicShadow(viewBinding.recyclerView, viewBinding.titleShadow);
 
         Bundle args = requireArguments();
         //noinspection ConstantConditions
@@ -126,15 +110,15 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
         Menu menu = createMenu(requireContext(), args.getInt(MENU_ARG));
         MenuAdapter menuAdapter = new MenuAdapter(menu, R.layout.item_menu);
         menuAdapter.setOnItemClickListener(this::onActionItemClicked);
-        recyclerView.setAdapter(menuAdapter);
+        viewBinding.recyclerView.setAdapter(menuAdapter);
 
-        tvCompositionName.setText(formatCompositionName(composition));
+        viewBinding.tvCompositionName.setText(formatCompositionName(composition));
 
         SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(requireContext());
         sb.append(formatCompositionAuthor(composition, requireContext()));
         sb.append(formatMilliseconds(composition.getDuration()));
         sb.append(formatSize(requireContext(), composition.getSize()));
-        tvCompositionInfo.setText(sb);
+        viewBinding.tvCompositionInfo.setText(sb);
 
         view.measure(
                 makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
@@ -167,14 +151,14 @@ public class CompositionActionDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void showBottomSheetSlided(float slideOffset) {
-        recyclerView.post(() -> {
+        viewBinding.recyclerView.post(() -> {
             View contentView = getContentView(getActivity());
             if (contentView == null) {
                 return;
             }
             float usableSlideOffset = slideOffset;
             int activityHeight = contentView.getHeight() - getStatusBarHeight(requireContext());
-            int viewHeight = listContainer.getHeight();
+            int viewHeight = viewBinding.listContainer.getHeight();
             if (activityHeight > viewHeight) {
                 usableSlideOffset = 0;
             }

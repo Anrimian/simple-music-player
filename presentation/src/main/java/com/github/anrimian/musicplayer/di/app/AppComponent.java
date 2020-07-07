@@ -1,18 +1,21 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -53,8 +56,9 @@ public interface AppComponent {
     SettingsComponent settingsComponent();
     CompositionEditorComponent compositionEditorComponent(CompositionEditorModule module);
     AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
+    ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
 
-    MusicPlayerInteractor musicPlayerInteractor();
+    LibraryPlayerInteractor musicPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
 
     PlayListsPresenter playListsPresenter();
@@ -73,6 +77,7 @@ public interface AppComponent {
     FileLog fileLog();
 
     ThemeController themeController();
+    EqualizerController equalizerController();
 
     void inject(MusicService musicService);
 

@@ -2,10 +2,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/nsv_container"
+        android:id="@+id/nsvContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="ifContentScrolls"
@@ -17,7 +18,7 @@
 
             <CheckBox
                 style="@style/CheckboxStyle"
-                android:id="@+id/cb_decrease_volume"
+                android:id="@+id/cbDecreaseVolume"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/decrease_volume_on_notification"
@@ -27,6 +28,50 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
+
+            <View style="@style/Divider.Horizontal.Constraint"
+                android:id="@+id/dividerDecreaseVolume"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbDecreaseVolume" />
+
+            <TextView
+                style="@style/TextStyle.Medium"
+                android:id="@+id/tvEqualizer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_vertical_margin"
+                android:text="@string/equalizer"
+                app:layout_constraintTop_toBottomOf="@id/dividerDecreaseVolume"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                style="@style/TextStyle.Subtitle"
+                android:id="@+id/tvEqualizerState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_spacing_margin"
+                android:paddingBottom="@dimen/content_vertical_margin"
+                tools:text="@string/no_equalizer"
+                app:layout_constraintTop_toBottomOf="@id/tvEqualizer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <FrameLayout
+                android:id="@+id/flEqualizerClickableArea"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                app:layout_constraintTop_toTopOf="@id/tvEqualizer"
+                app:layout_constraintBottom_toBottomOf="@id/tvEqualizerState"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

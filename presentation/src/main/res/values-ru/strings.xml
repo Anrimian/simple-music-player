@@ -185,7 +185,6 @@
     <string name="ignored_folder_added">Папка \'%s\' добавлена в список игнорируемых папок</string>
     <string name="excluded_folders">Игнорируемые папки</string>
     <string name="remove_excluded_folder">Убрать игнорируемую папку</string>
-    <string name="no_excluded_folders">Нет игнорируемых папок</string>
     <string name="ignored_folder_removed">Игнорируемая папка убрана</string>
     <string name="moving_and_destination_folders_matches">Перемещаемая и целевая папка совпадает</string>
     <string name="folder_with_this_name_already_exists_in_dest_folder">Папка с таким именем уже существует в целевой папке</string>
@@ -203,6 +202,24 @@
     <string name="log_file_deleted">Файл удалён</string>
     <string name="pick_email_app_to_send">Выберите приложение email для отправки</string>
     <string name="clear_play_queue">Очистить очередь воспроизведения</string>
+    <string name="no_excluded_folders">Папки, исключённые из медиа сканера, будут появляться здесь</string>
+    <string name="keep_playing_after_window_close">Продолжать воспроизведение после закрытия окна</string>
+    <string name="unknown_play_error">Неизвестная ошибка воспроизведения</string>
+    <string name="equalizer">Эквалайзер</string>
+    <string name="system_equalizer">Системный эквалайзер</string>
+    <string name="no_equalizer">Не использовать</string>
+    <string name="external_equalizer_description">Работа системного эквалайзера зависит от внешнего приложения-эквалайзера и может не работать с некоторыми приложениями</string>
+    <string name="external_equalizer_not_found">Внешнее приложение-эквалайзер не найдено</string>
+    <string name="open">Открыть</string>
+    <string name="cover">Обложка</string>
+    <string name="change_cover">Изменить обложку</string>
+    <string name="pick_from_gallery">Выбрать из галереи</string>
+    <string name="remove_cover">Убрать обложку</string>
+    <string name="changing_cover_progress">Смена обложки…</string>
+    <string name="editor_timeout_error">Время ожидания редактора тэгов истекло. Возможно, формат файла неподдерживается</string>
+    <string name="change_lyrics">Изменить текст композиции</string>
+    <string name="lyrics">Текст композиции</string>
+    <string name="check_tags_error">Не удалось проверить теги композиции: %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>

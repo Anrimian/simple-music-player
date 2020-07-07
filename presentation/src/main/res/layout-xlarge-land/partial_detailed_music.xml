@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,166 +7,172 @@
     android:layout_height="@dimen/bottom_sheet_expand_height"
     android:background="?attr/playerPanelBackground">
 
-    <!--uses to catch unnecessary clicks-->
-    <View
-        android:id="@+id/bottom_panel"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:importantForAccessibility="no"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/top_panel"
-        android:layout_width="0dp"
-        android:layout_height="0dp" />
+        <!--uses to catch unnecessary clicks-->
+        <View
+            android:id="@+id/bottom_panel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageView
-        android:id="@+id/iv_skip_to_previous"
-        style="@style/ButtonStyle.Main"
-        android:layout_marginEnd="@dimen/content_spacing_margin"
-        android:layout_marginStart="@dimen/content_spacing_margin"
-        android:contentDescription="@string/previous_track"
-        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/btn_random_play"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
-        app:srcCompat="@drawable/ic_skip_previous" />
+        <View
+            android:id="@+id/top_panel"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
 
-    <ImageView
-        android:id="@+id/iv_play_pause"
-        style="@style/ButtonStyle.Main"
-        app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
-        app:layout_constraintTop_toTopOf="@id/btn_random_play"
-        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-        app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous"
-        app:srcCompat="@drawable/ic_pause"
-        tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/iv_skip_to_previous"
+            style="@style/ButtonStyle.Main"
+            android:layout_marginEnd="@dimen/content_spacing_margin"
+            android:layout_marginStart="@dimen/content_spacing_margin"
+            android:contentDescription="@string/previous_track"
+            app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/btn_random_play"
+            app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
+            app:srcCompat="@drawable/ic_skip_previous" />
 
-    <ImageView
-        android:id="@+id/iv_skip_to_next"
-        style="@style/ButtonStyle.Main"
-        android:layout_marginEnd="@dimen/content_spacing_margin"
-        android:layout_marginStart="@dimen/content_spacing_margin"
-        android:contentDescription="@string/next_track"
-        app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
-        app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
-        app:srcCompat="@drawable/ic_skip_next" />
+        <ImageView
+            android:id="@+id/iv_play_pause"
+            style="@style/ButtonStyle.Main"
+            app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
+            app:layout_constraintTop_toTopOf="@id/btn_random_play"
+            app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
+            app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous"
+            app:srcCompat="@drawable/ic_pause"
+            tools:ignore="ContentDescription" />
 
-    <TextView
-        android:id="@+id/tv_current_composition"
-        style="@style/TextStyle.Composition"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:layout_marginBottom="@dimen/content_spacing_margin"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="@+id/iv_music_icon"
-        app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
-        app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
-        app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
-        tools:text="testtggpptesttggppptresttststststtsttesttggppptresttststststtstptresttststststtst" />
+        <ImageView
+            android:id="@+id/iv_skip_to_next"
+            style="@style/ButtonStyle.Main"
+            android:layout_marginEnd="@dimen/content_spacing_margin"
+            android:layout_marginStart="@dimen/content_spacing_margin"
+            android:contentDescription="@string/next_track"
+            app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
+            app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
+            app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
+            app:srcCompat="@drawable/ic_skip_next" />
 
-    <ImageView
-        android:id="@+id/btn_random_play"
-        style="@style/ButtonStyle"
-        android:contentDescription="@string/content_description_shuffle"
-        android:layout_marginBottom="@dimen/content_vertical_margin"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_shuffle"/>
+        <TextView
+            android:id="@+id/tv_current_composition"
+            style="@style/TextStyle.Composition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:layout_marginBottom="@dimen/content_spacing_margin"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="@+id/iv_music_icon"
+            app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
+            app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
+            app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
+            tools:text="testtggpptesttggppptresttststststtsttesttggppptresttststststtstptresttststststtst" />
 
-    <ImageView
-        android:id="@+id/btn_infinite_play"
-        style="@style/ButtonStyle"
-        android:contentDescription="@string/content_description_repeat_mode"
-        android:layout_marginBottom="@dimen/content_vertical_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_repeat" />
+        <ImageView
+            android:id="@+id/btn_random_play"
+            style="@style/ButtonStyle"
+            android:contentDescription="@string/content_description_shuffle"
+            android:layout_marginBottom="@dimen/content_vertical_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_shuffle"/>
 
-    <TextView
-        android:id="@+id/tv_played_time"
-        style="@style/TextStyle.Time"
-        android:gravity="center_vertical|start"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
-        app:layout_constraintStart_toStartOf="@+id/btn_random_play"
-        app:layout_constraintEnd_toStartOf="@id/tv_total_time"
-        tools:text="00:11"/>
+        <ImageView
+            android:id="@+id/btn_infinite_play"
+            style="@style/ButtonStyle"
+            android:contentDescription="@string/content_description_repeat_mode"
+            android:layout_marginBottom="@dimen/content_vertical_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_repeat" />
 
-    <TextView
-        android:id="@+id/tv_total_time"
-        style="@style/TextStyle.Time"
-        android:gravity="center_vertical|end"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
-        app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
-        app:layout_constraintStart_toEndOf="@id/tv_played_time"
-        tools:text="00:11" />
+        <TextView
+            android:id="@+id/tv_played_time"
+            style="@style/TextStyle.Time"
+            android:gravity="center_vertical|start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
+            app:layout_constraintStart_toStartOf="@+id/btn_random_play"
+            app:layout_constraintEnd_toStartOf="@id/tv_total_time"
+            tools:text="00:11"/>
 
-    <SeekBar
-        android:id="@+id/sb_track_state"
-        style="@style/SeekBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/content_spacing_margin"
-        android:layout_marginLeft="1.5dp"
-        android:layout_marginRight="1.5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tv_played_time"/>
+        <TextView
+            android:id="@+id/tv_total_time"
+            style="@style/TextStyle.Time"
+            android:gravity="center_vertical|end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
+            app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
+            app:layout_constraintStart_toEndOf="@id/tv_played_time"
+            tools:text="00:11" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_music_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/folder"
-        android:layout_gravity="center|start"
-        android:scaleType="centerCrop"
-        android:layout_marginTop="@dimen/content_vertical_margin"
-        android:layout_marginBottom="@dimen/content_internal_margin"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sb_track_state"
-        app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
-        tools:srcCompat="@drawable/ic_music_placeholder" />
+        <SeekBar
+            android:id="@+id/sb_track_state"
+            style="@style/SeekBarStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/content_spacing_margin"
+            android:layout_marginLeft="1.5dp"
+            android:layout_marginRight="1.5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tv_played_time"/>
 
-    <ImageView
-        android:id="@+id/btn_actions_menu"
-        style="@style/ButtonStyle.Menu"
-        android:contentDescription="@string/content_description_menu"
-        android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_dots_vertical" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_music_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/folder"
+            android:layout_gravity="center|start"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="@dimen/content_vertical_margin"
+            android:layout_marginBottom="@dimen/content_internal_margin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/sb_track_state"
+            app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
+            tools:srcCompat="@drawable/ic_music_placeholder" />
 
-    <TextView
-        android:id="@+id/tv_current_composition_author"
-        style="@style/TextStyle.Subtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:layout_marginStart="@dimen/content_internal_margin"
-        android:layout_marginEnd="@dimen/content_internal_margin"
-        app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_music_icon"
-        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
-        app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
-        tools:text="ddddddddddddddddddddd"/>
+        <ImageView
+            android:id="@+id/btn_actions_menu"
+            style="@style/ButtonStyle.Menu"
+            android:contentDescription="@string/content_description_menu"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dots_vertical" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_current_composition_author"
+            style="@style/TextStyle.Subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginStart="@dimen/content_internal_margin"
+            android:layout_marginEnd="@dimen/content_internal_margin"
+            app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_music_icon"
+            app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
+            app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
+            tools:text="ddddddddddddddddddddd"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 

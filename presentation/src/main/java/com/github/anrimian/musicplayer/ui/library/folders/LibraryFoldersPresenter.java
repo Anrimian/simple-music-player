@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import android.annotation.SuppressLint;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
@@ -42,7 +42,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFoldersScreenInteractor interactor;
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
@@ -79,7 +79,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     public LibraryFoldersPresenter(@Nullable Long folderId,
                                    LibraryFoldersScreenInteractor interactor,
-                                   MusicPlayerInteractor playerInteractor,
+                                   LibraryPlayerInteractor playerInteractor,
                                    DisplaySettingsInteractor displaySettingsInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {

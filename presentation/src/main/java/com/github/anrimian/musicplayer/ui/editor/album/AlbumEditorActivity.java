@@ -3,33 +3,25 @@ package com.github.anrimian.musicplayer.ui.editor.album;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
-import com.r0adkll.slidr.Slidr;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -41,8 +33,6 @@ import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEditorView {
@@ -50,35 +40,7 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     @InjectPresenter
     AlbumEditorPresenter presenter;
 
-    @BindView(R.id.container)
-    ViewGroup container;
-
-    @BindView(R.id.tv_author)
-    TextView tvAuthor;
-
-    @BindView(R.id.tv_name)
-    TextView tvName;
-
-    @BindView(R.id.tv_author_hint)
-    TextView tvAuthorHint;
-
-    @BindView(R.id.tv_name_hint)
-    TextView tvNameHint;
-
-    @BindView(R.id.change_author_clickable_area)
-    View changeAuthorClickableArea;
-
-    @BindView(R.id.change_name_clickable_area)
-    View changeNameClickableArea;
-
-    @BindView(R.id.iv_name_edit)
-    ImageView ivNameEdit;
-
-    @BindView(R.id.iv_author_edit)
-    ImageView ivAuthorEdit;
-
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    private ActivityAlbumEditBinding viewBinding;
 
     private DialogFragmentRunner<InputTextDialogFragment> authorDialogFragmentRunner;
     private DialogFragmentRunner<InputTextDialogFragment> nameDialogFragmentRunner;
@@ -100,25 +62,25 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     protected void onCreate(Bundle savedInstanceState) {
         Components.getAppComponent().themeController().applyCurrentSlidrTheme(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_album_edit);
-        ButterKnife.bind(this);
+        viewBinding = ActivityAlbumEditBinding.inflate(getLayoutInflater());
+        setContentView(viewBinding.getRoot());
 
         AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground);
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(viewBinding.toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(R.string.edit_album_tags);
         }
 
-        CompatUtils.setMainButtonStyle(ivNameEdit);
-        CompatUtils.setMainButtonStyle(ivAuthorEdit);
+        CompatUtils.setMainButtonStyle(viewBinding.ivNameEdit);
+        CompatUtils.setMainButtonStyle(viewBinding.ivAuthorEdit);
 
-        changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
-        changeNameClickableArea.setOnClickListener(v -> presenter.onChangeNameClicked());
-        onLongClick(changeAuthorClickableArea, () -> copyText(tvAuthor, tvAuthorHint));
-        onLongClick(changeNameClickableArea, () -> copyText(tvName, tvNameHint));
+        viewBinding.changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
+        viewBinding.changeNameClickableArea.setOnClickListener(v -> presenter.onChangeNameClicked());
+        onLongClick(viewBinding.changeAuthorClickableArea, () -> copyText(viewBinding.tvAuthor, viewBinding.tvAuthorHint));
+        onLongClick(viewBinding.changeNameClickableArea, () -> copyText(viewBinding.tvName, viewBinding.tvNameHint));
 
         SlidrPanel.attachWithNavBarChange(this,
                 R.attr.playerPanelBackground,
@@ -150,18 +112,18 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
 
     @Override
     public void showAlbumLoadingError(ErrorCommand errorCommand) {
-        tvAuthor.setText(errorCommand.getMessage());
+        viewBinding.tvAuthor.setText(errorCommand.getMessage());
     }
 
     @Override
     public void showAlbum(Album album) {
-        tvName.setText(album.getName());
-        tvAuthor.setText(formatAuthor(album.getArtist(), this));
+        viewBinding.tvName.setText(album.getName());
+        viewBinding.tvAuthor.setText(formatAuthor(album.getArtist(), this));
     }
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        makeSnackbar(container, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
+        makeSnackbar(viewBinding.getRoot(), errorCommand.getMessage(), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -206,6 +168,6 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
     }
 
     private void onTextCopied() {
-        makeSnackbar(container, R.string.copied_message, Snackbar.LENGTH_SHORT).show();
+        makeSnackbar(viewBinding.getRoot(), R.string.copied_message, Snackbar.LENGTH_SHORT).show();
     }
 }
