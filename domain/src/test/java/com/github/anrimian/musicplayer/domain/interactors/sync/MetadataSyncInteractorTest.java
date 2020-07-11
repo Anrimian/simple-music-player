@@ -63,6 +63,11 @@ public class MetadataSyncInteractorTest {
     private RemoteRepositoryType remoteRepositoryType1 = new RemoteRepositoryType("1");
     private RemoteRepository remoteRepository = mock(RemoteRepository.class);
 
+    //test specific changes without file upload\download - wait
+    //test filepath change? - wait
+    //test sync launch rules, often calls?
+    //test wait_for_wifi, wait_for_charging state
+
     @Before
     public void setUp() {
         when(syncSettingsRepository.getEnabledRemoteRepositories()).thenReturn(asList(remoteRepositoryType1));
@@ -864,11 +869,25 @@ public class MetadataSyncInteractorTest {
         observer.assertValueAt(1, value -> value instanceof RunningSyncState.GetRemoteFileTable);
         observer.assertValueAt(2, value -> value instanceof RunningSyncState.Error);
     }
-
-    //test specific changes without file upload\download - wait
-    //test filepath change? - wait
-    //test sync launch rules, often calls?
-    //test wait_for_wifi, wait_for_charging state
+//
+//    static int i = 0;
+//
+//    @Test
+//    public void testRx() {
+//        Maybe<Integer> maybe = Maybe.create(emitter -> {
+//            if (i > 10) {
+//                emitter.onComplete();
+//            } else {
+//                emitter.onSuccess(i++);
+//            }
+//        });
+//
+//        Flowable subj = Flowable.create();
+//
+//        maybe.doOnSuccess(System.out::println)
+//                .repeatWhen(i -> subj)
+//                .subscribe();
+//    }
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, 0);
@@ -906,12 +925,12 @@ public class MetadataSyncInteractorTest {
     }
 
     private Single<RemoteFilesMetadata> remoteFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
-                                                    FileMetadata... metadataList) {
+                                                            FileMetadata... metadataList) {
         return Single.just(new RemoteFilesMetadata(1, new Date(0), metadataMap(metadataList), removedItems));
     }
 
     private Single<LocalFilesMetadata> localFilesMetadata(Map<FileKey, RemovedFileMetadata> removedItems,
-                                                  FileMetadata... metadataList) {
+                                                          FileMetadata... metadataList) {
         return Single.just(new LocalFilesMetadata(metadataMap(metadataList), metadataKeySet(metadataList), removedItems));
     }
 

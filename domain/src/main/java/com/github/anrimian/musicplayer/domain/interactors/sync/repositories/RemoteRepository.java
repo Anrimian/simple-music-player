@@ -25,4 +25,6 @@ public interface RemoteRepository {
                                List<Change<FileMetadata>> remoteChangedItems,
                                List<RemovedFileMetadata> remoteRemovedItemsToAdd,
                                Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete);
+
+    Completable deleteRemoteFile(FileMetadata fileMetadata);
 }
