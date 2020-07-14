@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
@@ -142,6 +143,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     //async creation?
+    @NonNull
     private UriCompositionSource createCompositionSource(Uri uri) {
         String displayName = null;
         String title = null;
@@ -160,16 +162,12 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
                 null,
                 null,
                 null)) {
-            if (cursor == null || cursor.getCount() == 0) {
-                return null;
-            }
-
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 displayName = cursorWrapper.getString(MediaStore.Audio.Media.DISPLAY_NAME);
                 size = cursorWrapper.getLong(MediaStore.Audio.Media.SIZE);
             }
-        }
+        } catch (Exception ignored) {}
 
         MediaMetadataRetriever mmr = null;
         try {
