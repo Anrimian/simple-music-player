@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
+import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileKey;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.FileMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.LocalFilesMetadata;
 import com.github.anrimian.musicplayer.domain.interactors.sync.models.RemovedFileMetadata;
@@ -25,6 +26,7 @@ import com.github.anrimian.musicplayer.domain.utils.changes.Change;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -251,18 +253,23 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public LocalFilesMetadata getLocalFilesMetadata() {
+    public Single<LocalFilesMetadata> getLocalFilesMetadata() {
         return null;
     }
 
     @Override
-    public void updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
-                                         List<FileMetadata> localItemsToAdd,
-                                         List<FileMetadata> localItemsToDelete,
-                                         List<Change<FileMetadata>> localChangedItems,
-                                         List<RemovedFileMetadata> localRemovedItemsToAdd,
-                                         List<RemovedFileMetadata> localRemovedItemToDelete) {
+    public Completable updateLocalFilesMetadata(LocalFilesMetadata localFilesMetadata,
+                                                List<FileMetadata> localItemsToAdd,
+                                                List<FileMetadata> localItemsToDelete,
+                                                List<Change<FileMetadata>> localChangedItems,
+                                                List<RemovedFileMetadata> localRemovedItemsToAdd,
+                                                Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete) {
+        return null;
+    }
 
+    @Override
+    public Completable deleteFile(FileMetadata metadata) {
+        return null;
     }
 
     private List<Long> extractFolderIds(List<FileSource> sources) {

@@ -100,4 +100,6 @@ public interface LibraryRepository {
                                          List<Change<FileMetadata>> localChangedItems,
                                          List<RemovedFileMetadata> localRemovedItemsToAdd,
                                          Map<FileKey, RemovedFileMetadata> localRemovedItemToDelete);
+
+    Completable deleteFile(FileMetadata metadata);
 }

@@ -27,4 +27,8 @@ public interface RemoteRepository {
                                Map<FileKey, RemovedFileMetadata> remoteRemovedItemToDelete);
 
     Completable deleteRemoteFile(FileMetadata fileMetadata);
+
+    Completable uploadFile(FileMetadata fileMetadata);
+
+    Completable downloadFile(FileMetadata fileMetadata);
 }

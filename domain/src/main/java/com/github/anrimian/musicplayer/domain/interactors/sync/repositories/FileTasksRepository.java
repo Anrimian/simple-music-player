@@ -11,8 +11,6 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 public interface FileTasksRepository {
-    //set
-    //get
 
     Completable saveFileTasks(RemoteRepositoryType repositoryType,
                               List<FileMetadata> localFilesToDelete,
@@ -24,5 +22,17 @@ public interface FileTasksRepository {
 
     Maybe<FileMetadata> getNextRemoteFileToDelete(RemoteRepositoryType repositoryType);
 
-    Completable removeFileToDelete(FileMetadata fileMetadata, RemoteRepositoryType remoteRepositoryType);
+    Maybe<FileMetadata> getNextLocalFileToUpload(RemoteRepositoryType repositoryType);
+
+    Maybe<FileMetadata> getNextLocalFileToDelete();
+
+    Maybe<DownloadFileTask> getNextRemoteFileToDownload(RemoteRepositoryType repositoryType);
+
+    Completable removeRemoteFileToDelete(FileMetadata fileMetadata, RemoteRepositoryType remoteRepositoryType);
+
+    Completable removeLocalFileToUpload(FileMetadata fileMetadata, RemoteRepositoryType remoteRepositoryType);
+
+    Completable removeLocalFileToDelete(FileMetadata fileMetadata);
+
+    Completable removeRemoteFileToDownload(FileMetadata fileMetadata, RemoteRepositoryType remoteRepositoryType);
 }

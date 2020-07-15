@@ -869,25 +869,6 @@ public class MetadataSyncInteractorTest {
         observer.assertValueAt(1, value -> value instanceof RunningSyncState.GetRemoteFileTable);
         observer.assertValueAt(2, value -> value instanceof RunningSyncState.Error);
     }
-//
-//    static int i = 0;
-//
-//    @Test
-//    public void testRx() {
-//        Maybe<Integer> maybe = Maybe.create(emitter -> {
-//            if (i > 10) {
-//                emitter.onComplete();
-//            } else {
-//                emitter.onSuccess(i++);
-//            }
-//        });
-//
-//        Flowable subj = Flowable.create();
-//
-//        maybe.doOnSuccess(System.out::println)
-//                .repeatWhen(i -> subj)
-//                .subscribe();
-//    }
 
     private FileMetadata simpleFileMetadata(String path, String name) {
         return simpleFileMetadata(path, name, 0);
