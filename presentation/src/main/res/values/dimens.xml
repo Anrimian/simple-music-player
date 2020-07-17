@@ -140,4 +140,8 @@
     <!--seekbar-->
     <dimen name="seekbar_height">2dp</dimen>
     <dimen name="seekbar_corner_radius">6dp</dimen>
+
+    <!--covers-->
+    <dimen name="cover_item_size">40dp</dimen>
+    <dimen name="item_play_icon_size">24dp</dimen>
 </resources>

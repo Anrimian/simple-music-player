@@ -32,6 +32,7 @@ import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidg
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+import com.github.anrimian.musicplayer.ui.common.views.CompositionItemView;
 
 import java.util.Date;
 
@@ -64,6 +65,19 @@ public class CoverImageLoader {
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
                 .into(imageView);
+    }
+
+    public void displayImage(@NonNull CompositionItemView view, @NonNull Composition data) {
+        if (!isValidContextForGlide(view.getContext())) {
+            return;
+        }
+
+        Glide.with(view)
+                .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .placeholder(DEFAULT_PLACEHOLDER)
+                .error(DEFAULT_PLACEHOLDER)
+                .timeout(TIMEOUT_MILLIS)
+                .into(compositionItemViewTarget(view));
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
@@ -224,6 +238,40 @@ public class CoverImageLoader {
                 } else {
                     Drawable safeDrawable = copy(previousDrawable);
                     super.onLoadCleared(safeDrawable == null ? placeholder : safeDrawable);
+                }
+            }
+        };
+    }
+
+    private CustomTarget<Drawable> compositionItemViewTarget(CompositionItemView view) {
+        return new CustomTarget<Drawable>() {
+
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition transition) {
+                view.setCoverDrawable(resource);
+            }
+
+            @Override
+            public void onLoadStarted(@Nullable Drawable placeholder) {
+                if (view.getCoverDrawable() == null) {
+                    view.setCoverDrawable(placeholder);
+                }
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                view.setCoverDrawable(errorDrawable);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                //glide can't replace previous image without blinking, hacky solution
+                Drawable previousDrawable = view.getCoverDrawable();
+                if (previousDrawable == null) {
+                    view.setCoverDrawable(placeholder);
+                } else {
+                    Drawable safeDrawable = copy(previousDrawable);
+                    view.setCoverDrawable(safeDrawable == null ? placeholder : safeDrawable);
                 }
             }
         };

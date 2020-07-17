@@ -18,10 +18,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.common.views.CompositionItemView;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import java.util.List;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
@@ -58,6 +61,8 @@ public class CompositionItemWrapper {
     private boolean isCurrent;
     private boolean isDragging;
 
+    private CompositionItemView compositionItemView;
+
     public CompositionItemWrapper(View itemView,
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
@@ -77,6 +82,12 @@ public class CompositionItemWrapper {
 
         if (btnActionsMenu != null) {
             CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        }
+
+        compositionItemView = new CompositionItemView(itemView.getContext());
+        FrameLayout tempView = itemView.findViewById(R.id.tempView);
+        if (tempView != null) {
+            tempView.addView(compositionItemView, MATCH_PARENT, WRAP_CONTENT);
         }
     }
 
@@ -119,8 +130,10 @@ public class CompositionItemWrapper {
         if (ivMusicIcon != null) {
             if (showCovers) {
                 Components.getAppComponent().imageLoader().displayImage(ivMusicIcon, composition);
+                Components.getAppComponent().imageLoader().displayImage(compositionItemView, composition);
             } else {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
+                compositionItemView.setCoverDrawable(R.drawable.ic_music_placeholder_simple);
             }
         }
     }
@@ -150,6 +163,10 @@ public class CompositionItemWrapper {
             AndroidUtils.setAnimatedVectorDrawable(ivPlay,
                     isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
                     animate);
+            compositionItemView.setAnimatedPlayStateDrawable(
+                    isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
+                    animate
+            );
         }
     }
 

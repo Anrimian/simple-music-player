@@ -72,8 +72,8 @@
 
     <ImageView
         android:id="@+id/iv_play"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/item_play_icon_size"
+        android:layout_height="@dimen/item_play_icon_size"
         android:tint="@android:color/white"
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="@id/iv_music_icon"
@@ -89,5 +89,13 @@
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_composition_name"/>
+
+    <FrameLayout
+        android:id="@+id/tempView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
