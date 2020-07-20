@@ -84,7 +84,7 @@ public class CompositionItemWrapper {
             CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
         }
 
-        compositionItemView = new CompositionItemView(itemView.getContext());
+        compositionItemView = new CompositionItemView(itemView.getContext(), true);
         FrameLayout tempView = itemView.findViewById(R.id.tempView);
         if (tempView != null) {
             tempView.addView(compositionItemView, MATCH_PARENT, WRAP_CONTENT);
@@ -143,6 +143,7 @@ public class CompositionItemWrapper {
             this.isDragging = dragging;
 
             animateVisibility(divider, dragging? View.INVISIBLE: View.VISIBLE);
+            compositionItemView.setDividerVisible(!dragging);
             if (!dragging && isCurrent) {
                 showAsCurrentCompositionInternal(true);
             } else {
@@ -187,6 +188,8 @@ public class CompositionItemWrapper {
         if (iconClickableArea != null) {
             iconClickableArea.setContentDescription(compositionName);
         }
+
+        compositionItemView.setTitle(compositionName);
     }
 
     private void showCorrupted() {
@@ -223,6 +226,8 @@ public class CompositionItemWrapper {
             sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         tvAdditionalInfo.setText(sb);
+
+        compositionItemView.setDescription(sb);
     }
 
     private String getCorruptionTypeHint() {

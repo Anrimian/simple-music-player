@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
@@ -86,6 +87,39 @@ public class ViewUtils {
                     super.onAnimationEnd(animation);
                     view.clearAnimation();
                     view.setVisibility(visibility);
+                    if (onAnimFinished != null) {
+                        onAnimFinished.run();
+                    }
+                }
+            });
+            animator.start();
+        } else {
+            if (onAnimFinished != null) {
+                onAnimFinished.run();
+            }
+        }
+    }
+
+    public static void animateAlpha(View view, int targetAlpha, Paint paint) {
+        animateAlpha(view, targetAlpha, paint, null);
+    }
+
+    public static void animateAlpha(View view, int targetAlpha, Paint paint, Runnable onAnimFinished) {
+        int currentAlpha = paint.getAlpha();
+        boolean visible = targetAlpha > currentAlpha;
+        if (currentAlpha != targetAlpha) {
+            ValueAnimator animator = ObjectAnimator.ofInt(paint.getAlpha(), targetAlpha);
+            animator.setDuration(visible ? 150: 120);
+            animator.setInterpolator(visible ? new DecelerateInterpolator(): new AccelerateInterpolator());
+            animator.addUpdateListener(animation -> {
+                paint.setAlpha((Integer) animation.getAnimatedValue());
+                view.invalidate();
+            });
+            animator.addListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
                     if (onAnimFinished != null) {
                         onAnimFinished.run();
                     }

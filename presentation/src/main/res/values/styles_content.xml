@@ -88,7 +88,7 @@
 
     <style name="TextStyleContentSubtitle" parent="Content.SecondaryText">
         <item name="android:textSize">12sp</item>
-        <item name="android:lineSpacingExtra">2dp</item>
+        <item name="android:lineSpacingExtra">@dimen/subtitle_line_spacing</item>
     </style>
 
     <style name="TextStyle.Small">
