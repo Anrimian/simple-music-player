@@ -14,6 +14,8 @@ import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
@@ -24,6 +26,7 @@ import androidx.core.content.ContextCompat;
 import com.github.anrimian.musicplayer.R;
 
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getDrawableFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateAlpha;
 
 @SuppressLint("ViewConstructor")
@@ -47,6 +50,10 @@ public class CompositionItemView extends View {
     private final boolean showMenuButton;
 
     private final Drawable menuButtonDrawable;
+
+    private final Drawable coverClickDrawable;
+    private final Drawable itemClickDrawable;
+    private final Drawable menuClickDrawable;
 
     @Nullable
     private Drawable coverDrawable;
@@ -91,7 +98,10 @@ public class CompositionItemView extends View {
                 ContextCompat.getColor(context, R.color.color_button_secondary),
                 context.getResources().getDimensionPixelSize(R.dimen.menu_button_icon_size),
                 getColorFromAttr(context, android.R.attr.dividerHorizontal),
-                context.getDrawable(R.drawable.ic_dots_vertical));
+                context.getDrawable(R.drawable.ic_dots_vertical),
+                getDrawableFromAttr(context, R.attr.selectableItemBackground),
+                getDrawableFromAttr(context, R.attr.selectableItemBackground),
+                getDrawableFromAttr(context, R.attr.actionBarItemBackground));
     }
 
     public CompositionItemView(Context context,
@@ -113,7 +123,10 @@ public class CompositionItemView extends View {
                                int menuButtonColor,
                                int menuButtonIconSize,
                                int dividerColor,
-                               Drawable menuButtonDrawable) {
+                               Drawable menuButtonDrawable,
+                               Drawable coverClickDrawable,
+                               Drawable itemClickDrawable,
+                               Drawable menuClickDrawable) {
         super(context);
         this.showMenuButton = showMenuButton;
         this.horizontalItemMargin = horizontalItemMargin;
@@ -129,9 +142,16 @@ public class CompositionItemView extends View {
         this.menuButtonIconSize = menuButtonIconSize;
         this.dividerColor = dividerColor;
         this.menuButtonDrawable = menuButtonDrawable;
+        this.coverClickDrawable = coverClickDrawable;
+        this.itemClickDrawable = itemClickDrawable;
+        this.menuClickDrawable = menuClickDrawable;
 
         menuButtonDrawable.setTint(menuButtonColor);
         menuButtonDrawable.setBounds(0, 0, menuButtonIconSize, menuButtonIconSize);
+
+        menuClickDrawable.setBounds(0, 0, menuButtonSize, menuButtonSize);
+        menuClickDrawable.setHotspotBounds(0, 0, menuButtonSize, menuButtonSize);
+        menuClickDrawable.setState(new int[] { android.R.attr.state_enabled/*, android.R.attr.state_pressed*/ });
 
         //+line spacing
         titleTextPaint.setTextSize(titleTextSize);
@@ -171,15 +191,20 @@ public class CompositionItemView extends View {
                 + descriptionStaticLayout.getHeight()
                 + dividerHeight;
 
+        itemClickDrawable.setBounds(
+                horizontalItemMargin + titleHorizontalMargin + coverSize,
+                0,
+                width,
+                height);
+
         setMeasuredDimension(width, height);
     }
-
-    private Paint testPaint = new Paint();
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        canvas.save();
         canvas.translate(horizontalItemMargin, verticalItemMargin);
 
         float coverEndX = 0;
@@ -233,18 +258,23 @@ public class CompositionItemView extends View {
         if (showMenuButton) {
             canvas.save();
 
+            int menuButtonX = getMeasuredWidth() - menuButtonSize - horizontalItemMargin;
+            int menuButtonY = menuButtonPaddingTop - verticalItemMargin;
             canvas.translate(
-                    getMeasuredWidth() - menuButtonSize - horizontalItemMargin + menuButtonIconSize/2f,
-                    menuButtonPaddingTop - verticalItemMargin + menuButtonIconSize/2f
+                    menuButtonX + menuButtonIconSize/2f,
+                    menuButtonY + menuButtonIconSize/2f
             );
             menuButtonDrawable.draw(canvas);
 
             canvas.restore();
+
+            canvas.save();
+            canvas.translate(menuButtonX, menuButtonY);
+            menuClickDrawable.draw(canvas);
+            canvas.restore();
         }
 
         //divider
-        canvas.save();
-
         canvas.drawRect(
                 coverEndX + titleHorizontalMargin,
                 getMeasuredHeight() - dividerHeight - verticalItemMargin,
@@ -253,6 +283,40 @@ public class CompositionItemView extends View {
                 dividerPaint);
 
         canvas.restore();
+
+//        canvas.save();
+//        canvas.translate(coverEndX + titleHorizontalMargin, 0);
+        itemClickDrawable.draw(canvas);
+//        canvas.restore();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        Log.d("KEK", "onTouchEvent, x: " + x + ", y: " + y + ", action: " + event.getAction());
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+//                menuClickDrawable.setHotspot(24, 24);
+                //                menuClickDrawable.invalidateSelf();
+
+                //sync drawable state
+
+                itemClickDrawable.setHotspot(x, y);
+                itemClickDrawable.setState(new int[] { android.R.attr.state_enabled, android.R.attr.state_pressed });
+
+                invalidate();
+                return true;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                itemClickDrawable.setState(new int[] { android.R.attr.state_enabled, -android.R.attr.state_pressed });
+
+//                menuClickDrawable.setState(new int[] { android.R.attr.state_enabled, -android.R.attr.state_pressed });
+                invalidate();
+                return true;
+            }
+        }
+        return super.onTouchEvent(event);
     }
 
     public void setTitle(CharSequence title) {
