@@ -32,7 +32,7 @@
         <item name="android:scaleType">centerInside</item>
         <item name="android:tint">@color/color_remote_button</item>
         <item name="android:padding">4dp</item>
-        <!--app widget button is disabled by default, well be enabled after widget provider call-->
+        <!--app widget button is disabled by default, will be enabled after widget provider call-->
         <item name="android:enabled">false</item>
     </style>
 

@@ -45,6 +45,11 @@ android {
         }
 
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -76,9 +81,6 @@ dependencies {
     implementation deps.moxyAppcompat
     implementation deps.moxyMaterial
     annotationProcessor deps.moxyCompiler
-
-    implementation deps.butterKnife
-    annotationProcessor deps.butterKnifeCompiler
 
     implementation deps.dagger
     annotationProcessor deps.daggerCompiler

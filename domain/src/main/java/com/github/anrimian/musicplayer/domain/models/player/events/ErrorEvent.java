@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.models.player.events;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 
 import javax.annotation.Nonnull;
@@ -8,9 +8,9 @@ import javax.annotation.Nonnull;
 public class ErrorEvent implements PlayerEvent {
 
     private final ErrorType errorType;
-    private final Composition composition;
+    private final CompositionSource composition;
 
-    public ErrorEvent(@Nonnull ErrorType errorType, @Nonnull Composition composition) {
+    public ErrorEvent(@Nonnull ErrorType errorType, @Nonnull CompositionSource composition) {
         this.errorType = errorType;
         this.composition = composition;
     }
@@ -34,7 +34,7 @@ public class ErrorEvent implements PlayerEvent {
         return errorType.hashCode();
     }
 
-    public Composition getComposition() {
+    public CompositionSource getComposition() {
         return composition;
     }
 

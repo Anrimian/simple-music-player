@@ -149,6 +149,18 @@ public class StorageFilesDataSource {
         }
     }
 
+    public long getCompositionFileSize(FullComposition composition) {
+        Long storageId = composition.getStorageId();
+        if (storageId == null) {
+            return -1;
+        }
+        String filePath = storageMusicProvider.getCompositionFilePath(storageId);
+        if (filePath == null) {
+            return -1;
+        }
+        return new File(filePath).length();
+    }
+
     private void deleteFile(Composition composition) {
         Long storageId = composition.getStorageId();
         if (storageId == null) {

@@ -7,10 +7,9 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class CreatePlayListPresenter extends MvpPresenter<CreatePlayListView> {
 
     private final PlayListsInteractor playListsInteractor;

@@ -9,12 +9,12 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullC
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +34,7 @@ public class TestDataProvider {
                 albumId,
                 folderId,
                 title,
+                null,
                 "test file name",
                 "test file path",
                 100L,
@@ -73,6 +74,10 @@ public class TestDataProvider {
             items.put(i, item);
         }
         return items;
+    }
+
+    public static CompositionSource fakeCompositionSource(long id) {
+        return new LibraryCompositionSource(fakeComposition(id), 0);
     }
 
     public static Composition fakeComposition(long id) {

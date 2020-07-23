@@ -71,9 +71,12 @@ public class CompositionHelper {
     }
 
     public static String formatCompositionName(Composition composition) {
-        String title = composition.getTitle();
+        return formatCompositionName(composition.getTitle(), composition.getFileName());
+    }
+
+    public static String formatCompositionName(String title, String fileName) {
         if (isEmpty(title)) {
-            return formatFileName(composition.getFileName());
+            return formatFileName(fileName);
         }
         return title;
     }

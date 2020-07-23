@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
-import utils.TestDataProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
@@ -13,6 +12,7 @@ import org.mockito.Mockito;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
+import utils.TestDataProvider;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -47,7 +47,7 @@ public class CompositeMediaPlayerTest {
 
     @Test
     public void testPlayersSwitch() {
-        Composition composition = TestDataProvider.fakeComposition(0);
+        CompositionSource composition = TestDataProvider.fakeCompositionSource(0);
 
         compositeMediaPlayer.prepareToPlay(composition, 0L);
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));
@@ -59,7 +59,7 @@ public class CompositeMediaPlayerTest {
 
     @Test
     public void testAllPlayersNotWorking() {
-        Composition composition = TestDataProvider.fakeComposition(0);
+        CompositionSource composition = TestDataProvider.fakeCompositionSource(0);
 
         TestObserver<PlayerEvent> eventsObserver = compositeMediaPlayer.getEventsObservable().test();
 
@@ -74,7 +74,7 @@ public class CompositeMediaPlayerTest {
 
         eventsObserver.assertValue(new ErrorEvent(ErrorType.UNSUPPORTED, composition));
 
-        Composition composition2 = TestDataProvider.fakeComposition(2);
+        CompositionSource composition2 = TestDataProvider.fakeCompositionSource(2);
 
         compositeMediaPlayer.prepareToPlay(composition2, 0L);
         inOrder.verify(player2).release();
@@ -83,7 +83,7 @@ public class CompositeMediaPlayerTest {
 
     @Test
     public void testPlayersSwitchWithPosition() {
-        Composition composition = TestDataProvider.fakeComposition(0);
+        CompositionSource composition = TestDataProvider.fakeCompositionSource(0);
 
         compositeMediaPlayer.prepareToPlay(composition, 0L);
         inOrder.verify(player1).prepareToPlay(eq(composition), eq(0L));

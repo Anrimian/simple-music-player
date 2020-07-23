@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -42,8 +43,6 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.List;
 import java.util.Objects;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -63,14 +62,9 @@ public class PlayListFragment extends MvpAppCompatFragment
     @InjectPresenter
     PlayListPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.fab)
-    View fab;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
+    private RecyclerView recyclerView;
+    private View fab;
+    private CoordinatorLayout clListContainer;
 
     private AdvancedToolbar toolbar;
     private PlayListItemAdapter adapter;
@@ -94,14 +88,16 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_base_fab_list, container, false);
+        FragmentBaseFabListBinding viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
+        recyclerView = viewBinding.recyclerView;
+        fab = viewBinding.fab;
+        clListContainer = viewBinding.listContainer;
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        ButterKnife.bind(this, view);
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
@@ -210,7 +206,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
         MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
+                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
     }

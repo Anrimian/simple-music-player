@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -18,7 +19,6 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.areSourcesTheSame;
@@ -28,10 +28,9 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
  * Created on 02.11.2017.
  */
 
-@InjectViewState
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final PlayerScreenInteractor playerScreenInteractor;
     private final ErrorParser errorParser;
@@ -48,7 +47,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private final List<Composition> compositionsForPlayList = new LinkedList<>();
     private final List<Composition> compositionsToDelete = new LinkedList<>();
 
-    public PlayerPresenter(MusicPlayerInteractor musicPlayerInteractor,
+    public PlayerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                            PlayListsInteractor playListsInteractor,
                            PlayerScreenInteractor playerScreenInteractor,
                            ErrorParser errorParser,
@@ -159,8 +158,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         if (playQueueItem.equals(currentItem)) {
             playerInteractor.playOrPause();
         } else {
-            playerInteractor.play();
             onCompositionItemClicked(position, playQueueItem);
+            playerInteractor.play();
         }
     }
 
@@ -246,7 +245,14 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 .subscribe(() -> {}, this::onDefaultError);
     }
 
+    void onClearPlayQueueClicked() {
+        playerInteractor.clearPlayQueue();
+    }
+
     private void swapItems(int from, int to) {
+        if (!ListUtils.isIndexInRange(playQueue, from) || !ListUtils.isIndexInRange(playQueue, to)) {
+            return;
+        }
         PlayQueueItem fromItem = playQueue.get(from);
         PlayQueueItem toItem = playQueue.get(to);
 
@@ -263,9 +269,9 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void subscribeOnRepeatMode() {
-        playerInteractor.getRepeatModeObservable()
+        batterySafeDisposable.add(playerInteractor.getRepeatModeObservable()
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::showRepeatMode);
+                .subscribe(getViewState()::showRepeatMode));
     }
 
     private void addPreparedCompositionsToPlayList(PlayList playList) {
@@ -320,18 +326,21 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void onPlayQueueEventReceived(PlayQueueEvent playQueueEvent) {
         PlayQueueItem newItem = playQueueEvent.getPlayQueueItem();
-        if (currentItem == null || !currentItem.equals(newItem)
+        if (currentItem == null
+                || !currentItem.equals(newItem)
                 || !areSourcesTheSame(newItem.getComposition(), currentItem.getComposition())) {
             onCurrentCompositionChanged(newItem, playQueueEvent.getTrackPosition());
         }
     }
 
     private void onCurrentCompositionChanged(PlayQueueItem newItem, long trackPosition) {
-        this.currentItem = newItem;
         getViewState().showCurrentQueueItem(newItem, isCoversEnabled);
-        if (newItem != null) {
+        if (newItem != null
+                && (!newItem.equals(currentItem) || newItem.getComposition().getDuration() != currentItem.getComposition().getDuration())) {
             getViewState().showTrackState(trackPosition, newItem.getComposition().getDuration());
         }
+
+        this.currentItem = newItem;
     }
 
     private void subscribeOnPlayerStateChanges() {

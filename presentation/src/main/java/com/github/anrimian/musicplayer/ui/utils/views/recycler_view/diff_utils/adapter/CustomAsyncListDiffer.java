@@ -316,10 +316,20 @@ public class CustomAsyncListDiffer<T> {
         // notify last, after list is updated
         mReadOnlyList = Collections.unmodifiableList(newList);
 
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+        RecyclerView.LayoutManager lm = recyclerView.getLayoutManager();
+        Parcelable recyclerViewState = getRecyclerViewState(lm);
         diffResult.dispatchUpdatesTo(mUpdateCallback);
-        recyclerView.post(() ->
-                recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState)
-        );
+        if (lm != null && recyclerViewState != null) {
+            recyclerView.post(() -> lm.onRestoreInstanceState(recyclerViewState));
+        }
+    }
+
+    @Nullable
+    private Parcelable getRecyclerViewState(RecyclerView.LayoutManager lm) {
+        Parcelable recyclerViewState = null;
+        if (lm != null) {
+            recyclerViewState = lm.onSaveInstanceState();
+        }
+        return recyclerViewState;
     }
 }

@@ -22,11 +22,9 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
@@ -41,35 +39,21 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibili
 
 public class CompositionItemWrapper {
 
-    @BindView(R.id.tv_composition_name)
-    TextView tvMusicName;
-
-    @BindView(R.id.tv_additional_info)
-    TextView tvAdditionalInfo;
-
-    @BindView(R.id.clickable_item)
-    FrameLayout clickableItem;
-
+    private TextView tvMusicName;
+    private TextView tvAdditionalInfo;
+    private FrameLayout clickableItem;
+    private View divider;
     @Nullable
-    @BindView(R.id.iv_play)
-    ImageView ivPlay;
-
+    private ImageView ivPlay;
     @Nullable
-    @BindView(R.id.iv_music_icon)
-    ImageView ivMusicIcon;
-
-    @BindView(R.id.divider)
-    View divider;
-
+    private ImageView ivMusicIcon;
     @Nullable
-    @BindView(R.id.btn_actions_menu)
-    ImageView btnActionsMenu;
-
+    private ImageView btnActionsMenu;
     @Nullable
-    @BindView(R.id.icon_clickable_area)
-    View iconClickableArea;
+    private View iconClickableArea;
 
     private Composition composition;
+    private boolean showCovers;
 
     private boolean isCurrent;
     private boolean isDragging;
@@ -77,7 +61,15 @@ public class CompositionItemWrapper {
     public CompositionItemWrapper(View itemView,
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
-        ButterKnife.bind(this, itemView);
+        tvMusicName = itemView.findViewById(R.id.tv_composition_name);
+        tvAdditionalInfo = itemView.findViewById(R.id.tv_additional_info);
+        clickableItem = itemView.findViewById(R.id.clickable_item);
+        ivPlay = itemView.findViewById(R.id.iv_play);
+        ivMusicIcon = itemView.findViewById(R.id.iv_music_icon);
+        divider = itemView.findViewById(R.id.divider);
+        btnActionsMenu = itemView.findViewById(R.id.btn_actions_menu);
+        iconClickableArea = itemView.findViewById(R.id.icon_clickable_area);
+
         if (iconClickableArea != null) {
             iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
@@ -90,6 +82,8 @@ public class CompositionItemWrapper {
 
     public void bind(Composition composition, boolean showCovers) {
         this.composition = composition;
+        this.showCovers = showCovers;
+
         showCompositionName();
         showAdditionalInfo();
         showCorrupted();
@@ -110,6 +104,9 @@ public class CompositionItemWrapper {
             }
             if (payload == ARTIST || payload == DURATION) {
                 showAdditionalInfo();
+            }
+            if (payload == DATE_MODIFIED) {
+                showCompositionImage(showCovers);
             }
             if (payload == CORRUPTED) {
                 showCorrupted();

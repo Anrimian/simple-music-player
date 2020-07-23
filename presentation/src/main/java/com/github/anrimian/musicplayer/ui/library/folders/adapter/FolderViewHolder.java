@@ -2,11 +2,9 @@ package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
 import android.graphics.Color;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemStorageFolderBinding;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
@@ -16,9 +14,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
@@ -34,17 +29,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class FolderViewHolder extends FileViewHolder {
 
-    @BindView(R.id.clickable_item)
-    FrameLayout clickableItem;
-
-    @BindView(R.id.tv_folder_name)
-    TextView tvFolderName;
-
-    @BindView(R.id.tv_compositions_count)
-    TextView tvCompositionsCount;
-
-    @BindView(R.id.btn_actions_menu)
-    ImageView btnActionsMenu;
+    private ItemStorageFolderBinding viewBinding;
 
     private FolderFileSource folder;
     private String path;
@@ -56,14 +41,15 @@ class FolderViewHolder extends FileViewHolder {
                      OnViewItemClickListener<FolderFileSource> onMenuClickListener,
                      OnPositionItemClickListener<FileSource> onLongClickListener) {
         super(parent, R.layout.item_storage_folder);
-        ButterKnife.bind(this, itemView);
+        viewBinding = ItemStorageFolderBinding.bind(itemView);
+
         if (onFolderClickListener != null) {
-            clickableItem.setOnClickListener(v ->
+            viewBinding.clickableItem.setOnClickListener(v ->
                     onFolderClickListener.onItemClick(getAdapterPosition(), folder)
             );
         }
         if (onLongClickListener != null) {
-            onLongClick(clickableItem,  () -> {
+            onLongClick(viewBinding.clickableItem,  () -> {
                 if (selected) {
                     return;
                 }
@@ -71,8 +57,8 @@ class FolderViewHolder extends FileViewHolder {
                 onLongClickListener.onItemClick(getAdapterPosition(), folder);
             });
         }
-        btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
-        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        viewBinding.btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
+        CompatUtils.setSecondaryButtonStyle(viewBinding.btnActionsMenu);
     }
 
     @Override
@@ -82,7 +68,7 @@ class FolderViewHolder extends FileViewHolder {
             int unselectedColor = Color.TRANSPARENT;
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
-            animateBackgroundColor(clickableItem, endColor);
+            animateBackgroundColor(viewBinding.clickableItem, endColor);
         }
     }
 
@@ -137,16 +123,16 @@ class FolderViewHolder extends FileViewHolder {
         String text = getContext().getResources().getQuantityString(R.plurals.compositions_count,
                 filesCount,
                 filesCount);
-        tvCompositionsCount.setText(text);
+        viewBinding.tvCompositionsCount.setText(text);
     }
 
     private void showFolderName() {
 //        String displayPath = getFileName(path);
-        tvFolderName.setText(path);
+        viewBinding.tvFolderName.setText(path);
     }
 
     private void selectImmediate() {
-        clickableItem.setBackgroundColor(getSelectionColor());
+        viewBinding.clickableItem.setBackgroundColor(getSelectionColor());
         selected = true;
     }
 }

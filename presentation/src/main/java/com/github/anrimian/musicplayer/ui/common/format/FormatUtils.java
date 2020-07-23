@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.common.format;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
+import android.text.format.Formatter;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
@@ -161,6 +162,22 @@ public class FormatUtils {
         }
     }
 
+    @StringRes
+    public static int getRepeatModeText(int repeatMode) {
+        switch (repeatMode) {
+            case RepeatMode.NONE: {
+                return R.string.do_not_repeat;
+            }
+            case RepeatMode.REPEAT_COMPOSITION: {
+                return R.string.repeat_composition;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                return R.string.repeat_playlist;
+            }
+            default: return R.string.do_not_repeat;
+        }
+    }
+
     public static void formatLinkedFabView(View view, View fab) {
         run(fab, () -> {
             int width = fab.getWidth();
@@ -189,5 +206,9 @@ public class FormatUtils {
                 R.dimen.swipe_panel_text_top_padding,
                 R.dimen.swipe_panel_icon_size,
                 R.dimen.swipe_panel_text_size);
+    }
+
+    public static String formatSize(Context context, long bytes) {
+        return Formatter.formatShortFileSize(context, bytes);
     }
 }

@@ -3,10 +3,9 @@ package com.github.anrimian.musicplayer.ui.library.common.order;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class SelectOrderPresenter extends MvpPresenter<SelectOrderView> {
 
     private OrderType orderType;

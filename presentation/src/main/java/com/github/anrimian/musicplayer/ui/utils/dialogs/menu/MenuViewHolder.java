@@ -12,16 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 class MenuViewHolder extends RecyclerView.ViewHolder {
 
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
-
-    @BindView(R.id.iv_icon)
-    ImageView ivIcon;
+    private TextView tvTitle;
+    private ImageView ivIcon;
 
     private MenuItem menuItem;
 
@@ -30,7 +24,8 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
                    @LayoutRes int menuViewRes,
                    OnItemClickListener<MenuItem> onItemClickListener) {
         super(inflater.inflate(menuViewRes, parent, false));
-        ButterKnife.bind(this, itemView);
+        tvTitle = itemView.findViewById(R.id.tv_title);
+        ivIcon = itemView.findViewById(R.id.iv_icon);
 
         itemView.setOnClickListener(v -> onItemClickListener.onItemClick(menuItem));
     }

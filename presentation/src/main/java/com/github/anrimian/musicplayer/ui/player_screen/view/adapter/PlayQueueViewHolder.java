@@ -18,17 +18,11 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 /**
  * Created on 31.10.2017.
  */
 
 class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener {
-
-    @BindView(R.id.btn_actions_menu)
-    View btnActionsMenu;
 
     private CompositionItemWrapper compositionItemWrapper;
 
@@ -40,7 +34,8 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
                         OnViewItemClickListener<PlayQueueItem> menuClickListener,
                         OnPositionItemClickListener<PlayQueueItem> iconClickListener) {
         super(inflater.inflate(R.layout.item_play_queue, parent, false));
-        ButterKnife.bind(this, itemView);
+        View btnActionsMenu = itemView.findViewById(R.id.btn_actions_menu);
+
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 o -> iconClickListener.onItemClick(getAdapterPosition(), playQueueItem),
                 composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), playQueueItem)
@@ -62,6 +57,7 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
     }
 
     void update(PlayQueueItem item, List<Object> payloads) {
+        this.playQueueItem = item;
         compositionItemWrapper.update(item.getComposition(), payloads);
     }
 

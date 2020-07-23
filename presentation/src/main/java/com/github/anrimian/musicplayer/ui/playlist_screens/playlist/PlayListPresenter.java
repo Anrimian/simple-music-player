@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -22,7 +22,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.isInactive;
@@ -30,10 +29,10 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 import static java.util.Objects.requireNonNull;
 
-@InjectViewState
+
 public class PlayListPresenter extends MvpPresenter<PlayListView> {
 
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
@@ -60,7 +59,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private Item<PlayListItem> deletedItem;
 
     public PlayListPresenter(long playListId,
-                             MusicPlayerInteractor playerInteractor,
+                             LibraryPlayerInteractor playerInteractor,
                              PlayListsInteractor playListsInteractor,
                              DisplaySettingsInteractor displaySettingsInteractor,
                              ErrorParser errorParser,
@@ -214,7 +213,7 @@ public class PlayListPresenter extends MvpPresenter<PlayListView> {
     private void addCompositionsToEnd(List<Composition> compositions) {
         playerInteractor.addCompositionsToEnd(compositions)
                 .observeOn(uiScheduler)
-                .subscribe(getViewState()::onCompositionsAddedToPlayNext, this::onDefaultError);
+                .subscribe(getViewState()::onCompositionsAddedToQueue, this::onDefaultError);
     }
 
     private void onDefaultError(Throwable throwable) {

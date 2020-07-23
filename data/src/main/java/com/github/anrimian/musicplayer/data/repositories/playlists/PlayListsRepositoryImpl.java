@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
+
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -68,14 +69,9 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                                                  PlayList playList,
                                                  int position) {
         return Completable.fromAction(() -> {
-            Long storageId = playListsDao.selectStorageId(playList.getId());
-            if (storageId != null) {
-                storagePlayListsProvider.addCompositionsToPlayList(compositions,
-                        storageId,
-                        position);
-            }
             playListsDao.addCompositions(compositions, playList.getId(), position);
-        }).subscribeOn(scheduler);
+        }).subscribeOn(scheduler)
+                .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playList, position));
     }
 
     @Override
@@ -125,5 +121,21 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                 storagePlayListsProvider.updatePlayListName(storageId, name);
             }
         }).subscribeOn(scheduler);
+    }
+
+    //can be slow on large amount of data, run in separate task
+    private void addCompositionsToStoragePlaylist(List<Composition> compositions,
+                                                  PlayList playList,
+                                                  int position) {
+        Completable.fromAction(() -> {
+            Long storageId = playListsDao.selectStorageId(playList.getId());
+            if (storageId != null) {
+                storagePlayListsProvider.addCompositionsToPlayList(compositions,
+                        storageId,
+                        position);
+            }
+        }).onErrorComplete()
+                .subscribeOn(scheduler)
+                .subscribe();
     }
 }

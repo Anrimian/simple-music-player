@@ -15,6 +15,7 @@ public class CompositionMapper {
                 albumId,
                 folderId,
                 composition.getTitle(),
+                null,
                 composition.getFileName(),
                 composition.getFilePath(),
                 composition.getDuration(),

@@ -5,20 +5,18 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogSelectPlayListBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
@@ -47,8 +45,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpBottomSheetDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -70,26 +66,8 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @InjectPresenter
     ChoosePlayListPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.iv_create_playlist)
-    ImageView ivCreatePlaylist;
-
-    @BindView(R.id.iv_close)
-    ImageView ivClose;
-
-    @BindView(R.id.title_shadow)
-    View titleShadow;
-
-    @BindView(R.id.motion_layout)
-    MotionLayout motionLayout;
-
-    @BindView(R.id.tv_title)
-    TextView tvTitle;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
+    private DialogSelectPlayListBinding viewBinding;
+    private RecyclerView recyclerView;
 
     @Nullable
     private OnCompleteListener<PlayList> onCompleteListener;
@@ -128,7 +106,9 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
     @Override
     public void setupDialog(@NonNull Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View view = View.inflate(getContext(), R.layout.dialog_select_play_list, null);
+        viewBinding = DialogSelectPlayListBinding.inflate(LayoutInflater.from(getContext()));
+        recyclerView = viewBinding.recyclerView;
+        View view = viewBinding.getRoot();
         dialog.setContentView(view);
 
         DisplayMetrics displayMetrics = requireActivity().getResources().getDisplayMetrics();
@@ -138,8 +118,6 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         float heightPercent = getFloat(getResources(), R.dimen.choose_playlist_dialog_height);
         int minHeight = (int) (height * heightPercent);
         view.setMinimumHeight(minHeight);
-
-        ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
@@ -154,7 +132,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         );
         recyclerView.setAdapter(adapter);
 
-        attachDynamicShadow(recyclerView, titleShadow);
+        attachDynamicShadow(recyclerView, viewBinding.titleShadow);
 
         BottomSheetBehavior bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog);
         bottomSheetBehavior.setPeekHeight(minHeight);
@@ -166,9 +144,9 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
         slideDelegate = buildSlideDelegate();
 
-        ivClose.setOnClickListener(v -> dismiss());
-        ivClose.setVisibility(INVISIBLE);//start state
-        ivCreatePlaylist.setOnClickListener(v -> onCreatePlayListButtonClicked());
+        viewBinding.ivClose.setOnClickListener(v -> dismiss());
+        viewBinding.ivClose.setVisibility(INVISIBLE);//start state
+        viewBinding.ivCreatePlaylist.setOnClickListener(v -> onCreatePlayListButtonClicked());
 
         MenuDialogFragment fragment = (MenuDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(PLAY_LIST_MENU);
@@ -200,7 +178,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
             }
             float usableSlideOffset = slideOffset;
             int activityHeight = contentView.getHeight() - getStatusBarHeight(requireContext());
-            int viewHeight = clListContainer.getHeight();
+            int viewHeight = viewBinding.listContainer.getHeight();
             if (activityHeight > viewHeight) {
                 usableSlideOffset = 0;
             }
@@ -252,7 +230,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        MessagesUtils.makeSnackbar(clListContainer,
+        MessagesUtils.makeSnackbar(viewBinding.listContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -260,7 +238,7 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
+        MessagesUtils.makeSnackbar(viewBinding.listContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -306,17 +284,17 @@ public class ChoosePlayListDialogFragment extends MvpBottomSheetDialogFragment
         SlideDelegate boundDelegate = new DelegateManager()
                 .addDelegate(
                         new BoundValuesDelegate(0.85f, 1f,
-                                new VisibilityDelegate(ivClose)
+                                new VisibilityDelegate(viewBinding.ivClose)
                         )
                 )
                 .addDelegate(
                         new BoundValuesDelegate(0.7f, 1f,
                                 new DelegateManager()
-                                        .addDelegate(new MotionLayoutDelegate(motionLayout))
-                                        .addDelegate(new TextSizeDelegate(tvTitle,
+                                        .addDelegate(new MotionLayoutDelegate(viewBinding.motionLayout))
+                                        .addDelegate(new TextSizeDelegate(viewBinding.tvTitle,
                                                 R.dimen.sheet_dialog_title_collapsed_size,
                                                 R.dimen.sheet_dialog_title_expanded_size))
-                                        .addDelegate(new TextColorDelegate(tvTitle,
+                                        .addDelegate(new TextColorDelegate(viewBinding.tvTitle,
                                                 android.R.attr.textColorSecondary,
                                                 android.R.attr.textColorPrimary)
                                         )

@@ -273,6 +273,10 @@ public class PlayQueueDaoWrapper {
         }
     }
 
+    public void deletePlayQueue() {
+        playQueueDao.deletePlayQueue();
+    }
+
     private Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
         return playQueueDao.getPlayQueueInNormalOrderObservable()
                 .map(list -> mapList(list, this::toQueueItem));

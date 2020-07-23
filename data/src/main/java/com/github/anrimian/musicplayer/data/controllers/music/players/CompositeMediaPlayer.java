@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
@@ -22,7 +22,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     private AppMediaPlayer currentPlayer;
     private int currentPlayerIndex;
 
-    private Composition currentComposition;
+    private CompositionSource currentComposition;
     private long currentTrackPosition;
 
     @SafeVarargs
@@ -38,7 +38,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(Composition composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition, long startPosition) {
         currentComposition = composition;
         currentTrackPosition = startPosition;
 

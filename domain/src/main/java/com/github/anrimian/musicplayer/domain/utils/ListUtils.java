@@ -89,6 +89,10 @@ public class ListUtils {
         Collections.swap(list, i, j);
     }
 
+    public static boolean isIndexInRange(List<?> list, int index) {
+        return index >= 0 && index < list.size();
+    }
+
     public interface MapperFunction<T, E> {
 
         E map(T t);

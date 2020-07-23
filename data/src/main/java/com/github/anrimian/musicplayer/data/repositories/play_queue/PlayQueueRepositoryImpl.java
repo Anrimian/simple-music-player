@@ -192,6 +192,13 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         });
     }
 
+    @Override
+    public void clearPlayQueue() {
+        Completable.fromAction(playQueueDao::deletePlayQueue)
+                .subscribeOn(scheduler)
+                .subscribe();
+    }
+
     private void setCurrentItem(@Nullable Long itemId) {
         if (itemId == null) {
             itemId = NO_ITEM;

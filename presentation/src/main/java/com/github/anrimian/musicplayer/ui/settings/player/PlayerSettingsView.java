@@ -8,4 +8,7 @@ public interface PlayerSettingsView extends MvpView {
 
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showDecreaseVolumeOnAudioFocusLossEnabled(boolean checked);
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void showSelectedEqualizerType(int type);
 }

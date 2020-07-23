@@ -10,15 +10,11 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getOrderTitle;
 
 class OrderViewHolder extends RecyclerView.ViewHolder {
 
-    @BindView(R.id.rb_order)
-    RadioButton rbOrder;
+    private RadioButton rbOrder;
 
     private OrderType order;
 
@@ -26,7 +22,7 @@ class OrderViewHolder extends RecyclerView.ViewHolder {
                     ViewGroup parent,
                     OnItemClickListener<OrderType> onItemClickListener) {
         super(inflater.inflate(R.layout.item_order, parent, false));
-        ButterKnife.bind(this, itemView);
+        rbOrder = itemView.findViewById(R.id.rb_order);
 
         if (onItemClickListener != null) {
             rbOrder.setOnClickListener(v -> onItemClickListener.onItemClick(order));

@@ -1,20 +1,20 @@
 package com.github.anrimian.musicplayer.domain.models.player.events;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 
 import javax.annotation.Nonnull;
 
 public class FinishedEvent implements PlayerEvent {
 
     @Nonnull
-    private final Composition composition;
+    private final CompositionSource composition;
 
-    public FinishedEvent(@Nonnull Composition composition) {
+    public FinishedEvent(@Nonnull CompositionSource composition) {
         this.composition = composition;
     }
 
     @Nonnull
-    public Composition getComposition() {
+    public CompositionSource getComposition() {
         return composition;
     }
 

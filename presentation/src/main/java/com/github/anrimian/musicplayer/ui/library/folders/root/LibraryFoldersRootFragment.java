@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentRootLibraryFoldersBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
@@ -23,8 +24,6 @@ import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
@@ -36,8 +35,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     @InjectPresenter
     FolderRootPresenter presenter;
 
-    @BindView(R.id.library_folders_container)
-    JugglerView jvFoldersContainer;
+    private JugglerView jvFoldersContainer;
 
     private FragmentNavigation navigation;
     private final DefferedObject<FragmentNavigation> navigationWrapper = new DefferedObject<>();
@@ -54,13 +52,14 @@ public class LibraryFoldersRootFragment extends LibraryFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_root_library_folders, container, false);
+        FragmentRootLibraryFoldersBinding binding = FragmentRootLibraryFoldersBinding.inflate(inflater, container, false);
+        jvFoldersContainer = binding.libraryFoldersContainer;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.onTryAgainClick(presenter::onEmptyFolderStackArrived);

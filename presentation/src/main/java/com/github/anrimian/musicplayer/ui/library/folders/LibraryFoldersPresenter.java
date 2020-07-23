@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders;
 import android.annotation.SuppressLint;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
@@ -39,11 +38,11 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
  * Created on 23.10.2017.
  */
 
-@InjectViewState
+
 public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     private final LibraryFoldersScreenInteractor interactor;
-    private final MusicPlayerInteractor playerInteractor;
+    private final LibraryPlayerInteractor playerInteractor;
     private final DisplaySettingsInteractor displaySettingsInteractor;
     private final ErrorParser errorParser;
     private final Scheduler uiScheduler;
@@ -80,7 +79,7 @@ public class LibraryFoldersPresenter extends MvpPresenter<LibraryFoldersView> {
 
     public LibraryFoldersPresenter(@Nullable Long folderId,
                                    LibraryFoldersScreenInteractor interactor,
-                                   MusicPlayerInteractor playerInteractor,
+                                   LibraryPlayerInteractor playerInteractor,
                                    DisplaySettingsInteractor displaySettingsInteractor,
                                    ErrorParser errorParser,
                                    Scheduler uiScheduler) {

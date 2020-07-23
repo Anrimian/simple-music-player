@@ -2,14 +2,12 @@ package com.github.anrimian.musicplayer.ui.utils.views.seek_bar;
 
 import android.widget.SeekBar;
 
-import androidx.appcompat.widget.AppCompatSeekBar;
-
 /**
  * Created on 03.06.2018.
  */
 public class SeekBarViewWrapper {
 
-    private AppCompatSeekBar seekBar;
+    private SeekBar seekBar;
 
     private ProgressChangeListener progressChangeListener;
     private OnSeekStartListener onSeekStartListener;
@@ -18,7 +16,7 @@ public class SeekBarViewWrapper {
     private boolean isOnTouch;
     private int progress;
 
-    public SeekBarViewWrapper(AppCompatSeekBar seekBar) {
+    public SeekBarViewWrapper(SeekBar seekBar) {
         this.seekBar = seekBar;
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

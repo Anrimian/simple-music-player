@@ -54,6 +54,9 @@ public class CompositionEntity {
     @Nullable
     private String title;
 
+    @Nullable
+    private String lyrics;
+
     @Nonnull
     private String fileName;
 
@@ -75,6 +78,7 @@ public class CompositionEntity {
                              @Nullable Long albumId,
                              @Nullable Long folderId,
                              @Nullable String title,
+                             @Nullable String lyrics,
                              @Nonnull String fileName,
                              @Nonnull String filePath,
                              long duration,
@@ -88,6 +92,7 @@ public class CompositionEntity {
         this.folderId = folderId;
         this.storageId = storageId;
         this.title = title;
+        this.lyrics = lyrics;
         this.fileName = fileName;
         this.filePath = filePath;
         this.duration = duration;
@@ -163,5 +168,10 @@ public class CompositionEntity {
     @Nullable
     public CorruptionType getCorruptionType() {
         return corruptionType;
+    }
+
+    @Nullable
+    public String getLyrics() {
+        return lyrics;
     }
 }

@@ -12,10 +12,9 @@ import javax.annotation.Nullable;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class ExcludedFoldersPresenter extends MvpPresenter<ExcludedFoldersView> {
 
     private final LibraryFoldersInteractor interactor;

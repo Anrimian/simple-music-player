@@ -15,12 +15,11 @@ import javax.annotation.Nullable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
-@InjectViewState
+
 public class GenresListPresenter extends MvpPresenter<GenresListView> {
 
     private final LibraryGenresInteractor interactor;

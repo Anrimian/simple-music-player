@@ -2,12 +2,11 @@ package com.github.anrimian.musicplayer.ui.library.artists.items.adapter.albums;
 
 import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemAlbumHorizontalBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
@@ -16,9 +15,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHold
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
@@ -26,21 +22,15 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class AlbumViewHolder extends BaseViewHolder {
 
-    @BindView(R.id.tv_album_name)
-    TextView tvAlbumName;
-
-    @BindView(R.id.tv_compositions_count)
-    TextView tvCompositionsCount;
-
-    @BindView(R.id.iv_music_icon)
-    ImageView ivMusicIcon;
+    private ItemAlbumHorizontalBinding viewBinding;
 
     private Album album;
 
     AlbumViewHolder(@NonNull ViewGroup parent,
                     Callback<Album> itemClickListener) {
         super(parent, R.layout.item_album_horizontal);
-        ButterKnife.bind(this, itemView);
+        viewBinding = ItemAlbumHorizontalBinding.bind(itemView);
+
         itemView.setOnClickListener(v -> itemClickListener.call(album));
     }
 
@@ -69,7 +59,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showAlbumName() {
-        tvAlbumName.setText(album.getName());
+        viewBinding.tvAlbumName.setText(album.getName());
     }
 
     private void showCompositionsCount() {
@@ -82,11 +72,11 @@ public class AlbumViewHolder extends BaseViewHolder {
                 getContext(),
                 album.getCompositionsCount())
         );
-        tvCompositionsCount.setText(sb);
+        viewBinding.tvCompositionsCount.setText(sb);
     }
 
     private void showCover() {
-        Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
+        Components.getAppComponent().imageLoader().displayImage(viewBinding.ivMusicIcon,
                 album,
                 R.drawable.ic_album_placeholder);
     }

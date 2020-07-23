@@ -1,13 +1,12 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -34,6 +33,8 @@ public interface EditorRepository {
 
     Completable changeCompositionTitle(FullComposition composition, String title);
 
+    Completable changeCompositionLyrics(FullComposition composition, String text);
+
     Completable changeCompositionFileName(FullComposition composition, String fileName);
 
     Completable changeFolderName(long folderId, String folderName);
@@ -58,4 +59,8 @@ public interface EditorRepository {
     Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
 
     Single<String[]> getCompositionFileGenres(FullComposition composition);
+
+    Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource);
+
+    Completable removeCompositionAlbumArt(FullComposition composition);
 }

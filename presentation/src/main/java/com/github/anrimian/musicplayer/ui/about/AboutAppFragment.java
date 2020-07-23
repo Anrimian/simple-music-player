@@ -10,7 +10,6 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.anrimian.musicplayer.BuildConfig;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentAboutBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -28,37 +28,12 @@ import com.github.anrimian.musicplayer.utils.filelog.FileLog;
 
 import java.io.File;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class AboutAppFragment extends Fragment implements FragmentLayerListener {
 
-    @BindView(R.id.container_view)
-    View containerView;
-
-    @BindView(R.id.log_actions_container)
-    View logActionsContainer;
-
-    @BindView(R.id.log_divider)
-    View logDivider;
-
-    @BindView(R.id.tv_about)
-    TextView tvAbout;
-
-    @BindView(R.id.tv_log_info)
-    TextView tvLogInfo;
-
-    @BindView(R.id.btn_delete)
-    View btnDelete;
-
-    @BindView(R.id.btn_view)
-    View btnView;
-
-    @BindView(R.id.btn_send)
-    View btnSend;
+    private FragmentAboutBinding viewBinding;
 
     private FileLog fileLog;
 
@@ -67,13 +42,13 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_about, container, false);
+        viewBinding = FragmentAboutBinding.inflate(inflater, container, false);
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         setHasOptionsMenu(true);
 
@@ -83,20 +58,20 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         boolean isLogExists = fileLog.isFileExists();
         setLogActionsVisibility(isLogExists);
         if (isLogExists) {
-            tvLogInfo.setText(getString(R.string.log_info_text, fileLog.getFileSize() / 1024));
+            viewBinding.tvLogInfo.setText(getString(R.string.log_info_text, fileLog.getFileSize() / 1024));
         }
 
         String aboutText = getString(R.string.about_app_text,
                 linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
                 linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email));
-        tvAbout.setText(Html.fromHtml(aboutText));
-        tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
+        viewBinding.tvAbout.setText(Html.fromHtml(aboutText));
+        viewBinding.tvAbout.setMovementMethod(LinkMovementMethod.getInstance());
 
-        btnDelete.setOnClickListener(v -> deleteLogFile());
-        btnView.setOnClickListener(v -> startViewLogScreen());
-        btnSend.setOnClickListener(v -> startSendLogScreen());
+        viewBinding.btnDelete.setOnClickListener(v -> deleteLogFile());
+        viewBinding.btnView.setOnClickListener(v -> startViewLogScreen());
+        viewBinding.btnSend.setOnClickListener(v -> startSendLogScreen());
 
-        SlidrPanel.simpleSwipeBack(containerView, this, toolbar::onStackFragmentSlided);
+        SlidrPanel.simpleSwipeBack(viewBinding.containerView, this, toolbar::onStackFragmentSlided);
     }
 
     @Override
@@ -128,7 +103,6 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
         }
     }
 
-    //
     private void startSendLogScreen() {
         Uri uri = createUri(requireContext(), fileLog.getFile());
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -146,9 +120,9 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
 
     private void setLogActionsVisibility(boolean isLogExists) {
         int logActionsVisibility = isLogExists? VISIBLE: GONE;
-        logActionsContainer.setVisibility(logActionsVisibility);
-        logDivider.setVisibility(logActionsVisibility);
-        tvLogInfo.setVisibility(logActionsVisibility);
+        viewBinding.logActionsContainer.setVisibility(logActionsVisibility);
+        viewBinding.logDivider.setVisibility(logActionsVisibility);
+        viewBinding.tvLogInfo.setVisibility(logActionsVisibility);
     }
 
     private Uri createUri(Context context, File file) {

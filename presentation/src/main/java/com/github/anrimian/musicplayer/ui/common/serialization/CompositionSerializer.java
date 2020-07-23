@@ -28,6 +28,7 @@ public interface CompositionSerializer {
         bundle.putString(TITLE, composition.getTitle());
         bundle.putString(ALBUM, composition.getAlbum());
         bundle.putString(FILE_NAME, composition.getFileName());
+        bundle.putLong(DURATION, composition.getDuration());
         bundle.putLong(SIZE, composition.getSize());
         bundle.putLong(ID, composition.getId());
         Long storageId = composition.getStorageId();

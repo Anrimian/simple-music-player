@@ -8,12 +8,11 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
-@InjectViewState
+
 public class AlbumEditorPresenter extends MvpPresenter<AlbumEditorView> {
 
     private final long albumId;

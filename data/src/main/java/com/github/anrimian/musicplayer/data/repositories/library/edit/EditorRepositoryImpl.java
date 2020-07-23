@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
@@ -18,19 +19,22 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +47,8 @@ import io.reactivex.Single;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class EditorRepositoryImpl implements EditorRepository {
+
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 5000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
@@ -164,6 +170,16 @@ public class EditorRepositoryImpl implements EditorRepository {
         return sourceEditor.setCompositionTitle(composition, title)
                 .doOnComplete(() -> {
                     compositionsDao.updateTitle(composition.getId(), title);
+                    runSystemRescan(composition);
+                })
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionLyrics(FullComposition composition, String text) {
+        return sourceEditor.setCompositionLyrics(composition, text)
+                .doOnComplete(() -> {
+                    compositionsDao.updateLyrics(composition.getId(), text);
                     runSystemRescan(composition);
                 })
                 .subscribeOn(scheduler);
@@ -328,6 +344,30 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Single<String[]> getCompositionFileGenres(FullComposition composition) {
         return sourceEditor.getCompositionGenres(composition)
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
+        return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
+                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable removeCompositionAlbumArt(FullComposition composition) {
+        return sourceEditor.removeCompositionAlbumArt(composition)
+                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
+                .subscribeOn(scheduler);
+    }
+
+    private void onCompositionFileChanged(FullComposition composition) {
+        long size = filesDataSource.getCompositionFileSize(composition);
+        if (size > 0) {
+            compositionsDao.updateModifyTimeAndSize(composition.getId(), size, new Date());
+        }
+        runSystemRescan(composition);
     }
 
     private Completable checkAlbumExists(String name) {

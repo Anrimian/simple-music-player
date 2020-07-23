@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreated
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
@@ -80,6 +81,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof GenreAlreadyExistsException) {
             return error(R.string.genre_already_exists);
+        }
+        if (throwable instanceof EditorTimeoutException) {
+            return error(R.string.editor_timeout_error);
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);

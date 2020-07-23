@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
+import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.library.albums.AlbumsComponent;
@@ -126,6 +128,10 @@ public class Components {
 
     public static SettingsComponent getSettingsComponent() {
         return getAppComponent().settingsComponent();
+    }
+
+    public static ExternalPlayerComponent getExternalPlayerComponent() {
+        return getAppComponent().externalPlayerComponent(new ExternalPlayerModule());
     }
 
     private LibraryComponent buildLibraryComponent() {

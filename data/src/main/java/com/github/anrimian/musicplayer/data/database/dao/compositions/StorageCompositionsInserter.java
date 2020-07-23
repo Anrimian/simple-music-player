@@ -89,11 +89,6 @@ public class StorageCompositionsInserter {
         long compositionId = oldComposition.getId();
         long compositionStorageId = oldComposition.getStorageId();
 
-        String newArtist = composition.getArtist();
-        if (!Objects.equals(newArtist, oldComposition.getArtist())) {
-            compositionsDaoWrapper.updateArtist(compositionId, newArtist);
-        }
-
         String newAlbumName = null;
         String newAlbumArtist = null;
         StorageAlbum newAlbum = composition.getStorageAlbum();
@@ -107,6 +102,12 @@ public class StorageCompositionsInserter {
         if (!Objects.equals(newAlbumArtist, oldComposition.getAlbumArtist())) {
             compositionsDaoWrapper.updateAlbumArtist(compositionId, newAlbumArtist);
         }
+
+        String newArtist = composition.getArtist();
+        if (!Objects.equals(newArtist, oldComposition.getArtist())) {
+            compositionsDaoWrapper.updateArtist(compositionId, newArtist);
+        }
+
         Long newFolderId = insertedCompositionFolderMap.get(compositionStorageId);
         if (!Objects.equals(oldComposition.getFolderId(), newFolderId)) {
             compositionsDao.updateFolderId(compositionId, newFolderId);

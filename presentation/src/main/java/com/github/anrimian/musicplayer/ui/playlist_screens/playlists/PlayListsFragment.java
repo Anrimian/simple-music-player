@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.FragmentPlayListsBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
@@ -34,8 +34,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -48,14 +46,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
     @InjectPresenter
     PlayListsPresenter presenter;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-
-    @BindView(R.id.list_container)
-    CoordinatorLayout clListContainer;
-
-    @BindView(R.id.fab)
-    View fab;
+    private FragmentPlayListsBinding viewBinding;
 
     private PlayListsAdapter adapter;
     private ProgressViewWrapper progressViewWrapper;
@@ -72,30 +63,30 @@ public class PlayListsFragment extends MvpAppCompatFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_play_lists, container, false);
+        viewBinding = FragmentPlayListsBinding.inflate(inflater, container, false);
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         progressViewWrapper = new ProgressViewWrapper(view);
         progressViewWrapper.hideAll();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
+        viewBinding.recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerViewUtils.attachFastScroller(recyclerView);
+        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView);
 
         adapter = new PlayListsAdapter(
-                recyclerView,
+                viewBinding.recyclerView,
                 this::goToPlayListScreen,
                 presenter::onPlayListLongClick
         );
-        recyclerView.setAdapter(adapter);
+        viewBinding.recyclerView.setAdapter(adapter);
 
-        fab.setOnClickListener(v -> onCreatePlayListButtonClicked());
+        viewBinding.fab.setOnClickListener(v -> onCreatePlayListButtonClicked());
 
         menuDialogRunner = new DialogFragmentRunner<>(getChildFragmentManager(),
                 PLAY_LIST_MENU,
@@ -155,7 +146,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showPlayListDeleteSuccess(PlayList playList) {
-        MessagesUtils.makeSnackbar(clListContainer,
+        MessagesUtils.makeSnackbar(viewBinding.listContainer,
                 getString(R.string.play_list_deleted, playList.getName()),
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -163,7 +154,7 @@ public class PlayListsFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeletePlayListError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
+        MessagesUtils.makeSnackbar(viewBinding.listContainer,
                 getString(R.string.play_list_delete_error, errorCommand.getMessage()),
                 Snackbar.LENGTH_SHORT)
                 .show();

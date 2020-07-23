@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.player.MusicPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
@@ -83,7 +83,7 @@ public class AppModule {
     @NonNull
     @Singleton
     WidgetUpdater widgetUpdater(Context context,
-                                MusicPlayerInteractor playerInteractor,
+                                LibraryPlayerInteractor playerInteractor,
                                 DisplaySettingsInteractor displaySettingsInteractor) {
         return new WidgetUpdater(context, playerInteractor, displaySettingsInteractor);
     }

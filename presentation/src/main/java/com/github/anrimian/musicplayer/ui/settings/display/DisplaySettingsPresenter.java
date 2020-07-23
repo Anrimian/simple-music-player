@@ -4,10 +4,9 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
-@InjectViewState
+
 public class DisplaySettingsPresenter extends MvpPresenter<DisplaySettingsView> {
 
     private final DisplaySettingsInteractor interactor;

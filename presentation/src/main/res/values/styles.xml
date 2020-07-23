@@ -78,6 +78,31 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="DialogActivityTheme">
+        <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/dialog_min_width_minor</item>
+        <item name="android:windowElevation">@dimen/floating_window_z</item>
+
+        <item name="android:windowAnimationStyle">@style/DialogActivityAnimation</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="DialogActivityAnimation" parent="@android:style/Animation.Dialog">
+        <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_bottom</item>
+        <!--don't see any affects from close animation, but leave it-->
+        <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_bottom</item>
+    </style>
+
     <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
         <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>

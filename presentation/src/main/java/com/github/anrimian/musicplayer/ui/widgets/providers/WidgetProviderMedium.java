@@ -11,11 +11,7 @@ import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
-
-import java.util.Date;
 
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
@@ -34,6 +30,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                                   String compositionName,
                                   String compositionAuthor,
                                   long compositionId,
+                                  long compositionUpdateTime,
                                   int queueSize,
                                   boolean enabled,
                                   boolean showCovers,
@@ -45,6 +42,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                 compositionName,
                 compositionAuthor,
                 compositionId,
+                compositionUpdateTime,
                 queueSize,
                 enabled,
                 showCovers,
@@ -68,6 +66,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                             R.id.iv_cover,
                             widgetId,
                             compositionId,
+                            compositionUpdateTime,
                             R.drawable.ic_music_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);

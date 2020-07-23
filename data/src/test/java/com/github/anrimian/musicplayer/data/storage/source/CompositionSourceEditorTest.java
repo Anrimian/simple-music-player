@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.data.utils.files.ResourceFile;
 
 import org.junit.Rule;
@@ -18,8 +17,9 @@ public class CompositionSourceEditorTest {
     public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
 
     private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
+    private FileSourceProvider fileSourceProvider = mock(FileSourceProvider.class);
 
-    private CompositionSourceEditor sourceEditor = new CompositionSourceEditor(musicProvider);
+    private CompositionSourceEditor sourceEditor = new CompositionSourceEditor(musicProvider, fileSourceProvider);
 
     @Test
     public void testEditor() throws IOException {

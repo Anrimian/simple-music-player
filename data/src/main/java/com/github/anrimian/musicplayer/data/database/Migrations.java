@@ -31,6 +31,13 @@ import java.util.Map;
 @SuppressLint("RestrictedApi")
 class Migrations {
 
+    static Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE compositions ADD COLUMN lyrics TEXT");
+        }
+    };
+
     static Migration MIGRATION_5_6 = new Migration(5, 6) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.editor.composition;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
+import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 
@@ -11,12 +12,11 @@ import java.util.List;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
-@InjectViewState
+
 public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorView> {
 
     private final long compositionId;
@@ -75,6 +75,13 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
             return;
         }
         getViewState().showEnterTitleDialog(composition);
+    }
+
+    void onChangeLyricsClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showEnterLyricsDialog(composition);
     }
 
     void onChangeFileNameClicked() {
@@ -245,11 +252,60 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
         presenterDisposable.add(changeDisposable);
     }
 
+    void onNewLyricsEntered(String text) {
+        if (composition == null) {
+            return;
+        }
+
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.editCompositionLyrics(composition, text)
+                .observeOn(uiScheduler)
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
     void onCopyFileNameClicked() {
         if (composition == null) {
             return;
         }
         getViewState().copyFileNameText(composition.getFileName());
+    }
+
+    void onChangeCoverClicked() {
+        if (composition == null) {
+            return;
+        }
+        getViewState().showCoverActionsDialog();
+    }
+
+    void onClearCoverClicked() {
+        if (composition == null) {
+            return;
+        }
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.removeCompositionAlbumArt(composition)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
+                .doFinally(() -> getViewState().hideChangeCoverProgress())
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
+    }
+
+    void onNewCoverSelected() {
+        getViewState().showSelectImageFromGalleryScreen();
+    }
+
+    void onNewImageForCoverSelected(ImageSource imageSource) {
+        if (composition == null) {
+            return;
+        }
+        dispose(changeDisposable, presenterDisposable);
+        changeDisposable = editorInteractor.changeCompositionAlbumArt(composition, imageSource)
+                .observeOn(uiScheduler)
+                .doOnSubscribe(d -> getViewState().showChangeCoverProgress())
+                .doFinally(() -> getViewState().hideChangeCoverProgress())
+                .subscribe(() -> {}, this::onDefaultError);
+        presenterDisposable.add(changeDisposable);
     }
 
     private void onDefaultError(Throwable throwable) {
@@ -286,8 +342,12 @@ public class CompositionEditorPresenter extends MvpPresenter<CompositionEditorVi
     private void checkCompositionTagsInSource(FullComposition composition) {
         presenterDisposable.add(editorInteractor.updateTagsFromSource(composition)
                 .observeOn(uiScheduler)
-                .subscribe(() -> {}, this::onDefaultError));
+                .subscribe(() -> {}, this::onTagCheckError));
+    }
 
+    private void onTagCheckError(Throwable throwable) {
+        ErrorCommand errorCommand = errorParser.parseError(throwable);
+        getViewState().showCheckTagsErrorMessage(errorCommand);
     }
 
     private void onCompositionLoadingError(Throwable throwable) {

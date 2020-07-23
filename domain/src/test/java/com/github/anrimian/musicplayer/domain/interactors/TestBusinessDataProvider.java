@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.domain.interactors;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -16,6 +18,10 @@ import java.util.Map;
  * Created on 16.04.2018.
  */
 public class TestBusinessDataProvider {
+
+    public static CompositionSource fakeCompositionSource(long id) {
+        return new LibraryCompositionSource(fakeComposition(id), 0);
+    }
 
     public static List<Composition> getFakeCompositions() {
         List<Composition> compositions = new ArrayList<>();

@@ -8,19 +8,17 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemStorageMusicBinding;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
@@ -33,8 +31,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgrou
 
 public class MusicFileViewHolder extends FileViewHolder {
 
-    @BindView(R.id.clickable_item)
-    FrameLayout clickableItem;
+    private FrameLayout clickableItem;
 
     private CompositionItemWrapper compositionItemWrapper;
 
@@ -49,7 +46,9 @@ public class MusicFileViewHolder extends FileViewHolder {
                                OnPositionItemClickListener<FileSource> onLongClickListener,
                                OnPositionItemClickListener<Composition> iconClickListener) {
         super(parent, R.layout.item_storage_music);
-        ButterKnife.bind(this, itemView);
+        ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
+        clickableItem = binding.clickableItem;
+
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 composition -> iconClickListener.onItemClick(getAdapterPosition(), composition),
                 composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)

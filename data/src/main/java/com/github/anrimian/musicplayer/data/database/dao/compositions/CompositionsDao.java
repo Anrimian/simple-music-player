@@ -4,14 +4,12 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
-import androidx.room.Update;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -30,6 +28,7 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "lyrics as lyrics, " +
             "fileName as fileName, " +
             "duration as duration, " +
             "size as size, " +
@@ -111,6 +110,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
+    @Query("UPDATE compositions SET lyrics = :lyrics WHERE id = :id")
+    void updateLyrics(long id, String lyrics);
+
     @Query("UPDATE compositions SET fileName = :fileName WHERE id = :id")
     void updateCompositionFileName(long id, String fileName);
 
@@ -137,6 +139,9 @@ public interface CompositionsDao {
 
     @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
     void setUpdateTime(long id, Date date);
+
+    @Query("UPDATE compositions SET dateModified = :date, size = :size WHERE id = :id")
+    void setModifyTimeAndSize(long id, long size, Date date);
 
     static String getCompositionQuery() {
         return "SELECT " +

@@ -135,7 +135,7 @@ public class CompositionsDaoWrapper {
         });
     }
 
-    public void updateAlbum(long compositionId, String albumName) {
+    public void updateAlbum(long compositionId, @Nullable String albumName) {
         appDatabase.runInTransaction(() -> {
 
             Long artistId = null;
@@ -153,7 +153,9 @@ public class CompositionsDaoWrapper {
             // if album not exists - create album
             if (albumId == null && albumName != null) {
                 //single crash here
-                //unexisting artist id?
+                //irrelevant artist id?
+                //already existing album? - no
+                //non unique albumName and artist id?
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 
@@ -239,6 +241,21 @@ public class CompositionsDaoWrapper {
             compositionsDao.updateTitle(id, title);
             compositionsDao.setUpdateTime(id, new Date());
         });
+    }
+
+    public void updateLyrics(long id, String text) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateLyrics(id, text);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
+    public void updateModifyTime(long id, Date date) {
+        compositionsDao.setUpdateTime(id, date);
+    }
+
+    public void updateModifyTimeAndSize(long id, long size, Date date) {
+        compositionsDao.setModifyTimeAndSize(id, size, date);
     }
 
     public void updateCompositionFileName(long id, String fileName) {

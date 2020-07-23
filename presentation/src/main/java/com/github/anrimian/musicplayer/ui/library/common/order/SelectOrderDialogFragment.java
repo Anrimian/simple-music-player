@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.common.order;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -13,14 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.DialogOrderBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.ui.library.common.order.adapter.OrderAdapter;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -34,11 +34,7 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @InjectPresenter
     SelectOrderPresenter presenter;
 
-    @BindView(R.id.rv_order)
-    RecyclerView rvOrder;
-
-    @BindView(R.id.cb_desc)
-    CheckBox cbDesc;
+    private CheckBox cbDesc;
 
     private OrderAdapter orderAdapter;
 
@@ -63,9 +59,12 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = View.inflate(getActivity(), R.layout.dialog_order, null);
-
-        ButterKnife.bind(this, view);
+        DialogOrderBinding viewBinding = DialogOrderBinding.inflate(
+                LayoutInflater.from(requireContext())
+        );
+        RecyclerView rvOrder = viewBinding.rvOrder;
+        cbDesc = viewBinding.cbDesc;
+        View view = viewBinding.getRoot();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rvOrder.setLayoutManager(layoutManager);

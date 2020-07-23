@@ -55,7 +55,7 @@ public class FragmentNavigation {
             container = new NavigationFragment();
             fm.beginTransaction()
                     .add(container, NAVIGATION_FRAGMENT_TAG)
-                    .commit();
+                    .commitAllowingStateLoss();
         }
         return container.getFragmentNavigation();
     }
@@ -170,7 +170,7 @@ public class FragmentNavigation {
                         }
 
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -195,7 +195,7 @@ public class FragmentNavigation {
                         notifyStackListeners();
                         notifyFragmentMovedToTop(getFragmentOnTop());
                     })
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -239,8 +239,11 @@ public class FragmentNavigation {
             screens.add(new FragmentMetaData(newRootFragment));
             int topViewId = jugglerView.getTopViewId();
             newRootFragment.setMenuVisibility(isVisible);
-            fragmentManagerProvider.getFragmentManager()
-                    .beginTransaction()
+            FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+            if (fm == null) {
+                return;
+            }
+            fm.beginTransaction()
                     .setCustomAnimations(enterAnimation, exitAnimation)
                     .replace(topViewId, newRootFragment)
                     .runOnCommit(() -> {
@@ -292,7 +295,7 @@ public class FragmentNavigation {
                 ft.remove(fragmentOnBottom);
             }
             ft.runOnCommit(this::notifyStackListeners)
-                    .commit();
+                    .commitAllowingStateLoss();
         });
     }
 
@@ -349,8 +352,11 @@ public class FragmentNavigation {
 
     @Nullable
     public Fragment getFragmentOnTop() {
-        return fragmentManagerProvider.getFragmentManager()
-                .findFragmentById(jugglerView.getTopViewId());
+        FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+        if (fm == null) {
+            return null;
+        }
+        return fm.findFragmentById(jugglerView.getTopViewId());
     }
 
     @Nullable
@@ -410,7 +416,7 @@ public class FragmentNavigation {
             FragmentMetaData bottomFragment = screens.get(screens.size() - 2);
             FragmentManager fm = fragmentManagerProvider.getFragmentManager();
             if (fm == null) {
-                //can be null if in very fast create-close case
+                //can be null in very fast create-close case
                 return;
             }
             fm.beginTransaction()
@@ -472,7 +478,7 @@ public class FragmentNavigation {
                                 notifyStackListeners();
                                 scheduleFragmentAtBottomReplacing(getAnimationDuration(exitAnimation));
                             })
-                            .commit();
+                            .commitAllowingStateLoss();
                 }
             });
             try {

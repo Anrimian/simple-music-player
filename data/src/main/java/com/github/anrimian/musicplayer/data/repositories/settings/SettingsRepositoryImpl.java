@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
@@ -37,6 +38,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
+    private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
+
+    private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
+    private static final String EXTERNAL_PLAYER_KEEP_IN_BACKGROUND = "external_player_keep_in_background";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
@@ -48,6 +53,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
+
+    private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
     private SharedPreferencesHelper preferences;
 
@@ -253,6 +261,48 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled) {
         preferences.putBoolean(DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS, enabled);
+    }
+
+    @Override
+    public void setExternalPlayerRepeatMode(int mode) {
+        preferences.putInt(EXTERNAL_PLAYER_REPEAT_MODE, mode);
+        externalPlayerRepeatModeSubject.onNext(mode);
+    }
+
+    @Override
+    public int getExternalPlayerRepeatMode() {
+        return preferences.getInt(EXTERNAL_PLAYER_REPEAT_MODE, RepeatMode.NONE);
+    }
+
+    @Override
+    public Observable<Integer> getExternalPlayerRepeatModeObservable() {
+        return withDefaultValue(externalPlayerRepeatModeSubject, this::getExternalPlayerRepeatMode);
+    }
+
+    @Override
+    public void setExternalPlayerKeepInBackground(boolean enabled) {
+        preferences.putBoolean(EXTERNAL_PLAYER_KEEP_IN_BACKGROUND, enabled);
+    }
+
+    @Override
+    public boolean isExternalPlayerKeepInBackground() {
+        return preferences.getBoolean(EXTERNAL_PLAYER_KEEP_IN_BACKGROUND, true);
+    }
+
+    @Override
+    public void setSelectedEqualizerType(int type) {
+        preferences.putInt(SELECTED_EQUALIZER_TYPE, type);
+        selectedEqualizerSubject.onNext(type);
+    }
+
+    @Override
+    public int getSelectedEqualizerType() {
+        return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerTypes.NONE);
+    }
+
+    @Override
+    public Observable<Integer> getSelectedEqualizerTypeObservable() {
+        return withDefaultValue(selectedEqualizerSubject, this::getSelectedEqualizerType);
     }
 
     private Order orderFromInt(int order) {

@@ -7,8 +7,7 @@ import com.bumptech.glide.load.model.ModelLoader;
 import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.ui.common.images.CompositionImage;
+import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 
 import javax.annotation.Nonnull;
 
