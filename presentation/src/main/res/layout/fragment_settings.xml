@@ -65,6 +65,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/theme"/>
 
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/composeView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
